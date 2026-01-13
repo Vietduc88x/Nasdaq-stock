@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 10 Nasdaq Stocks</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Top 10 Nasdaq Stocks</h1>
+            <p class="subtitle">Real-time stock prices</p>
+        </header>
+
+        <div class="refresh-container">
+            <button id="refreshBtn" class="refresh-btn">Refresh Prices</button>
+            <span class="last-updated">Last updated: <span id="lastUpdated">Never</span></span>
+        </div>
+
+        <div id="stocksContainer" class="stocks-grid">
+            <div class="loading">Loading stock data...</div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
