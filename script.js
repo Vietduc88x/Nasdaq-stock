@@ -1,4 +1,4 @@
-// Top 10 Nasdaq stocks by market cap
+// Top 50 Nasdaq stocks by market cap
 const top10Stocks = [
     { symbol: 'AAPL', name: 'Apple Inc.' },
     { symbol: 'MSFT', name: 'Microsoft Corporation' },
@@ -9,7 +9,47 @@ const top10Stocks = [
     { symbol: 'GOOG', name: 'Alphabet Inc. (Class C)' },
     { symbol: 'TSLA', name: 'Tesla Inc.' },
     { symbol: 'AVGO', name: 'Broadcom Inc.' },
-    { symbol: 'COST', name: 'Costco Wholesale Corporation' }
+    { symbol: 'COST', name: 'Costco Wholesale Corporation' },
+    { symbol: 'NFLX', name: 'Netflix Inc.' },
+    { symbol: 'ASML', name: 'ASML Holding N.V.' },
+    { symbol: 'AMD', name: 'Advanced Micro Devices Inc.' },
+    { symbol: 'ADBE', name: 'Adobe Inc.' },
+    { symbol: 'PEP', name: 'PepsiCo Inc.' },
+    { symbol: 'CSCO', name: 'Cisco Systems Inc.' },
+    { symbol: 'TMUS', name: 'T-Mobile US Inc.' },
+    { symbol: 'INTC', name: 'Intel Corporation' },
+    { symbol: 'CMCSA', name: 'Comcast Corporation' },
+    { symbol: 'INTU', name: 'Intuit Inc.' },
+    { symbol: 'TXN', name: 'Texas Instruments Inc.' },
+    { symbol: 'AMGN', name: 'Amgen Inc.' },
+    { symbol: 'QCOM', name: 'QUALCOMM Inc.' },
+    { symbol: 'HON', name: 'Honeywell International Inc.' },
+    { symbol: 'AMAT', name: 'Applied Materials Inc.' },
+    { symbol: 'SBUX', name: 'Starbucks Corporation' },
+    { symbol: 'BKNG', name: 'Booking Holdings Inc.' },
+    { symbol: 'ISRG', name: 'Intuitive Surgical Inc.' },
+    { symbol: 'GILD', name: 'Gilead Sciences Inc.' },
+    { symbol: 'PANW', name: 'Palo Alto Networks Inc.' },
+    { symbol: 'ADP', name: 'Automatic Data Processing Inc.' },
+    { symbol: 'ADI', name: 'Analog Devices Inc.' },
+    { symbol: 'VRTX', name: 'Vertex Pharmaceuticals Inc.' },
+    { symbol: 'MDLZ', name: 'Mondelez International Inc.' },
+    { symbol: 'REGN', name: 'Regeneron Pharmaceuticals Inc.' },
+    { symbol: 'LRCX', name: 'Lam Research Corporation' },
+    { symbol: 'MU', name: 'Micron Technology Inc.' },
+    { symbol: 'SNPS', name: 'Synopsys Inc.' },
+    { symbol: 'KLAC', name: 'KLA Corporation' },
+    { symbol: 'CDNS', name: 'Cadence Design Systems Inc.' },
+    { symbol: 'MELI', name: 'MercadoLibre Inc.' },
+    { symbol: 'PYPL', name: 'PayPal Holdings Inc.' },
+    { symbol: 'CRWD', name: 'CrowdStrike Holdings Inc.' },
+    { symbol: 'MAR', name: 'Marriott International Inc.' },
+    { symbol: 'CSX', name: 'CSX Corporation' },
+    { symbol: 'FTNT', name: 'Fortinet Inc.' },
+    { symbol: 'DASH', name: 'DoorDash Inc.' },
+    { symbol: 'MNST', name: 'Monster Beverage Corporation' },
+    { symbol: 'WDAY', name: 'Workday Inc.' },
+    { symbol: 'ADSK', name: 'Autodesk Inc.' }
 ];
 
 // Function to fetch stock data from a free API
@@ -32,12 +72,14 @@ async function fetchStockData() {
                     const previousClose = quote.chartPreviousClose || quote.previousClose;
                     const change = price - previousClose;
                     const changePercent = (change / previousClose) * 100;
+                    const marketCap = quote.marketCap || 0;
 
                     return {
                         ...stock,
                         price: price.toFixed(2),
                         change: change.toFixed(2),
                         changePercent: changePercent.toFixed(2),
+                        marketCap: marketCap,
                         rank: index + 1
                     };
                 }
@@ -49,6 +91,7 @@ async function fetchStockData() {
                     price: (Math.random() * 500 + 50).toFixed(2),
                     change: (Math.random() * 20 - 10).toFixed(2),
                     changePercent: (Math.random() * 10 - 5).toFixed(2),
+                    marketCap: Math.floor(Math.random() * 2000000000000 + 100000000000),
                     rank: index + 1
                 };
             }
@@ -64,6 +107,18 @@ async function fetchStockData() {
                 <p style="font-size: 0.9rem; margin-top: 10px;">Error: ${error.message}</p>
             </div>
         `;
+    }
+}
+
+function formatMarketCap(marketCap) {
+    if (marketCap >= 1e12) {
+        return '$' + (marketCap / 1e12).toFixed(2) + 'T';
+    } else if (marketCap >= 1e9) {
+        return '$' + (marketCap / 1e9).toFixed(2) + 'B';
+    } else if (marketCap >= 1e6) {
+        return '$' + (marketCap / 1e6).toFixed(2) + 'M';
+    } else {
+        return '$' + marketCap.toLocaleString();
     }
 }
 
@@ -83,6 +138,7 @@ function displayStocks(stocks) {
                 </div>
                 <div class="stock-name">${stock.name}</div>
                 <div class="stock-price">$${stock.price}</div>
+                <div class="stock-marketcap">Market Cap: ${formatMarketCap(stock.marketCap)}</div>
                 <div class="stock-change ${changeClass}">
                     <span>${changeSymbol}</span>
                     <span>$${Math.abs(stock.change)}</span>

@@ -1,0 +1,4 @@
+# Temporary files
+tmpclaude-*
+*.tmp
+.DS_Store
