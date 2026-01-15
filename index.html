@@ -3,24 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top 50 Nasdaq Stocks</title>
+    <title>Market Tracker - Stocks & Crypto</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Top 50 Nasdaq Stocks</h1>
-            <p class="subtitle">Real-time stock prices</p>
+            <h1>Market Tracker</h1>
+            <p class="subtitle">Real-time stocks and cryptocurrency prices</p>
         </header>
 
         <div class="refresh-container">
-            <button id="refreshBtn" class="refresh-btn">Refresh Prices</button>
+            <button id="refreshBtn" class="refresh-btn">Refresh All Data</button>
             <span class="last-updated">Last updated: <span id="lastUpdated">Never</span></span>
         </div>
 
-        <div id="stocksContainer" class="stocks-grid">
-            <div class="loading">Loading stock data...</div>
-        </div>
+        <!-- Stocks Section -->
+        <section class="market-section">
+            <div class="section-header">
+                <h2>Top 50 Nasdaq Stocks</h2>
+                <span class="section-badge">Stocks</span>
+            </div>
+            <div id="stocksContainer" class="stocks-grid">
+                <div class="loading">Loading stock data...</div>
+            </div>
+        </section>
+
+        <!-- Crypto Section -->
+        <section class="market-section">
+            <div class="section-header">
+                <h2>Top 50 Cryptocurrencies</h2>
+                <span class="section-badge crypto-badge">Crypto</span>
+            </div>
+            <div id="cryptoContainer" class="stocks-grid">
+                <div class="loading">Loading cryptocurrency data...</div>
+            </div>
+        </section>
     </div>
 
     <script src="script.js"></script>

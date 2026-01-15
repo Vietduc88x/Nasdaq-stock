@@ -159,11 +159,93 @@ function updateLastUpdatedTime() {
     document.getElementById('lastUpdated').textContent = timeString;
 }
 
+// Function to fetch cryptocurrency data from CoinGecko
+async function fetchCryptoData() {
+    const cryptoContainer = document.getElementById('cryptoContainer');
+    cryptoContainer.innerHTML = '<div class="loading">Loading cryptocurrency data...</div>';
+
+    try {
+        // CoinGecko API - Free, no API key required
+        // Get top 50 cryptocurrencies by market cap
+        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h');
+        const data = await response.json();
+
+        const cryptoData = data.map((crypto, index) => ({
+            id: crypto.id,
+            symbol: crypto.symbol.toUpperCase(),
+            name: crypto.name,
+            price: crypto.current_price,
+            change: crypto.price_change_24h || 0,
+            changePercent: crypto.price_change_percentage_24h || 0,
+            marketCap: crypto.market_cap || 0,
+            fdv: crypto.fully_diluted_valuation || 0,
+            rank: index + 1,
+            image: crypto.image
+        }));
+
+        displayCrypto(cryptoData);
+        updateLastUpdatedTime();
+    } catch (error) {
+        cryptoContainer.innerHTML = `
+            <div class="error">
+                <p>Unable to fetch cryptocurrency data. Please try again later.</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">Error: ${error.message}</p>
+            </div>
+        `;
+    }
+}
+
+function displayCrypto(cryptos) {
+    const cryptoContainer = document.getElementById('cryptoContainer');
+
+    cryptoContainer.innerHTML = cryptos.map(crypto => {
+        const isPositive = parseFloat(crypto.change) >= 0;
+        const changeClass = isPositive ? 'positive' : 'negative';
+        const changeSymbol = isPositive ? '▲' : '▼';
+
+        return `
+            <div class="stock-card crypto-card">
+                <div class="stock-header">
+                    <div class="crypto-info">
+                        <img src="${crypto.image}" alt="${crypto.name}" class="crypto-icon">
+                        <div class="stock-symbol">${crypto.symbol}</div>
+                    </div>
+                    <div class="stock-rank">#${crypto.rank}</div>
+                </div>
+                <div class="stock-name">${crypto.name}</div>
+                <div class="stock-price">$${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
+                <div class="crypto-metrics">
+                    <div class="metric">
+                        <span class="metric-label">Market Cap:</span>
+                        <span class="metric-value">${formatMarketCap(crypto.marketCap)}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">FDV:</span>
+                        <span class="metric-value">${crypto.fdv > 0 ? formatMarketCap(crypto.fdv) : 'N/A'}</span>
+                    </div>
+                </div>
+                <div class="stock-change ${changeClass}">
+                    <span>${changeSymbol}</span>
+                    <span>$${Math.abs(crypto.change).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</span>
+                    <span>(${isPositive ? '+' : ''}${crypto.changePercent.toFixed(2)}%)</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Refresh all data
+function refreshAllData() {
+    fetchStockData();
+    fetchCryptoData();
+}
+
 // Event listeners
-document.getElementById('refreshBtn').addEventListener('click', fetchStockData);
+document.getElementById('refreshBtn').addEventListener('click', refreshAllData);
 
 // Initial load
 fetchStockData();
+fetchCryptoData();
 
 // Auto-refresh every 60 seconds
-setInterval(fetchStockData, 60000);
+setInterval(refreshAllData, 60000);
