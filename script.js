@@ -375,50 +375,85 @@ async function initWallet() {
             }
         });
 
-        console.log('Checking for NEAR Wallet Selector libraries...');
-        console.log('Available globals:', Object.keys(window).filter(k => k.toLowerCase().includes('near') || k.toLowerCase().includes('wallet')));
+        console.log('Initializing NEAR Wallet Selector...');
+        console.log('Checking window object for wallet selector modules...');
 
-        // UNPKG bundles export to window.nearWalletSelector
-        const walletSelectorCore = window.nearWalletSelector;
+        // Debug: Log all window properties to find the correct exports
+        const allProps = Object.keys(window);
+        console.log('Total window properties:', allProps.length);
+        console.log('Properties containing "near":', allProps.filter(k => k.toLowerCase().includes('near')));
+        console.log('Properties containing "wallet":', allProps.filter(k => k.toLowerCase().includes('wallet')));
+        console.log('Properties containing "selector":', allProps.filter(k => k.toLowerCase().includes('selector')));
+        console.log('Properties containing "meteor":', allProps.filter(k => k.toLowerCase().includes('meteor')));
+        console.log('Properties containing "sender":', allProps.filter(k => k.toLowerCase().includes('sender')));
 
-        console.log('nearWalletSelector object:', walletSelectorCore);
-        console.log('All window properties with "near":', Object.keys(window).filter(k => k.toLowerCase().includes('near')));
+        // Try different possible global variable names
+        const walletSelectorCore = window.nearWalletSelector ||
+                                    window['@near-wallet-selector/core'] ||
+                                    window.nearWalletSelectorCore;
 
-        // Check if wallet selector libraries are available
+        console.log('walletSelectorCore found:', !!walletSelectorCore);
+
+        if (walletSelectorCore) {
+            console.log('walletSelectorCore type:', typeof walletSelectorCore);
+            console.log('walletSelectorCore keys:', Object.keys(walletSelectorCore));
+        }
+
+        // If core not found, try to find individual modules
+        const meteorWallet = window.nearWalletSelectorMeteorWallet ||
+                            window['@near-wallet-selector/meteor-wallet'];
+        const senderWallet = window.nearWalletSelectorSender ||
+                            window['@near-wallet-selector/sender'];
+        const hereWallet = window.nearWalletSelectorHereWallet ||
+                          window['@near-wallet-selector/here-wallet'];
+        const modalUI = window.nearWalletSelectorModalUI ||
+                       window['@near-wallet-selector/modal-ui'];
+
+        console.log('Meteor Wallet module found:', !!meteorWallet);
+        console.log('Sender module found:', !!senderWallet);
+        console.log('HERE Wallet module found:', !!hereWallet);
+        console.log('Modal UI module found:', !!modalUI);
+
         if (!walletSelectorCore) {
-            console.error('NEAR Wallet Selector not loaded');
-            console.error('window.nearWalletSelector is undefined');
-            console.error('Available window properties:', Object.keys(window).slice(0, 50));
+            console.error('NEAR Wallet Selector core not found in window object');
+            showNotification('Wallet libraries failed to load. Please refresh the page.', 'error');
             updateWalletUI(false);
             return;
         }
 
-        const { setupWalletSelector, setupModal, setupMeteorWallet, setupSender, setupHereWallet } = walletSelectorCore;
+        const { setupWalletSelector } = walletSelectorCore;
+        const { setupModal } = modalUI || walletSelectorCore;
+        const { setupMeteorWallet } = meteorWallet || walletSelectorCore;
+        const { setupSender } = senderWallet || walletSelectorCore;
+        const { setupHereWallet } = hereWallet || walletSelectorCore;
 
-        if (!setupWalletSelector) {
-            console.error('setupWalletSelector not found in nearWalletSelector');
-            console.error('Available methods:', Object.keys(walletSelectorCore));
+        console.log('Functions extracted:', {
+            setupWalletSelector: !!setupWalletSelector,
+            setupModal: !!setupModal,
+            setupMeteorWallet: !!setupMeteorWallet,
+            setupSender: !!setupSender,
+            setupHereWallet: !!setupHereWallet
+        });
+
+        if (!setupWalletSelector || !setupModal) {
+            console.error('Required functions not found');
+            showNotification('Wallet initialization failed. Missing required functions.', 'error');
             updateWalletUI(false);
             return;
         }
 
-        if (!setupModal) {
-            console.error('setupModal not found in nearWalletSelector');
-            console.error('Available methods:', Object.keys(walletSelectorCore));
-            updateWalletUI(false);
-            return;
-        }
+        console.log('Creating wallet selector...');
 
-        console.log('All libraries loaded. Initializing wallet selector...');
+        const modules = [];
+        if (setupMeteorWallet) modules.push(setupMeteorWallet());
+        if (setupSender) modules.push(setupSender());
+        if (setupHereWallet) modules.push(setupHereWallet());
 
-        // Initialize wallet selector with Meteor Wallet, Sender (supports Phantom/MetaMask), and HERE Wallet
+        console.log('Wallet modules to load:', modules.length);
+
         walletSelector = await setupWalletSelector({
             network: "mainnet",
-            modules: [
-                setupMeteorWallet(),
-                setupSender(),
-                setupHereWallet()
-            ]
+            modules: modules
         });
 
         console.log('Wallet selector created, setting up modal...');
@@ -435,7 +470,7 @@ async function initWallet() {
 
         // Check if already connected
         const state = walletSelector.store.getState();
-        console.log('Wallet state:', state);
+        console.log('Initial wallet state:', state);
 
         if (state.accounts && state.accounts.length > 0) {
             accountId = state.accounts[0].accountId;
@@ -461,7 +496,6 @@ async function initWallet() {
     } catch (error) {
         console.error('Wallet initialization error:', error);
         console.error('Error stack:', error.stack);
-        // Show error to user with more details
         showNotification(`Wallet initialization failed: ${error.message}`, 'error');
         updateWalletUI(false);
     }
