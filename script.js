@@ -434,7 +434,7 @@ async function executeSwap() {
         // Show loading state
         const swapButton = document.querySelector('.modal-swap-btn');
         swapButton.disabled = true;
-        swapButton.innerHTML = '<span class="spinner-small"></span> Processing...';
+        swapButton.innerHTML = '<span class="spinner-small"></span> Getting Quote...';
 
         // Calculate fee (0.15% of swap amount)
         const FEE_PERCENTAGE = 0.0015; // 0.15%
@@ -446,44 +446,90 @@ async function executeSwap() {
         const FEE_RECEIVER = 'babyben.near';
 
         // NEAR Intents 1Click API endpoint
-        const nearIntentsUrl = `https://api.near-intents.org/swap`;
+        const oneClickApiUrl = 'https://1click.chaindefuser.com/quote';
 
-        // Prepare swap parameters with fee handling
-        const swapParams = {
-            from_token: fromToken.symbol.toLowerCase(),
-            to_token: toToken,
-            amount: userAmount.toFixed(8), // User receives amount after fee
-            fee_amount: feeAmount.toFixed(8), // Fee amount (0.15%)
-            fee_receiver: FEE_RECEIVER, // babyben.near
-            fee_token: 'usdt', // Convert fee to USDT
-            slippage: 0.5, // 0.5% slippage tolerance
-            referrer: 'market-tracker-pro',
-            referrer_fee: FEE_PERCENTAGE * 100 // 0.15% as percentage
+        // Token mapping for NEAR blockchain (adjust based on actual token addresses)
+        const tokenMap = {
+            'btc': 'bitcoin',
+            'eth': 'ethereum',
+            'usdt': 'tether',
+            'usdc': 'usd-coin',
+            'bnb': 'binancecoin',
+            'sol': 'solana',
+            'ada': 'cardano',
+            'dot': 'polkadot',
+            'matic': 'polygon',
+            'near': 'near'
         };
 
-        // Generate NEAR Intents swap URL
-        const swapUrl = `${nearIntentsUrl}?${new URLSearchParams(swapParams).toString()}`;
+        // Prepare swap quote request
+        const quoteRequest = {
+            source_asset: fromToken.id, // Use CoinGecko ID
+            destination_asset: tokenMap[toToken] || toToken,
+            amount: userAmount.toFixed(8),
+            destination_address: FEE_RECEIVER, // Your NEAR address
+            refund_address: FEE_RECEIVER,
+            referrer: 'market-tracker-pro',
+            referrer_fee_bps: 15 // 0.15% = 15 basis points
+        };
 
-        // Open NEAR Intents swap interface
-        window.open(swapUrl, '_blank', 'width=600,height=800');
+        // Make POST request to get quote
+        const response = await fetch(oneClickApiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(quoteRequest)
+        });
 
-        showNotification(
-            `Swap initiated: ${userAmount.toFixed(4)} ${fromToken.symbol} to ${toToken.toUpperCase()} (Fee: ${feeAmount.toFixed(6)} ${fromToken.symbol})`,
-            'success'
-        );
+        if (!response.ok) {
+            throw new Error(`API returned ${response.status}: ${response.statusText}`);
+        }
+
+        const quoteData = await response.json();
+
+        // The API returns a deposit address and swap ID
+        if (quoteData.deposit_address && quoteData.swap_id) {
+            // Show deposit information to user
+            showNotification(
+                `Swap quote received! Swap ID: ${quoteData.swap_id.substring(0, 8)}...`,
+                'success'
+            );
+
+            // Create a detailed instruction modal or redirect
+            const depositInfo = `
+                <div style="padding: 20px; text-align: left;">
+                    <h4 style="margin-top: 0;">Complete Your Swap</h4>
+                    <p><strong>Send Amount:</strong> ${userAmount.toFixed(6)} ${fromToken.symbol}</p>
+                    <p><strong>To Address:</strong><br/><code style="background: #f5f5f5; padding: 5px; display: block; word-break: break-all; font-size: 0.85rem;">${quoteData.deposit_address}</code></p>
+                    <p><strong>You'll Receive:</strong> ~${quoteData.estimated_amount || 'calculating...'} ${toToken.toUpperCase()}</p>
+                    <p><strong>Platform Fee:</strong> ${feeAmount.toFixed(6)} ${fromToken.symbol} (0.15%)</p>
+                    <p style="font-size: 0.85rem; color: #666; margin-top: 15px;">Swap ID: ${quoteData.swap_id}</p>
+                </div>
+            `;
+
+            // Show in notification or new modal
+            alert(depositInfo.replace(/<[^>]*>/g, '\n').replace(/&nbsp;/g, ' '));
+
+        } else {
+            throw new Error('Invalid response from swap API');
+        }
 
         // Reset button
         swapButton.disabled = false;
         swapButton.innerHTML = '<span>🔄</span> Swap Now';
 
-        // Close modal after short delay
+        // Close modal after delay
         setTimeout(() => {
             closeSwapModal();
-        }, 2000);
+        }, 3000);
 
     } catch (error) {
         console.error('Swap error:', error);
-        showNotification('Swap failed. Please try again.', 'error');
+        showNotification(
+            `Swap failed: ${error.message}. Please try again or contact support.`,
+            'error'
+        );
 
         // Reset button
         const swapButton = document.querySelector('.modal-swap-btn');
