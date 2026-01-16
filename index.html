@@ -3,42 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Tracker - Stocks & Crypto</title>
+    <title>Market Tracker Pro - Stocks & Crypto</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Market Tracker</h1>
-            <p class="subtitle">Real-time stocks and cryptocurrency prices</p>
+    <div class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-icon">📊</div>
+                    <div>
+                        <h1 class="main-title">Market Tracker Pro</h1>
+                        <p class="main-subtitle">Real-time market data at your fingertips</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <span class="last-updated">
+                        <span class="update-label">Last updated:</span>
+                        <span id="lastUpdated" class="update-time">Never</span>
+                    </span>
+                    <button id="refreshBtn" class="refresh-btn">
+                        <span class="refresh-icon">🔄</span>
+                        <span>Refresh</span>
+                    </button>
+                </div>
+            </div>
         </header>
 
-        <div class="refresh-container">
-            <button id="refreshBtn" class="refresh-btn">Refresh All Data</button>
-            <span class="last-updated">Last updated: <span id="lastUpdated">Never</span></span>
-        </div>
+        <!-- Main Content Area -->
+        <main class="content-wrapper">
+            <!-- Tab Navigation -->
+            <nav class="tab-navigation">
+                <button class="tab-btn active" data-tab="stocks">
+                    <span class="tab-icon">📈</span>
+                    <span class="tab-label">Stocks Market</span>
+                    <span class="tab-count">50</span>
+                </button>
+                <button class="tab-btn" data-tab="crypto">
+                    <span class="tab-icon">₿</span>
+                    <span class="tab-label">Crypto Market</span>
+                    <span class="tab-count">50</span>
+                </button>
+                <div class="tab-indicator"></div>
+            </nav>
 
-        <!-- Stocks Section -->
-        <section class="market-section">
-            <div class="section-header">
-                <h2>Top 50 Nasdaq Stocks</h2>
-                <span class="section-badge">Stocks</span>
-            </div>
-            <div id="stocksContainer" class="stocks-grid">
-                <div class="loading">Loading stock data...</div>
-            </div>
-        </section>
+            <!-- Tab Content -->
+            <div class="tab-content-area">
+                <!-- Stocks Tab Content -->
+                <div id="stocks-tab" class="tab-content active">
+                    <div class="content-header">
+                        <div class="content-title">
+                            <h2>Top 50 Nasdaq Stocks</h2>
+                            <p class="content-description">Market leaders by capitalization</p>
+                        </div>
+                        <div class="view-options">
+                            <span class="total-items">Showing 50 stocks</span>
+                        </div>
+                    </div>
+                    <div id="stocksContainer" class="market-grid">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>Loading market data...</p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Crypto Section -->
-        <section class="market-section">
-            <div class="section-header">
-                <h2>Top 50 Cryptocurrencies</h2>
-                <span class="section-badge crypto-badge">Crypto</span>
+                <!-- Crypto Tab Content -->
+                <div id="crypto-tab" class="tab-content">
+                    <div class="content-header">
+                        <div class="content-title">
+                            <h2>Top 50 Cryptocurrencies</h2>
+                            <p class="content-description">Leading digital assets by market cap</p>
+                        </div>
+                        <div class="view-options">
+                            <span class="total-items">Showing 50 cryptocurrencies</span>
+                        </div>
+                    </div>
+                    <div id="cryptoContainer" class="market-grid">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
+                            <p>Loading cryptocurrency data...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div id="cryptoContainer" class="stocks-grid">
-                <div class="loading">Loading cryptocurrency data...</div>
-            </div>
-        </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Data provided by Yahoo Finance & CoinGecko API</p>
+        </footer>
     </div>
 
     <script src="script.js"></script>

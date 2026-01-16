@@ -128,19 +128,21 @@ function displayStocks(stocks) {
     stocksContainer.innerHTML = stocks.map(stock => {
         const isPositive = parseFloat(stock.change) >= 0;
         const changeClass = isPositive ? 'positive' : 'negative';
-        const changeSymbol = isPositive ? '▲' : '▼';
+        const changeIcon = isPositive ? '↗' : '↘';
 
         return `
-            <div class="stock-card">
-                <div class="stock-header">
-                    <div class="stock-symbol">${stock.symbol}</div>
-                    <div class="stock-rank">#${stock.rank}</div>
+            <div class="asset-card">
+                <div class="card-header">
+                    <div class="asset-info">
+                        <div class="asset-symbol">${stock.symbol}</div>
+                    </div>
+                    <div class="asset-rank">#${stock.rank}</div>
                 </div>
-                <div class="stock-name">${stock.name}</div>
-                <div class="stock-price">$${stock.price}</div>
-                <div class="stock-marketcap">Market Cap: ${formatMarketCap(stock.marketCap)}</div>
-                <div class="stock-change ${changeClass}">
-                    <span>${changeSymbol}</span>
+                <div class="asset-name">${stock.name}</div>
+                <div class="asset-price">$${stock.price}</div>
+                <div class="asset-marketcap">Market Cap: ${formatMarketCap(stock.marketCap)}</div>
+                <div class="price-change ${changeClass}">
+                    <span class="change-icon">${changeIcon}</span>
                     <span>$${Math.abs(stock.change)}</span>
                     <span>(${isPositive ? '+' : ''}${stock.changePercent}%)</span>
                 </div>
@@ -201,31 +203,31 @@ function displayCrypto(cryptos) {
     cryptoContainer.innerHTML = cryptos.map(crypto => {
         const isPositive = parseFloat(crypto.change) >= 0;
         const changeClass = isPositive ? 'positive' : 'negative';
-        const changeSymbol = isPositive ? '▲' : '▼';
+        const changeIcon = isPositive ? '↗' : '↘';
 
         return `
-            <div class="stock-card crypto-card">
-                <div class="stock-header">
-                    <div class="crypto-info">
+            <div class="asset-card crypto">
+                <div class="card-header">
+                    <div class="asset-info">
                         <img src="${crypto.image}" alt="${crypto.name}" class="crypto-icon">
-                        <div class="stock-symbol">${crypto.symbol}</div>
+                        <div class="asset-symbol">${crypto.symbol}</div>
                     </div>
-                    <div class="stock-rank">#${crypto.rank}</div>
+                    <div class="asset-rank">#${crypto.rank}</div>
                 </div>
-                <div class="stock-name">${crypto.name}</div>
-                <div class="stock-price">$${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
+                <div class="asset-name">${crypto.name}</div>
+                <div class="asset-price">$${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
                 <div class="crypto-metrics">
                     <div class="metric">
-                        <span class="metric-label">Market Cap:</span>
+                        <span class="metric-label">Market Cap</span>
                         <span class="metric-value">${formatMarketCap(crypto.marketCap)}</span>
                     </div>
                     <div class="metric">
-                        <span class="metric-label">FDV:</span>
+                        <span class="metric-label">FDV</span>
                         <span class="metric-value">${crypto.fdv > 0 ? formatMarketCap(crypto.fdv) : 'N/A'}</span>
                     </div>
                 </div>
-                <div class="stock-change ${changeClass}">
-                    <span>${changeSymbol}</span>
+                <div class="price-change ${changeClass}">
+                    <span class="change-icon">${changeIcon}</span>
                     <span>$${Math.abs(crypto.change).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</span>
                     <span>(${isPositive ? '+' : ''}${crypto.changePercent.toFixed(2)}%)</span>
                 </div>
@@ -240,8 +242,41 @@ function refreshAllData() {
     fetchCryptoData();
 }
 
+// Tab Switching Functionality
+function initTabs() {
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            // Remove active class from all buttons and contents
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+
+            // Add active class to clicked button
+            button.classList.add('active');
+
+            // Show corresponding content
+            const tabName = button.getAttribute('data-tab');
+            const targetContent = document.getElementById(`${tabName}-tab`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+        });
+    });
+}
+
+// Refresh all data
+function refreshAllData() {
+    fetchStockData();
+    fetchCryptoData();
+}
+
 // Event listeners
 document.getElementById('refreshBtn').addEventListener('click', refreshAllData);
+
+// Initialize tabs
+initTabs();
 
 // Initial load
 fetchStockData();
