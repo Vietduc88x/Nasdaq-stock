@@ -96,6 +96,67 @@
         </footer>
     </div>
 
+    <!-- Swap Modal -->
+    <div id="swapModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Swap Cryptocurrency</h3>
+                <button class="modal-close" onclick="closeSwapModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="swap-from-section">
+                    <label class="swap-label">From</label>
+                    <div id="selectedToken" class="selected-token"></div>
+                </div>
+
+                <div class="swap-arrow">
+                    <span>⬇</span>
+                </div>
+
+                <div class="swap-to-section">
+                    <label class="swap-label">To</label>
+                    <select id="toToken" class="token-select">
+                        <option value="usdt">USDT (Tether)</option>
+                        <option value="usdc">USDC (USD Coin)</option>
+                        <option value="btc">BTC (Bitcoin)</option>
+                        <option value="eth">ETH (Ethereum)</option>
+                        <option value="bnb">BNB (Binance Coin)</option>
+                        <option value="sol">SOL (Solana)</option>
+                        <option value="ada">ADA (Cardano)</option>
+                        <option value="dot">DOT (Polkadot)</option>
+                        <option value="matic">MATIC (Polygon)</option>
+                        <option value="near">NEAR (NEAR Protocol)</option>
+                    </select>
+                </div>
+
+                <div class="swap-amount-section">
+                    <label class="swap-label">Amount</label>
+                    <input
+                        type="number"
+                        id="swapAmount"
+                        class="amount-input"
+                        placeholder="Enter amount"
+                        min="0"
+                        step="any"
+                    />
+                </div>
+
+                <div class="swap-info">
+                    <p class="swap-info-text">
+                        <span class="info-icon">ℹ</span>
+                        Powered by <strong>NEAR Intents</strong> - Secure, decentralized swaps
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel-btn" onclick="closeSwapModal()">Cancel</button>
+                <button class="modal-swap-btn" onclick="executeSwap()">
+                    <span>🔄</span> Swap Now
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

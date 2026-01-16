@@ -476,6 +476,330 @@ body {
     font-size: 1rem;
 }
 
+/* ===== SWAP BUTTON ===== */
+.swap-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.swap-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.swap-btn:active {
+    transform: translateY(0);
+}
+
+.swap-icon {
+    font-size: 1rem;
+}
+
+/* ===== MODAL ===== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 480px;
+    box-shadow: var(--shadow-xl);
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+}
+
+.modal-close:hover {
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.swap-from-section,
+.swap-to-section,
+.swap-amount-section {
+    margin-bottom: 20px;
+}
+
+.swap-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.selected-token {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+}
+
+.modal-token-symbol {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.modal-token-name {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+.swap-arrow {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+}
+
+.swap-arrow span {
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.token-select {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.token-select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.amount-input {
+    width: 100%;
+    padding: 14px;
+    background: white;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all 0.2s;
+}
+
+.amount-input:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.swap-info {
+    margin-top: 20px;
+    padding: 14px;
+    background: rgba(79, 70, 229, 0.05);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-blue);
+}
+
+.swap-info-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.info-icon {
+    font-size: 1.1rem;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 12px;
+    padding: 24px;
+    border-top: 2px solid var(--border-color);
+}
+
+.modal-cancel-btn,
+.modal-swap-btn {
+    flex: 1;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.modal-cancel-btn {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.modal-cancel-btn:hover {
+    background: var(--border-color);
+}
+
+.modal-swap-btn {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.modal-swap-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-swap-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===== NOTIFICATIONS ===== */
+.notification {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: white;
+    padding: 16px 20px;
+    border-radius: 10px;
+    box-shadow: var(--shadow-xl);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 300px;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 2000;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification-success {
+    border-left: 4px solid var(--success-green);
+}
+
+.notification-error {
+    border-left: 4px solid var(--danger-red);
+}
+
+.notification-info {
+    border-left: 4px solid var(--primary-blue);
+}
+
+.notification-icon {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+.notification-success .notification-icon {
+    color: var(--success-green);
+}
+
+.notification-error .notification-icon {
+    color: var(--danger-red);
+}
+
+.notification-info .notification-icon {
+    color: var(--primary-blue);
+}
+
+.notification-message {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.spinner-small {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
 /* ===== FOOTER ===== */
 .footer {
     text-align: center;

@@ -279,6 +279,10 @@ function displayCrypto(cryptos) {
                     <span>$${Math.abs(crypto.change).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</span>
                     <span>(${isPositive ? '+' : ''}${crypto.changePercent.toFixed(2)}%)</span>
                 </div>
+                <button class="swap-btn" onclick="openSwapModal('${crypto.id}', '${crypto.symbol}', '${crypto.name}')">
+                    <span class="swap-icon">🔄</span>
+                    <span>Swap</span>
+                </button>
             </div>
         `;
     }).join('');
@@ -332,3 +336,124 @@ fetchCryptoData();
 
 // Auto-refresh every 60 seconds
 setInterval(refreshAllData, 60000);
+
+// ===== NEAR INTENTS SWAP INTEGRATION =====
+
+// Open swap modal
+function openSwapModal(tokenId, tokenSymbol, tokenName) {
+    const modal = document.getElementById('swapModal');
+    const tokenDisplay = document.getElementById('selectedToken');
+
+    // Set selected token
+    tokenDisplay.innerHTML = `
+        <span class="modal-token-symbol">${tokenSymbol}</span>
+        <span class="modal-token-name">${tokenName}</span>
+    `;
+
+    // Store current token for swap
+    window.currentSwapToken = {
+        id: tokenId,
+        symbol: tokenSymbol,
+        name: tokenName
+    };
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+// Close swap modal
+function closeSwapModal() {
+    const modal = document.getElementById('swapModal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+
+    // Reset form
+    document.getElementById('swapAmount').value = '';
+    document.getElementById('toToken').value = 'usdt';
+}
+
+// Execute swap using NEAR Intents 1Click API
+async function executeSwap() {
+    const amount = document.getElementById('swapAmount').value;
+    const toToken = document.getElementById('toToken').value;
+    const fromToken = window.currentSwapToken;
+
+    if (!amount || parseFloat(amount) <= 0) {
+        showNotification('Please enter a valid amount', 'error');
+        return;
+    }
+
+    try {
+        // Show loading state
+        const swapButton = document.querySelector('.modal-swap-btn');
+        swapButton.disabled = true;
+        swapButton.innerHTML = '<span class="spinner-small"></span> Processing...';
+
+        // NEAR Intents 1Click API endpoint
+        const nearIntentsUrl = `https://api.near-intents.org/swap`;
+
+        // Prepare swap parameters
+        const swapParams = {
+            from_token: fromToken.symbol.toLowerCase(),
+            to_token: toToken,
+            amount: amount,
+            slippage: 0.5, // 0.5% slippage tolerance
+            referrer: 'market-tracker-pro'
+        };
+
+        // Generate NEAR Intents swap URL
+        const swapUrl = `${nearIntentsUrl}?${new URLSearchParams(swapParams).toString()}`;
+
+        // Open NEAR Intents swap interface
+        window.open(swapUrl, '_blank', 'width=600,height=800');
+
+        showNotification(`Swap initiated for ${amount} ${fromToken.symbol} to ${toToken.toUpperCase()}`, 'success');
+
+        // Reset button
+        swapButton.disabled = false;
+        swapButton.innerHTML = '<span>🔄</span> Swap Now';
+
+        // Close modal after short delay
+        setTimeout(() => {
+            closeSwapModal();
+        }, 1500);
+
+    } catch (error) {
+        console.error('Swap error:', error);
+        showNotification('Swap failed. Please try again.', 'error');
+
+        // Reset button
+        const swapButton = document.querySelector('.modal-swap-btn');
+        swapButton.disabled = false;
+        swapButton.innerHTML = '<span>🔄</span> Swap Now';
+    }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <span class="notification-icon">${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
+        <span class="notification-message">${message}</span>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Show notification
+    setTimeout(() => notification.classList.add('show'), 100);
+
+    // Hide and remove notification
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('swapModal');
+    if (event.target === modal) {
+        closeSwapModal();
+    }
+};
