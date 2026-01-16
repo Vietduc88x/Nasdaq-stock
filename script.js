@@ -393,7 +393,7 @@ async function initWallet() {
             return;
         }
 
-        const { setupWalletSelector, setupModal, setupMyNearWallet, setupHereWallet } = walletSelectorCore;
+        const { setupWalletSelector, setupModal, setupMeteorWallet, setupSender, setupHereWallet } = walletSelectorCore;
 
         if (!setupWalletSelector) {
             console.error('setupWalletSelector not found in nearWalletSelector');
@@ -411,10 +411,12 @@ async function initWallet() {
 
         console.log('All libraries loaded. Initializing wallet selector...');
 
+        // Initialize wallet selector with Meteor Wallet, Sender (supports Phantom/MetaMask), and HERE Wallet
         walletSelector = await setupWalletSelector({
             network: "mainnet",
             modules: [
-                setupMyNearWallet(),
+                setupMeteorWallet(),
+                setupSender(),
                 setupHereWallet()
             ]
         });
@@ -486,15 +488,8 @@ function handleWalletClick() {
                 showNotification('Failed to open wallet selector: ' + error.message, 'error');
             }
         } else {
-            console.warn('Wallet selector modal not available, using fallback');
-            // Fallback: redirect to MyNearWallet
-            showNotification('Opening MyNearWallet...', 'info');
-            const appUrl = encodeURIComponent(window.location.origin);
-            window.open(
-                `https://app.mynearwallet.com/?referrer=${appUrl}`,
-                '_blank',
-                'width=500,height=700'
-            );
+            console.warn('Wallet selector modal not available');
+            showNotification('Wallet selector is not initialized. Please refresh the page and try again.', 'error');
         }
     }
 }
