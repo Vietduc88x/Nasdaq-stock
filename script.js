@@ -375,12 +375,23 @@ async function initWallet() {
             }
         });
 
-        // Check if wallet selector is available
-        if (typeof window.nearWalletSelector === 'undefined') {
-            console.warn('NEAR Wallet Selector not loaded. Using fallback method.');
+        console.log('Checking for NEAR Wallet Selector libraries...');
+
+        // Check if wallet selector libraries are available
+        if (!window.nearWalletSelector || !window.nearWalletSelector.setupWalletSelector) {
+            console.error('NEAR Wallet Selector core not loaded');
+            console.log('Available on window:', Object.keys(window).filter(k => k.includes('near')));
             updateWalletUI(false);
             return;
         }
+
+        if (!window.nearWalletSelectorModalUI || !window.nearWalletSelectorModalUI.setupModal) {
+            console.error('NEAR Wallet Selector Modal UI not loaded');
+            updateWalletUI(false);
+            return;
+        }
+
+        console.log('All libraries loaded. Initializing wallet selector...');
 
         const { setupWalletSelector } = window.nearWalletSelector;
         const { setupModal } = window.nearWalletSelectorModalUI;
@@ -395,23 +406,32 @@ async function initWallet() {
             ]
         });
 
+        console.log('Wallet selector created, setting up modal...');
+
         const modal = setupModal(walletSelector, {
             contractId: "v2.ref-finance.near",
-            theme: "light"
+            theme: "light",
+            description: "Connect your NEAR wallet to swap cryptocurrencies"
         });
 
         window.walletSelectorModal = modal;
 
+        console.log('Modal created successfully');
+
         // Check if already connected
         const state = walletSelector.store.getState();
-        if (state.accounts.length > 0) {
+        console.log('Wallet state:', state);
+
+        if (state.accounts && state.accounts.length > 0) {
             accountId = state.accounts[0].accountId;
             updateWalletUI(true);
+            console.log('Wallet already connected:', accountId);
         }
 
         // Subscribe to wallet changes
         walletSelector.store.observable.subscribe(state => {
-            if (state.accounts.length > 0) {
+            console.log('Wallet state changed:', state);
+            if (state.accounts && state.accounts.length > 0) {
                 accountId = state.accounts[0].accountId;
                 updateWalletUI(true);
             } else {
@@ -421,17 +441,21 @@ async function initWallet() {
         });
 
         console.log('NEAR Wallet initialized successfully');
+        showNotification('Wallet ready! Click "Connect Wallet" to start.', 'success');
 
     } catch (error) {
         console.error('Wallet initialization error:', error);
-        // Show error to user
-        showNotification('Failed to initialize wallet. Please refresh the page.', 'error');
+        console.error('Error stack:', error.stack);
+        // Show error to user with more details
+        showNotification(`Wallet initialization failed: ${error.message}`, 'error');
         updateWalletUI(false);
     }
 }
 
 // Handle wallet button click
 function handleWalletClick() {
+    console.log('Wallet button clicked. Current accountId:', accountId);
+
     if (accountId) {
         // Show disconnect option
         if (confirm(`Disconnect wallet ${accountId}?`)) {
@@ -440,8 +464,16 @@ function handleWalletClick() {
     } else {
         // Show wallet selector modal
         if (window.walletSelectorModal) {
-            window.walletSelectorModal.show();
+            console.log('Opening wallet selector modal...');
+            try {
+                window.walletSelectorModal.show();
+                console.log('Modal.show() called successfully');
+            } catch (error) {
+                console.error('Error showing modal:', error);
+                showNotification('Failed to open wallet selector: ' + error.message, 'error');
+            }
         } else {
+            console.warn('Wallet selector modal not available, using fallback');
             // Fallback: redirect to MyNearWallet
             showNotification('Opening MyNearWallet...', 'info');
             const appUrl = encodeURIComponent(window.location.origin);
