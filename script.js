@@ -1,4 +1,4 @@
-// Top 50 Nasdaq stocks by market cap
+// Top 100 Nasdaq stocks by market cap
 const top10Stocks = [
     { symbol: 'AAPL', name: 'Apple Inc.' },
     { symbol: 'MSFT', name: 'Microsoft Corporation' },
@@ -49,13 +49,61 @@ const top10Stocks = [
     { symbol: 'DASH', name: 'DoorDash Inc.' },
     { symbol: 'MNST', name: 'Monster Beverage Corporation' },
     { symbol: 'WDAY', name: 'Workday Inc.' },
-    { symbol: 'ADSK', name: 'Autodesk Inc.' }
+    { symbol: 'ADSK', name: 'Autodesk Inc.' },
+    { symbol: 'ABNB', name: 'Airbnb Inc.' },
+    { symbol: 'ORLY', name: "O'Reilly Automotive Inc." },
+    { symbol: 'CHTR', name: 'Charter Communications Inc.' },
+    { symbol: 'MRVL', name: 'Marvell Technology Inc.' },
+    { symbol: 'AZN', name: 'AstraZeneca PLC' },
+    { symbol: 'PCAR', name: 'PACCAR Inc.' },
+    { symbol: 'NXPI', name: 'NXP Semiconductors N.V.' },
+    { symbol: 'CTAS', name: 'Cintas Corporation' },
+    { symbol: 'MRNA', name: 'Moderna Inc.' },
+    { symbol: 'CPRT', name: 'Copart Inc.' },
+    { symbol: 'ODFL', name: 'Old Dominion Freight Line Inc.' },
+    { symbol: 'TEAM', name: 'Atlassian Corporation' },
+    { symbol: 'DXCM', name: 'DexCom Inc.' },
+    { symbol: 'PAYX', name: 'Paychex Inc.' },
+    { symbol: 'LULU', name: 'Lululemon Athletica Inc.' },
+    { symbol: 'ROST', name: 'Ross Stores Inc.' },
+    { symbol: 'FAST', name: 'Fastenal Company' },
+    { symbol: 'BIIB', name: 'Biogen Inc.' },
+    { symbol: 'CTSH', name: 'Cognizant Technology Solutions Corp.' },
+    { symbol: 'EA', name: 'Electronic Arts Inc.' },
+    { symbol: 'KDP', name: 'Keurig Dr Pepper Inc.' },
+    { symbol: 'IDXX', name: 'IDEXX Laboratories Inc.' },
+    { symbol: 'EXC', name: 'Exelon Corporation' },
+    { symbol: 'VRSK', name: 'Verisk Analytics Inc.' },
+    { symbol: 'GEHC', name: 'GE HealthCare Technologies Inc.' },
+    { symbol: 'ON', name: 'ON Semiconductor Corporation' },
+    { symbol: 'CCEP', name: 'Coca-Cola Europacific Partners PLC' },
+    { symbol: 'XEL', name: 'Xcel Energy Inc.' },
+    { symbol: 'KHC', name: 'The Kraft Heinz Company' },
+    { symbol: 'ANSS', name: 'ANSYS Inc.' },
+    { symbol: 'CSGP', name: 'CoStar Group Inc.' },
+    { symbol: 'TTD', name: 'The Trade Desk Inc.' },
+    { symbol: 'DDOG', name: 'Datadog Inc.' },
+    { symbol: 'ZS', name: 'Zscaler Inc.' },
+    { symbol: 'TTWO', name: 'Take-Two Interactive Software Inc.' },
+    { symbol: 'GFS', name: 'GlobalFoundries Inc.' },
+    { symbol: 'CDW', name: 'CDW Corporation' },
+    { symbol: 'FANG', name: 'Diamondback Energy Inc.' },
+    { symbol: 'WBD', name: 'Warner Bros. Discovery Inc.' },
+    { symbol: 'MDB', name: 'MongoDB Inc.' },
+    { symbol: 'ILMN', name: 'Illumina Inc.' },
+    { symbol: 'WBA', name: 'Walgreens Boots Alliance Inc.' },
+    { symbol: 'SMCI', name: 'Super Micro Computer Inc.' },
+    { symbol: 'ARM', name: 'Arm Holdings plc' },
+    { symbol: 'MCHP', name: 'Microchip Technology Inc.' },
+    { symbol: 'ROP', name: 'Roper Technologies Inc.' },
+    { symbol: 'BKR', name: 'Baker Hughes Company' },
+    { symbol: 'ZM', name: 'Zoom Video Communications Inc.' }
 ];
 
 // Function to fetch stock data from a free API
 async function fetchStockData() {
     const stocksContainer = document.getElementById('stocksContainer');
-    stocksContainer.innerHTML = '<div class="loading">Loading stock data...</div>';
+    stocksContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading market data...</p></div>';
 
     try {
         // Using Yahoo Finance alternative API (free, no key required)
@@ -164,12 +212,12 @@ function updateLastUpdatedTime() {
 // Function to fetch cryptocurrency data from CoinGecko
 async function fetchCryptoData() {
     const cryptoContainer = document.getElementById('cryptoContainer');
-    cryptoContainer.innerHTML = '<div class="loading">Loading cryptocurrency data...</div>';
+    cryptoContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading cryptocurrency data...</p></div>';
 
     try {
         // CoinGecko API - Free, no API key required
-        // Get top 50 cryptocurrencies by market cap
-        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h');
+        // Get top 100 cryptocurrencies by market cap
+        const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h');
         const data = await response.json();
 
         const cryptoData = data.map((crypto, index) => ({
