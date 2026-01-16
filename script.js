@@ -351,3 +351,201 @@ fetchCryptoData();
 
 // Auto-refresh every 60 seconds
 setInterval(refreshAllData, 60000);
+
+// ===== CHART POPUP FUNCTIONALITY =====
+
+let chartInstance = null;
+let chartPopupTimeout = null;
+
+// Initialize chart popup listeners after cards are rendered
+function initChartListeners() {
+    document.querySelectorAll('.asset-card').forEach(card => {
+        card.addEventListener('mouseenter', handleCardHover);
+        card.addEventListener('mouseleave', handleCardLeave);
+        card.addEventListener('mousemove', updateChartPosition);
+    });
+}
+
+// Handle card hover
+function handleCardHover(e) {
+    const card = e.currentTarget;
+    const symbol = card.querySelector('.asset-symbol')?.textContent;
+    const name = card.querySelector('.asset-name')?.textContent;
+    const price = card.querySelector('.asset-price')?.textContent;
+    const changePercent = card.querySelector('.price-change span:last-child')?.textContent;
+
+    if (!symbol || !name) return;
+
+    // Clear any existing timeout
+    clearTimeout(chartPopupTimeout);
+
+    // Show chart after short delay
+    chartPopupTimeout = setTimeout(() => {
+        showChartPopup(symbol, name, price, changePercent, e);
+    }, 300);
+}
+
+// Handle card leave
+function handleCardLeave() {
+    clearTimeout(chartPopupTimeout);
+    hideChartPopup();
+}
+
+// Update chart position on mouse move
+function updateChartPosition(e) {
+    const popup = document.getElementById('chartPopup');
+    if (popup.style.display !== 'none') {
+        const x = e.clientX + 20;
+        const y = e.clientY + 20;
+
+        // Keep popup within viewport
+        const popupRect = popup.getBoundingClientRect();
+        const maxX = window.innerWidth - popupRect.width - 20;
+        const maxY = window.innerHeight - popupRect.height - 20;
+
+        popup.style.left = Math.min(x, maxX) + 'px';
+        popup.style.top = Math.min(y, maxY) + 'px';
+    }
+}
+
+// Show chart popup
+function showChartPopup(symbol, name, price, changePercent, event) {
+    const popup = document.getElementById('chartPopup');
+
+    // Update popup content
+    document.getElementById('chartAssetName').textContent = name;
+    document.getElementById('chartAssetSymbol').textContent = symbol;
+    document.getElementById('chartAssetPrice').textContent = price;
+
+    // Position popup near mouse
+    updateChartPosition(event);
+
+    // Show popup
+    popup.style.display = 'block';
+    setTimeout(() => popup.classList.add('show'), 10);
+
+    // Generate and display chart
+    generatePriceChart(symbol, changePercent);
+}
+
+// Hide chart popup
+function hideChartPopup() {
+    const popup = document.getElementById('chartPopup');
+    popup.classList.remove('show');
+    setTimeout(() => {
+        popup.style.display = 'none';
+    }, 200);
+}
+
+// Generate price chart with simulated data
+function generatePriceChart(symbol, changePercent) {
+    const canvas = document.getElementById('priceChart');
+    const ctx = canvas.getContext('2d');
+
+    // Destroy existing chart
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+
+    // Parse change percentage
+    const isPositive = changePercent?.includes('+');
+    const changeValue = parseFloat(changePercent?.replace(/[+()%]/g, '')) || 0;
+
+    // Generate simulated 24h price data (24 points for hourly data)
+    const dataPoints = 24;
+    const priceData = [];
+    const labels = [];
+
+    // Start with a base value and simulate price movement
+    let basePrice = 100;
+    for (let i = 0; i < dataPoints; i++) {
+        const progress = i / (dataPoints - 1);
+        const trend = changeValue * progress;
+        const volatility = (Math.random() - 0.5) * Math.abs(changeValue) * 0.3;
+        priceData.push(basePrice + trend + volatility);
+        labels.push(`${i}h`);
+    }
+
+    // Create gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+    if (isPositive) {
+        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)');
+        gradient.addColorStop(1, 'rgba(16, 185, 129, 0.01)');
+    } else {
+        gradient.addColorStop(0, 'rgba(239, 68, 68, 0.3)');
+        gradient.addColorStop(1, 'rgba(239, 68, 68, 0.01)');
+    }
+
+    // Create chart
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: symbol,
+                data: priceData,
+                borderColor: isPositive ? '#10B981' : '#EF4444',
+                backgroundColor: gradient,
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                pointHoverBackgroundColor: isPositive ? '#10B981' : '#EF4444',
+                pointHoverBorderColor: '#fff',
+                pointHoverBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: isPositive ? '#10B981' : '#EF4444',
+                    borderWidth: 1,
+                    padding: 10,
+                    displayColors: false,
+                    callbacks: {
+                        label: function(context) {
+                            return 'Price: $' + context.parsed.y.toFixed(2);
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    display: false
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
+
+// Re-initialize chart listeners after data loads
+const originalDisplayStocks = displayStocks;
+displayStocks = function(stocks) {
+    originalDisplayStocks(stocks);
+    setTimeout(initChartListeners, 100);
+};
+
+const originalDisplayCrypto = displayCrypto;
+displayCrypto = function(cryptos) {
+    originalDisplayCrypto(cryptos);
+    setTimeout(initChartListeners, 100);
+};

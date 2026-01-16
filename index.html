@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Tracker Pro - Stocks & Crypto</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js for price charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="main-container">
@@ -94,6 +96,23 @@
         <footer class="footer">
             <p>Data provided by Yahoo Finance & CoinGecko API</p>
         </footer>
+    </div>
+
+    <!-- Chart Popup -->
+    <div id="chartPopup" class="chart-popup" style="display: none;">
+        <div class="chart-popup-header">
+            <div class="chart-popup-title">
+                <span id="chartAssetName"></span>
+                <span id="chartAssetSymbol"></span>
+            </div>
+            <div id="chartAssetPrice"></div>
+        </div>
+        <div class="chart-container">
+            <canvas id="priceChart"></canvas>
+        </div>
+        <div class="chart-popup-footer">
+            <span>24H Chart</span>
+        </div>
     </div>
 
     <script src="script.js"></script>

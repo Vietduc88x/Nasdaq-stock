@@ -976,3 +976,83 @@ body {
         font-size: 1.4rem;
     }
 }
+
+/* ===== CHART POPUP ===== */
+.chart-popup {
+    position: fixed;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    z-index: 10000;
+    min-width: 400px;
+    max-width: 500px;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    border: 2px solid var(--border-color);
+}
+
+.chart-popup.show {
+    display: block !important;
+    opacity: 1;
+}
+
+.chart-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.chart-popup-title {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.chart-popup-title span:first-child {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.chart-popup-title span:last-child {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+#chartAssetPrice {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+.chart-container {
+    height: 200px;
+    position: relative;
+}
+
+.chart-popup-footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 2px solid var(--border-color);
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Make cards hoverable */
+.asset-card {
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.asset-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(79, 70, 229, 0.15);
+    border-color: var(--primary-blue);
+}
