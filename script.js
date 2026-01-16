@@ -466,6 +466,17 @@ function generatePriceChart(symbol, changePercent) {
         labels.push(`${i}h`);
     }
 
+    // Calculate high and low
+    const high = Math.max(...priceData);
+    const low = Math.min(...priceData);
+    const currentPrice = priceData[priceData.length - 1];
+
+    // Update stats display
+    document.getElementById('chartHigh').textContent = `$${high.toFixed(2)}`;
+    document.getElementById('chartLow').textContent = `$${low.toFixed(2)}`;
+    document.getElementById('chartChange').textContent = changePercent;
+    document.getElementById('chartChange').className = `stat-value ${isPositive ? 'positive' : 'negative'}`;
+
     // Create gradient
     const gradient = ctx.createLinearGradient(0, 0, 0, 200);
     if (isPositive) {
