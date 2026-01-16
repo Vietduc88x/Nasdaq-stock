@@ -5,29 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Tracker Pro - Stocks & Crypto</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- NEAR Wallet Selector - Using ES Modules -->
+    <!-- NEAR Wallet Selector - Using Skypack CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@near-wallet-selector/modal-ui@8.9.13/styles.css">
     <script type="module">
-        import { setupWalletSelector } from "https://cdn.jsdelivr.net/npm/@near-wallet-selector/core@8.9.13/+esm";
-        import { setupModal } from "https://cdn.jsdelivr.net/npm/@near-wallet-selector/modal-ui@8.9.13/+esm";
-        import { setupMeteorWallet } from "https://cdn.jsdelivr.net/npm/@near-wallet-selector/meteor-wallet@8.9.13/+esm";
-        import { setupSender } from "https://cdn.jsdelivr.net/npm/@near-wallet-selector/sender@8.9.13/+esm";
-        import { setupHereWallet } from "https://cdn.jsdelivr.net/npm/@near-wallet-selector/here-wallet@8.9.13/+esm";
+        try {
+            console.log('Starting to load NEAR Wallet Selector modules from Skypack...');
 
-        // Make functions globally available
-        window.nearWalletSelectorModules = {
-            setupWalletSelector,
-            setupModal,
-            setupMeteorWallet,
-            setupSender,
-            setupHereWallet
-        };
+            const { setupWalletSelector } = await import('https://cdn.skypack.dev/@near-wallet-selector/core@8.9.13');
+            const { setupModal } = await import('https://cdn.skypack.dev/@near-wallet-selector/modal-ui@8.9.13');
+            const { setupMeteorWallet } = await import('https://cdn.skypack.dev/@near-wallet-selector/meteor-wallet@8.9.13');
+            const { setupSender } = await import('https://cdn.skypack.dev/@near-wallet-selector/sender@8.9.13');
+            const { setupHereWallet } = await import('https://cdn.skypack.dev/@near-wallet-selector/here-wallet@8.9.13');
 
-        console.log('NEAR Wallet Selector modules loaded successfully via ES modules');
-        console.log('Available functions:', Object.keys(window.nearWalletSelectorModules));
+            console.log('All modules loaded successfully!');
 
-        // Trigger custom event to signal modules are ready
-        window.dispatchEvent(new Event('nearWalletSelectorReady'));
+            // Make functions globally available
+            window.nearWalletSelectorModules = {
+                setupWalletSelector,
+                setupModal,
+                setupMeteorWallet,
+                setupSender,
+                setupHereWallet
+            };
+
+            console.log('NEAR Wallet Selector modules loaded successfully via Skypack');
+            console.log('Available functions:', Object.keys(window.nearWalletSelectorModules));
+
+            // Trigger custom event to signal modules are ready
+            window.dispatchEvent(new Event('nearWalletSelectorReady'));
+        } catch (error) {
+            console.error('Failed to load NEAR Wallet Selector modules:', error);
+            console.error('Error details:', error.message);
+        }
     </script>
 </head>
 <body>
