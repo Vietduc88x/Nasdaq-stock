@@ -218,6 +218,23 @@ async function fetchCryptoData() {
         // CoinGecko API - Free, no API key required
         // Get top 100 cryptocurrencies by market cap
         const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h');
+
+        // Check for rate limiting
+        if (response.status === 429) {
+            cryptoContainer.innerHTML = `
+                <div class="error">
+                    <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">⏱️ Rate Limit Reached</p>
+                    <p>CoinGecko API rate limit exceeded. Please wait a moment and try refreshing.</p>
+                    <p style="font-size: 0.85rem; margin-top: 12px; opacity: 0.8;">The free API allows limited requests per minute. Try again in 60 seconds.</p>
+                </div>
+            `;
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
         const data = await response.json();
 
         const cryptoData = data.map((crypto, index) => ({
@@ -238,8 +255,10 @@ async function fetchCryptoData() {
     } catch (error) {
         cryptoContainer.innerHTML = `
             <div class="error">
-                <p>Unable to fetch cryptocurrency data. Please try again later.</p>
-                <p style="font-size: 0.9rem; margin-top: 10px;">Error: ${error.message}</p>
+                <p style="font-size: 1.1rem; font-weight: 600; margin-bottom: 8px;">❌ Unable to Load Crypto Data</p>
+                <p>Could not fetch cryptocurrency data from CoinGecko API.</p>
+                <p style="font-size: 0.85rem; margin-top: 12px; opacity: 0.8;">Error: ${error.message}</p>
+                <button onclick="fetchCryptoData()" style="margin-top: 16px; padding: 10px 20px; background: #8B5CF6; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 0.9rem;">Try Again</button>
             </div>
         `;
     }
