@@ -370,9 +370,37 @@ function closeSwapModal() {
     // Reset form
     document.getElementById('swapAmount').value = '';
     document.getElementById('toToken').value = 'usdt';
+    document.getElementById('feeBreakdown').style.display = 'none';
 }
 
-// Execute swap using NEAR Intents 1Click API
+// Update fee display in real-time
+function updateFeeDisplay() {
+    const amount = document.getElementById('swapAmount').value;
+    const feeBreakdown = document.getElementById('feeBreakdown');
+
+    if (!amount || parseFloat(amount) <= 0) {
+        feeBreakdown.style.display = 'none';
+        return;
+    }
+
+    const FEE_PERCENTAGE = 0.0015; // 0.15%
+    const swapAmount = parseFloat(amount);
+    const feeAmount = swapAmount * FEE_PERCENTAGE;
+    const receiveAmount = swapAmount - feeAmount;
+    const fromToken = window.currentSwapToken;
+
+    // Update display
+    document.getElementById('swapAmountDisplay').textContent =
+        `${swapAmount.toFixed(6)} ${fromToken.symbol}`;
+    document.getElementById('feeAmountDisplay').textContent =
+        `${feeAmount.toFixed(6)} ${fromToken.symbol}`;
+    document.getElementById('receiveAmountDisplay').textContent =
+        `${receiveAmount.toFixed(6)} ${fromToken.symbol}`;
+
+    feeBreakdown.style.display = 'block';
+}
+
+// Execute swap using NEAR Intents 1Click API with 0.15% fee
 async function executeSwap() {
     const amount = document.getElementById('swapAmount').value;
     const toToken = document.getElementById('toToken').value;
@@ -389,16 +417,29 @@ async function executeSwap() {
         swapButton.disabled = true;
         swapButton.innerHTML = '<span class="spinner-small"></span> Processing...';
 
+        // Calculate fee (0.15% of swap amount)
+        const FEE_PERCENTAGE = 0.0015; // 0.15%
+        const swapAmount = parseFloat(amount);
+        const feeAmount = swapAmount * FEE_PERCENTAGE;
+        const userAmount = swapAmount - feeAmount;
+
+        // NEAR account to receive fees
+        const FEE_RECEIVER = 'babyben.near';
+
         // NEAR Intents 1Click API endpoint
         const nearIntentsUrl = `https://api.near-intents.org/swap`;
 
-        // Prepare swap parameters
+        // Prepare swap parameters with fee handling
         const swapParams = {
             from_token: fromToken.symbol.toLowerCase(),
             to_token: toToken,
-            amount: amount,
+            amount: userAmount.toFixed(8), // User receives amount after fee
+            fee_amount: feeAmount.toFixed(8), // Fee amount (0.15%)
+            fee_receiver: FEE_RECEIVER, // babyben.near
+            fee_token: 'usdt', // Convert fee to USDT
             slippage: 0.5, // 0.5% slippage tolerance
-            referrer: 'market-tracker-pro'
+            referrer: 'market-tracker-pro',
+            referrer_fee: FEE_PERCENTAGE * 100 // 0.15% as percentage
         };
 
         // Generate NEAR Intents swap URL
@@ -407,7 +448,10 @@ async function executeSwap() {
         // Open NEAR Intents swap interface
         window.open(swapUrl, '_blank', 'width=600,height=800');
 
-        showNotification(`Swap initiated for ${amount} ${fromToken.symbol} to ${toToken.toUpperCase()}`, 'success');
+        showNotification(
+            `Swap initiated: ${userAmount.toFixed(4)} ${fromToken.symbol} to ${toToken.toUpperCase()} (Fee: ${feeAmount.toFixed(6)} ${fromToken.symbol})`,
+            'success'
+        );
 
         // Reset button
         swapButton.disabled = false;
@@ -416,7 +460,7 @@ async function executeSwap() {
         // Close modal after short delay
         setTimeout(() => {
             closeSwapModal();
-        }, 1500);
+        }, 2000);
 
     } catch (error) {
         console.error('Swap error:', error);
