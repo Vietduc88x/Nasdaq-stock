@@ -376,16 +376,28 @@ async function initWallet() {
         });
 
         console.log('Checking for NEAR Wallet Selector libraries...');
+        console.log('Available globals:', Object.keys(window).filter(k => k.toLowerCase().includes('near') || k.toLowerCase().includes('wallet')));
+
+        // The UMD bundles export to these exact global names
+        const walletSelectorCore = window['@near-wallet-selector/core'];
+        const walletSelectorModalUI = window['@near-wallet-selector/modal-ui'];
+        const myNearWallet = window['@near-wallet-selector/my-near-wallet'];
+        const hereWallet = window['@near-wallet-selector/here-wallet'];
+
+        console.log('Core module:', walletSelectorCore);
+        console.log('Modal UI module:', walletSelectorModalUI);
+        console.log('MyNearWallet module:', myNearWallet);
+        console.log('HereWallet module:', hereWallet);
 
         // Check if wallet selector libraries are available
-        if (!window.nearWalletSelector || !window.nearWalletSelector.setupWalletSelector) {
+        if (!walletSelectorCore || !walletSelectorCore.setupWalletSelector) {
             console.error('NEAR Wallet Selector core not loaded');
-            console.log('Available on window:', Object.keys(window).filter(k => k.includes('near')));
+            console.error('Expected: window["@near-wallet-selector/core"].setupWalletSelector');
             updateWalletUI(false);
             return;
         }
 
-        if (!window.nearWalletSelectorModalUI || !window.nearWalletSelectorModalUI.setupModal) {
+        if (!walletSelectorModalUI || !walletSelectorModalUI.setupModal) {
             console.error('NEAR Wallet Selector Modal UI not loaded');
             updateWalletUI(false);
             return;
@@ -393,10 +405,10 @@ async function initWallet() {
 
         console.log('All libraries loaded. Initializing wallet selector...');
 
-        const { setupWalletSelector } = window.nearWalletSelector;
-        const { setupModal } = window.nearWalletSelectorModalUI;
-        const { setupMyNearWallet } = window.nearWalletSelectorMyNearWallet;
-        const { setupHereWallet } = window.nearWalletSelectorHereWallet;
+        const { setupWalletSelector } = walletSelectorCore;
+        const { setupModal } = walletSelectorModalUI;
+        const { setupMyNearWallet } = myNearWallet;
+        const { setupHereWallet } = hereWallet;
 
         walletSelector = await setupWalletSelector({
             network: "mainnet",
