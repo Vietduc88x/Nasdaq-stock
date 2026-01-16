@@ -366,21 +366,38 @@ let accountId = null;
 // Initialize NEAR Wallet
 async function initWallet() {
     try {
-        const { setupWalletSelector } = window['@near-wallet-selector/core'];
-        const { setupModal } = window['@near-wallet-selector/modal-ui'];
-        const { setupMyNearWallet } = window['@near-wallet-selector/my-near-wallet'];
-        const { setupMeteorWallet } = window['@near-wallet-selector/meteor-wallet'];
+        // Wait for scripts to load
+        await new Promise(resolve => {
+            if (document.readyState === 'complete') {
+                resolve();
+            } else {
+                window.addEventListener('load', resolve);
+            }
+        });
+
+        // Check if wallet selector is available
+        if (typeof window.nearWalletSelector === 'undefined') {
+            console.warn('NEAR Wallet Selector not loaded. Using fallback method.');
+            updateWalletUI(false);
+            return;
+        }
+
+        const { setupWalletSelector } = window.nearWalletSelector;
+        const { setupModal } = window.nearWalletSelectorModalUI;
+        const { setupMyNearWallet } = window.nearWalletSelectorMyNearWallet;
+        const { setupHereWallet } = window.nearWalletSelectorHereWallet;
 
         walletSelector = await setupWalletSelector({
             network: "mainnet",
             modules: [
                 setupMyNearWallet(),
-                setupMeteorWallet()
+                setupHereWallet()
             ]
         });
 
         const modal = setupModal(walletSelector, {
-            contractId: "v2.ref-finance.near"
+            contractId: "v2.ref-finance.near",
+            theme: "light"
         });
 
         window.walletSelectorModal = modal;
@@ -403,8 +420,13 @@ async function initWallet() {
             }
         });
 
+        console.log('NEAR Wallet initialized successfully');
+
     } catch (error) {
         console.error('Wallet initialization error:', error);
+        // Show error to user
+        showNotification('Failed to initialize wallet. Please refresh the page.', 'error');
+        updateWalletUI(false);
     }
 }
 
@@ -419,6 +441,15 @@ function handleWalletClick() {
         // Show wallet selector modal
         if (window.walletSelectorModal) {
             window.walletSelectorModal.show();
+        } else {
+            // Fallback: redirect to MyNearWallet
+            showNotification('Opening MyNearWallet...', 'info');
+            const appUrl = encodeURIComponent(window.location.origin);
+            window.open(
+                `https://app.mynearwallet.com/?referrer=${appUrl}`,
+                '_blank',
+                'width=500,height=700'
+            );
         }
     }
 }
@@ -438,6 +469,11 @@ function updateWalletUI(connected) {
     const walletBtn = document.getElementById('walletBtn');
     const walletBtnText = document.getElementById('walletBtnText');
 
+    if (!walletBtn || !walletBtnText) {
+        console.warn('Wallet button elements not found');
+        return;
+    }
+
     if (connected && accountId) {
         walletBtn.classList.add('connected');
         walletBtnText.textContent = accountId.length > 20
@@ -449,10 +485,14 @@ function updateWalletUI(connected) {
     }
 }
 
-// Initialize wallet on page load
-document.addEventListener('DOMContentLoaded', () => {
-    initWallet();
-});
+// Initialize wallet after page loads
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initWallet, 1000); // Wait 1 second for all scripts to load
+    });
+} else {
+    setTimeout(initWallet, 1000);
+}
 
 // Open swap modal
 function openSwapModal(tokenId, tokenSymbol, tokenName) {
