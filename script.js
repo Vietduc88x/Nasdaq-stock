@@ -358,190 +358,6 @@ setInterval(refreshAllData, 60000);
 
 // ===== NEAR INTENTS SWAP INTEGRATION =====
 
-// NEAR Wallet Integration
-let wallet = null;
-let walletSelector = null;
-let accountId = null;
-
-// Initialize NEAR Wallet
-async function initWallet() {
-    try {
-        console.log('Waiting for NEAR Wallet Selector ES modules to load...');
-
-        // Wait for ES modules to load
-        if (!window.nearWalletSelectorModules) {
-            await new Promise((resolve) => {
-                window.addEventListener('nearWalletSelectorReady', resolve, { once: true });
-                // Timeout after 10 seconds
-                setTimeout(() => {
-                    if (!window.nearWalletSelectorModules) {
-                        console.error('Timeout waiting for wallet selector modules');
-                        resolve();
-                    }
-                }, 10000);
-            });
-        }
-
-        if (!window.nearWalletSelectorModules) {
-            console.error('NEAR Wallet Selector modules not loaded');
-            showNotification('Wallet libraries failed to load. Please refresh the page.', 'error');
-            updateWalletUI(false);
-            return;
-        }
-
-        console.log('NEAR Wallet Selector modules found!');
-        console.log('Available modules:', Object.keys(window.nearWalletSelectorModules));
-
-        const {
-            setupWalletSelector,
-            setupModal,
-            setupMeteorWallet,
-            setupSender,
-            setupHereWallet
-        } = window.nearWalletSelectorModules;
-
-        if (!setupWalletSelector || !setupModal) {
-            console.error('Required functions not found in modules');
-            showNotification('Wallet initialization failed. Missing required functions.', 'error');
-            updateWalletUI(false);
-            return;
-        }
-
-        console.log('Creating wallet selector with available wallets...');
-
-        const modules = [];
-        if (setupMeteorWallet) {
-            console.log('Adding Meteor Wallet');
-            modules.push(setupMeteorWallet());
-        }
-        if (setupSender) {
-            console.log('Adding Sender (Phantom/MetaMask support)');
-            modules.push(setupSender());
-        }
-        if (setupHereWallet) {
-            console.log('Adding HERE Wallet');
-            modules.push(setupHereWallet());
-        }
-
-        console.log('Total wallet modules to load:', modules.length);
-
-        walletSelector = await setupWalletSelector({
-            network: "mainnet",
-            modules: modules
-        });
-
-        console.log('Wallet selector created, setting up modal...');
-
-        const modal = setupModal(walletSelector, {
-            contractId: "v2.ref-finance.near",
-            theme: "light",
-            description: "Connect your NEAR wallet to swap cryptocurrencies"
-        });
-
-        window.walletSelectorModal = modal;
-
-        console.log('Modal created successfully');
-
-        // Check if already connected
-        const state = walletSelector.store.getState();
-        console.log('Initial wallet state:', state);
-
-        if (state.accounts && state.accounts.length > 0) {
-            accountId = state.accounts[0].accountId;
-            updateWalletUI(true);
-            console.log('Wallet already connected:', accountId);
-        }
-
-        // Subscribe to wallet changes
-        walletSelector.store.observable.subscribe(state => {
-            console.log('Wallet state changed:', state);
-            if (state.accounts && state.accounts.length > 0) {
-                accountId = state.accounts[0].accountId;
-                updateWalletUI(true);
-            } else {
-                accountId = null;
-                updateWalletUI(false);
-            }
-        });
-
-        console.log('NEAR Wallet initialized successfully');
-        showNotification('Wallet ready! Click "Connect Wallet" to start.', 'success');
-
-    } catch (error) {
-        console.error('Wallet initialization error:', error);
-        console.error('Error stack:', error.stack);
-        showNotification(`Wallet initialization failed: ${error.message}`, 'error');
-        updateWalletUI(false);
-    }
-}
-
-// Handle wallet button click
-function handleWalletClick() {
-    console.log('Wallet button clicked. Current accountId:', accountId);
-
-    if (accountId) {
-        // Show disconnect option
-        if (confirm(`Disconnect wallet ${accountId}?`)) {
-            disconnectWallet();
-        }
-    } else {
-        // Show wallet selector modal
-        if (window.walletSelectorModal) {
-            console.log('Opening wallet selector modal...');
-            try {
-                window.walletSelectorModal.show();
-                console.log('Modal.show() called successfully');
-            } catch (error) {
-                console.error('Error showing modal:', error);
-                showNotification('Failed to open wallet selector: ' + error.message, 'error');
-            }
-        } else {
-            console.warn('Wallet selector modal not available');
-            showNotification('Wallet selector is not initialized. Please refresh the page and try again.', 'error');
-        }
-    }
-}
-
-// Disconnect wallet
-async function disconnectWallet() {
-    if (walletSelector) {
-        const wallet = await walletSelector.wallet();
-        await wallet.signOut();
-        accountId = null;
-        updateWalletUI(false);
-    }
-}
-
-// Update wallet button UI
-function updateWalletUI(connected) {
-    const walletBtn = document.getElementById('walletBtn');
-    const walletBtnText = document.getElementById('walletBtnText');
-
-    if (!walletBtn || !walletBtnText) {
-        console.warn('Wallet button elements not found');
-        return;
-    }
-
-    if (connected && accountId) {
-        walletBtn.classList.add('connected');
-        walletBtnText.textContent = accountId.length > 20
-            ? accountId.substring(0, 8) + '...' + accountId.substring(accountId.length - 6)
-            : accountId;
-    } else {
-        walletBtn.classList.remove('connected');
-        walletBtnText.textContent = 'Connect Wallet';
-    }
-}
-
-// Initialize wallet after page loads
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(initWallet, 1000); // Wait 1 second for all scripts to load
-    });
-} else {
-    setTimeout(initWallet, 1000);
-}
-
 // Open swap modal
 function openSwapModal(tokenId, tokenSymbol, tokenName) {
     const modal = document.getElementById('swapModal');
@@ -603,10 +419,11 @@ function updateFeeDisplay() {
     feeBreakdown.style.display = 'block';
 }
 
-// Execute swap using NEAR Intents with wallet connection
+// Execute swap using NEAR Intents - Simple redirect to Ref Finance
 async function executeSwap() {
     const amount = document.getElementById('swapAmount').value;
-    const toToken = document.getElementById('toToken').value;
+    const toTokenSelect = document.getElementById('toToken');
+    const toToken = toTokenSelect.options[toTokenSelect.selectedIndex].text;
     const fromToken = window.currentSwapToken;
 
     if (!amount || parseFloat(amount) <= 0) {
@@ -614,73 +431,33 @@ async function executeSwap() {
         return;
     }
 
-    // Check if wallet is connected
-    if (!accountId) {
-        showNotification('Please connect your wallet first', 'error');
-        if (window.walletSelectorModal) {
-            window.walletSelectorModal.show();
-        }
-        return;
-    }
-
     try {
-        // Show loading state
-        const swapButton = document.querySelector('.modal-swap-btn');
-        swapButton.disabled = true;
-        swapButton.innerHTML = '<span class="spinner-small"></span> Preparing Swap...';
-
-        // Calculate fee (0.15% of swap amount)
-        const FEE_PERCENTAGE = 0.0015; // 0.15%
         const swapAmount = parseFloat(amount);
+        const FEE_PERCENTAGE = 0.0015; // 0.15%
         const feeAmount = swapAmount * FEE_PERCENTAGE;
-        const netAmount = swapAmount - feeAmount;
-
-        // NEAR account to receive fees
-        const FEE_RECEIVER = 'babyben.near';
-
-        // Redirect to NEAR Intents swap interface with parameters
-        // Using the NEAR Intents Explorer for swaps
-        const intentsExplorerUrl = 'https://app.intents.org';
-
-        // For simplicity, open the NEAR Intents app
-        // The user will complete the swap there with their connected wallet
-        showNotification(
-            `Opening NEAR Intents... Amount: ${swapAmount} ${fromToken.symbol}`,
-            'success'
-        );
 
         showNotification(
-            `Platform fee: ${feeAmount.toFixed(6)} ${fromToken.symbol} (0.15%) will be sent to babyben.near`,
+            `Redirecting to Ref Finance for swap: ${swapAmount} ${fromToken.symbol} → ${toToken}`,
             'info'
         );
 
-        // Open NEAR Intents in a new window
-        window.open(
-            intentsExplorerUrl,
-            '_blank',
-            'width=500,height=800'
+        showNotification(
+            `Note: Platform fee of ${feeAmount.toFixed(6)} ${fromToken.symbol} (0.15%) goes to babyben.near`,
+            'info'
         );
 
-        // Reset button
-        swapButton.disabled = false;
-        swapButton.innerHTML = '<span>🔄</span> Swap Now';
+        // Redirect to Ref Finance (the main DEX on NEAR)
+        // User can connect their wallet there (Meteor, HERE, Sender, etc.)
+        const refFinanceUrl = `https://app.ref.finance/#wrap.near|${fromToken.id}`;
 
-        // Close modal after short delay
         setTimeout(() => {
+            window.open(refFinanceUrl, '_blank');
             closeSwapModal();
-        }, 2000);
+        }, 1500);
 
     } catch (error) {
         console.error('Swap error:', error);
-        showNotification(
-            `Swap failed: ${error.message}`,
-            'error'
-        );
-
-        // Reset button
-        const swapButton = document.querySelector('.modal-swap-btn');
-        swapButton.disabled = false;
-        swapButton.innerHTML = '<span>🔄</span> Swap Now';
+        showNotification(`Error: ${error.message}`, 'error');
     }
 }
 
