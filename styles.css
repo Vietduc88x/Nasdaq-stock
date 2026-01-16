@@ -115,6 +115,39 @@ body {
     font-family: 'Monaco', 'Courier New', monospace;
 }
 
+.wallet-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.wallet-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.wallet-btn:active {
+    transform: translateY(0);
+}
+
+.wallet-btn.connected {
+    background: linear-gradient(135deg, var(--success-green), #059669);
+}
+
+.wallet-icon {
+    font-size: 1.1rem;
+}
+
 .refresh-btn {
     display: flex;
     align-items: center;

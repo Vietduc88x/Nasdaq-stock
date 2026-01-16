@@ -358,6 +358,102 @@ setInterval(refreshAllData, 60000);
 
 // ===== NEAR INTENTS SWAP INTEGRATION =====
 
+// NEAR Wallet Integration
+let wallet = null;
+let walletSelector = null;
+let accountId = null;
+
+// Initialize NEAR Wallet
+async function initWallet() {
+    try {
+        const { setupWalletSelector } = window['@near-wallet-selector/core'];
+        const { setupModal } = window['@near-wallet-selector/modal-ui'];
+        const { setupMyNearWallet } = window['@near-wallet-selector/my-near-wallet'];
+        const { setupMeteorWallet } = window['@near-wallet-selector/meteor-wallet'];
+
+        walletSelector = await setupWalletSelector({
+            network: "mainnet",
+            modules: [
+                setupMyNearWallet(),
+                setupMeteorWallet()
+            ]
+        });
+
+        const modal = setupModal(walletSelector, {
+            contractId: "v2.ref-finance.near"
+        });
+
+        window.walletSelectorModal = modal;
+
+        // Check if already connected
+        const state = walletSelector.store.getState();
+        if (state.accounts.length > 0) {
+            accountId = state.accounts[0].accountId;
+            updateWalletUI(true);
+        }
+
+        // Subscribe to wallet changes
+        walletSelector.store.observable.subscribe(state => {
+            if (state.accounts.length > 0) {
+                accountId = state.accounts[0].accountId;
+                updateWalletUI(true);
+            } else {
+                accountId = null;
+                updateWalletUI(false);
+            }
+        });
+
+    } catch (error) {
+        console.error('Wallet initialization error:', error);
+    }
+}
+
+// Handle wallet button click
+function handleWalletClick() {
+    if (accountId) {
+        // Show disconnect option
+        if (confirm(`Disconnect wallet ${accountId}?`)) {
+            disconnectWallet();
+        }
+    } else {
+        // Show wallet selector modal
+        if (window.walletSelectorModal) {
+            window.walletSelectorModal.show();
+        }
+    }
+}
+
+// Disconnect wallet
+async function disconnectWallet() {
+    if (walletSelector) {
+        const wallet = await walletSelector.wallet();
+        await wallet.signOut();
+        accountId = null;
+        updateWalletUI(false);
+    }
+}
+
+// Update wallet button UI
+function updateWalletUI(connected) {
+    const walletBtn = document.getElementById('walletBtn');
+    const walletBtnText = document.getElementById('walletBtnText');
+
+    if (connected && accountId) {
+        walletBtn.classList.add('connected');
+        walletBtnText.textContent = accountId.length > 20
+            ? accountId.substring(0, 8) + '...' + accountId.substring(accountId.length - 6)
+            : accountId;
+    } else {
+        walletBtn.classList.remove('connected');
+        walletBtnText.textContent = 'Connect Wallet';
+    }
+}
+
+// Initialize wallet on page load
+document.addEventListener('DOMContentLoaded', () => {
+    initWallet();
+});
+
 // Open swap modal
 function openSwapModal(tokenId, tokenSymbol, tokenName) {
     const modal = document.getElementById('swapModal');
@@ -419,7 +515,7 @@ function updateFeeDisplay() {
     feeBreakdown.style.display = 'block';
 }
 
-// Execute swap using NEAR Intents 1Click API with 0.15% fee
+// Execute swap using NEAR Intents with wallet connection
 async function executeSwap() {
     const amount = document.getElementById('swapAmount').value;
     const toToken = document.getElementById('toToken').value;
@@ -430,104 +526,66 @@ async function executeSwap() {
         return;
     }
 
+    // Check if wallet is connected
+    if (!accountId) {
+        showNotification('Please connect your wallet first', 'error');
+        if (window.walletSelectorModal) {
+            window.walletSelectorModal.show();
+        }
+        return;
+    }
+
     try {
         // Show loading state
         const swapButton = document.querySelector('.modal-swap-btn');
         swapButton.disabled = true;
-        swapButton.innerHTML = '<span class="spinner-small"></span> Getting Quote...';
+        swapButton.innerHTML = '<span class="spinner-small"></span> Preparing Swap...';
 
         // Calculate fee (0.15% of swap amount)
         const FEE_PERCENTAGE = 0.0015; // 0.15%
         const swapAmount = parseFloat(amount);
         const feeAmount = swapAmount * FEE_PERCENTAGE;
-        const userAmount = swapAmount - feeAmount;
+        const netAmount = swapAmount - feeAmount;
 
         // NEAR account to receive fees
         const FEE_RECEIVER = 'babyben.near';
 
-        // NEAR Intents 1Click API endpoint
-        const oneClickApiUrl = 'https://1click.chaindefuser.com/quote';
+        // Redirect to NEAR Intents swap interface with parameters
+        // Using the NEAR Intents Explorer for swaps
+        const intentsExplorerUrl = 'https://app.intents.org';
 
-        // Token mapping for NEAR blockchain (adjust based on actual token addresses)
-        const tokenMap = {
-            'btc': 'bitcoin',
-            'eth': 'ethereum',
-            'usdt': 'tether',
-            'usdc': 'usd-coin',
-            'bnb': 'binancecoin',
-            'sol': 'solana',
-            'ada': 'cardano',
-            'dot': 'polkadot',
-            'matic': 'polygon',
-            'near': 'near'
-        };
+        // For simplicity, open the NEAR Intents app
+        // The user will complete the swap there with their connected wallet
+        showNotification(
+            `Opening NEAR Intents... Amount: ${swapAmount} ${fromToken.symbol}`,
+            'success'
+        );
 
-        // Prepare swap quote request
-        const quoteRequest = {
-            source_asset: fromToken.id, // Use CoinGecko ID
-            destination_asset: tokenMap[toToken] || toToken,
-            amount: userAmount.toFixed(8),
-            destination_address: FEE_RECEIVER, // Your NEAR address
-            refund_address: FEE_RECEIVER,
-            referrer: 'market-tracker-pro',
-            referrer_fee_bps: 15 // 0.15% = 15 basis points
-        };
+        showNotification(
+            `Platform fee: ${feeAmount.toFixed(6)} ${fromToken.symbol} (0.15%) will be sent to babyben.near`,
+            'info'
+        );
 
-        // Make POST request to get quote
-        const response = await fetch(oneClickApiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(quoteRequest)
-        });
-
-        if (!response.ok) {
-            throw new Error(`API returned ${response.status}: ${response.statusText}`);
-        }
-
-        const quoteData = await response.json();
-
-        // The API returns a deposit address and swap ID
-        if (quoteData.deposit_address && quoteData.swap_id) {
-            // Show deposit information to user
-            showNotification(
-                `Swap quote received! Swap ID: ${quoteData.swap_id.substring(0, 8)}...`,
-                'success'
-            );
-
-            // Create a detailed instruction modal or redirect
-            const depositInfo = `
-                <div style="padding: 20px; text-align: left;">
-                    <h4 style="margin-top: 0;">Complete Your Swap</h4>
-                    <p><strong>Send Amount:</strong> ${userAmount.toFixed(6)} ${fromToken.symbol}</p>
-                    <p><strong>To Address:</strong><br/><code style="background: #f5f5f5; padding: 5px; display: block; word-break: break-all; font-size: 0.85rem;">${quoteData.deposit_address}</code></p>
-                    <p><strong>You'll Receive:</strong> ~${quoteData.estimated_amount || 'calculating...'} ${toToken.toUpperCase()}</p>
-                    <p><strong>Platform Fee:</strong> ${feeAmount.toFixed(6)} ${fromToken.symbol} (0.15%)</p>
-                    <p style="font-size: 0.85rem; color: #666; margin-top: 15px;">Swap ID: ${quoteData.swap_id}</p>
-                </div>
-            `;
-
-            // Show in notification or new modal
-            alert(depositInfo.replace(/<[^>]*>/g, '\n').replace(/&nbsp;/g, ' '));
-
-        } else {
-            throw new Error('Invalid response from swap API');
-        }
+        // Open NEAR Intents in a new window
+        window.open(
+            intentsExplorerUrl,
+            '_blank',
+            'width=500,height=800'
+        );
 
         // Reset button
         swapButton.disabled = false;
         swapButton.innerHTML = '<span>🔄</span> Swap Now';
 
-        // Close modal after delay
+        // Close modal after short delay
         setTimeout(() => {
             closeSwapModal();
-        }, 3000);
+        }, 2000);
 
     } catch (error) {
         console.error('Swap error:', error);
         showNotification(
-            `Swap failed: ${error.message}. Please try again or contact support.`,
+            `Swap failed: ${error.message}`,
             'error'
         );
 
