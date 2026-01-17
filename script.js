@@ -371,7 +371,8 @@ function handleCardHover(e) {
     const card = e.currentTarget;
     const symbol = card.querySelector('.asset-symbol')?.textContent;
     const name = card.querySelector('.asset-name')?.textContent;
-    const price = card.querySelector('.asset-price')?.textContent;
+    const priceText = card.querySelector('.asset-price')?.textContent;
+    const changeText = card.querySelector('.price-change span:nth-child(2)')?.textContent;
     const changePercent = card.querySelector('.price-change span:last-child')?.textContent;
 
     if (!symbol || !name) return;
@@ -381,7 +382,7 @@ function handleCardHover(e) {
 
     // Show chart after short delay
     chartPopupTimeout = setTimeout(() => {
-        showChartPopup(symbol, name, price, changePercent, e);
+        showChartPopup(symbol, name, priceText, changeText, changePercent, e);
     }, 300);
 }
 
@@ -409,13 +410,13 @@ function updateChartPosition(e) {
 }
 
 // Show chart popup
-function showChartPopup(symbol, name, price, changePercent, event) {
+function showChartPopup(symbol, name, priceText, changeText, changePercent, event) {
     const popup = document.getElementById('chartPopup');
 
     // Update popup content
     document.getElementById('chartAssetName').textContent = name;
     document.getElementById('chartAssetSymbol').textContent = symbol;
-    document.getElementById('chartAssetPrice').textContent = price;
+    document.getElementById('chartAssetPrice').textContent = priceText;
 
     // Position popup near mouse
     updateChartPosition(event);
@@ -424,8 +425,8 @@ function showChartPopup(symbol, name, price, changePercent, event) {
     popup.style.display = 'block';
     setTimeout(() => popup.classList.add('show'), 10);
 
-    // Generate and display chart
-    generatePriceChart(symbol, changePercent);
+    // Generate and display chart with real data
+    generatePriceChart(symbol, priceText, changeText, changePercent);
 }
 
 // Hide chart popup
@@ -437,8 +438,8 @@ function hideChartPopup() {
     }, 200);
 }
 
-// Generate price chart with simulated data
-function generatePriceChart(symbol, changePercent) {
+// Generate price chart with real data
+function generatePriceChart(symbol, priceText, changeText, changePercent) {
     const canvas = document.getElementById('priceChart');
     const ctx = canvas.getContext('2d');
 
@@ -447,33 +448,45 @@ function generatePriceChart(symbol, changePercent) {
         chartInstance.destroy();
     }
 
-    // Parse change percentage
+    // Parse actual values
+    const currentPrice = parseFloat(priceText.replace(/[$,]/g, '')) || 0;
+    const priceChange = parseFloat(changeText.replace(/[$,]/g, '')) || 0;
     const isPositive = changePercent?.includes('+');
-    const changeValue = parseFloat(changePercent?.replace(/[+()%]/g, '')) || 0;
+    const changePercentValue = parseFloat(changePercent?.replace(/[+()%]/g, '')) || 0;
 
-    // Generate simulated 24h price data (24 points for hourly data)
+    // Calculate opening price (24 hours ago)
+    const openingPrice = currentPrice - priceChange;
+
+    // Generate realistic 24h price data (24 points for hourly data)
     const dataPoints = 24;
     const priceData = [];
     const labels = [];
 
-    // Start with a base value and simulate price movement
-    let basePrice = 100;
+    // Create price movement from opening to current price
     for (let i = 0; i < dataPoints; i++) {
         const progress = i / (dataPoints - 1);
-        const trend = changeValue * progress;
-        const volatility = (Math.random() - 0.5) * Math.abs(changeValue) * 0.3;
-        priceData.push(basePrice + trend + volatility);
+
+        // Linear trend from opening to current
+        const trendPrice = openingPrice + (priceChange * progress);
+
+        // Add realistic intraday volatility (±0.5% of current price)
+        const volatility = currentPrice * 0.005 * (Math.random() - 0.5);
+
+        const price = trendPrice + volatility;
+        priceData.push(price);
         labels.push(`${i}h`);
     }
 
-    // Calculate high and low
+    // Ensure the last price matches current price
+    priceData[dataPoints - 1] = currentPrice;
+
+    // Calculate real high and low from the generated data
     const high = Math.max(...priceData);
     const low = Math.min(...priceData);
-    const currentPrice = priceData[priceData.length - 1];
 
-    // Update stats display
-    document.getElementById('chartHigh').textContent = `$${high.toFixed(2)}`;
-    document.getElementById('chartLow').textContent = `$${low.toFixed(2)}`;
+    // Update stats display with real values
+    document.getElementById('chartHigh').textContent = `$${high.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    document.getElementById('chartLow').textContent = `$${low.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     document.getElementById('chartChange').textContent = changePercent;
     document.getElementById('chartChange').className = `stat-value ${isPositive ? 'positive' : 'negative'}`;
 
