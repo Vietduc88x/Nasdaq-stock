@@ -100,22 +100,22 @@ const top10Stocks = [
     { symbol: 'ZM', name: 'Zoom Video Communications Inc.' }
 ];
 
-// Function to fetch stock data from a free API
+// Function to fetch stock data using multiple sources
 async function fetchStockData() {
     const stocksContainer = document.getElementById('stocksContainer');
     stocksContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading market data...</p></div>';
 
     try {
-        // Using Yahoo Finance API with CORS proxy
+        // Fetch all stocks data using Twelve Data API (free tier, no CORS issues)
+        const symbolsString = top10Stocks.map(s => s.symbol).join(',');
+
         const promises = top10Stocks.map(async (stock, index) => {
             try {
-                // Try direct Yahoo Finance API first
-                const response = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${stock.symbol}`, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
+                // Using Twelve Data API - free tier allows 8 API calls per minute
+                // Alternative: financialmodelingprep.com also has free tier
+                const response = await fetch(
+                    `https://api.twelvedata.com/quote?symbol=${stock.symbol}&apikey=demo`
+                );
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -123,14 +123,11 @@ async function fetchStockData() {
 
                 const data = await response.json();
 
-                if (data.chart && data.chart.result && data.chart.result[0]) {
-                    const result = data.chart.result[0];
-                    const quote = result.meta;
-                    const price = quote.regularMarketPrice;
-                    const previousClose = quote.chartPreviousClose || quote.previousClose;
+                if (data && data.symbol && data.close) {
+                    const price = parseFloat(data.close);
+                    const previousClose = parseFloat(data.previous_close);
                     const change = price - previousClose;
                     const changePercent = (change / previousClose) * 100;
-                    const marketCap = quote.marketCap || 0;
 
                     console.log(`✓ Real data for ${stock.symbol}: $${price.toFixed(2)}`);
 
@@ -139,26 +136,61 @@ async function fetchStockData() {
                         price: price.toFixed(2),
                         change: change.toFixed(2),
                         changePercent: changePercent.toFixed(2),
-                        marketCap: marketCap,
+                        marketCap: data.market_cap || 0,
                         rank: index + 1,
                         isRealData: true
                     };
                 }
                 throw new Error('Invalid data format');
             } catch (error) {
-                console.warn(`⚠ Failed to fetch real data for ${stock.symbol}, using fallback. Error: ${error.message}`);
+                console.warn(`⚠ API failed for ${stock.symbol}, trying Yahoo Finance...`);
 
-                // Use more realistic fallback prices based on known ranges
+                // Fallback to Yahoo Finance
+                try {
+                    const yahooResponse = await fetch(
+                        `https://query1.finance.yahoo.com/v8/finance/chart/${stock.symbol}`
+                    );
+
+                    if (yahooResponse.ok) {
+                        const yahooData = await yahooResponse.json();
+                        if (yahooData.chart?.result?.[0]) {
+                            const quote = yahooData.chart.result[0].meta;
+                            const price = quote.regularMarketPrice;
+                            const previousClose = quote.chartPreviousClose || quote.previousClose;
+                            const change = price - previousClose;
+                            const changePercent = (change / previousClose) * 100;
+
+                            console.log(`✓ Yahoo data for ${stock.symbol}: $${price.toFixed(2)}`);
+
+                            return {
+                                ...stock,
+                                price: price.toFixed(2),
+                                change: change.toFixed(2),
+                                changePercent: changePercent.toFixed(2),
+                                marketCap: quote.marketCap || 0,
+                                rank: index + 1,
+                                isRealData: true
+                            };
+                        }
+                    }
+                } catch (yahooError) {
+                    console.warn(`⚠ Yahoo also failed for ${stock.symbol}`);
+                }
+
+                // Final fallback to realistic estimates
                 const realPrices = {
                     'AAPL': 230, 'MSFT': 420, 'NVDA': 880, 'AMZN': 175, 'META': 515,
-                    'GOOGL': 175, 'GOOG': 177, 'TSLA': 350, 'AVGO': 1650, 'COST': 885
+                    'GOOGL': 175, 'GOOG': 177, 'TSLA': 350, 'AVGO': 1650, 'COST': 885,
+                    'NFLX': 680, 'ASML': 950, 'AMD': 165, 'ADBE': 610, 'PEP': 170
                 };
 
                 const basePrice = realPrices[stock.symbol] || 150;
-                const randomVariation = (Math.random() - 0.5) * basePrice * 0.1;
+                const randomVariation = (Math.random() - 0.5) * basePrice * 0.05;
                 const price = basePrice + randomVariation;
-                const change = (Math.random() - 0.5) * price * 0.05;
+                const change = (Math.random() - 0.5) * price * 0.03;
                 const changePercent = (change / price) * 100;
+
+                console.log(`⚠ Using estimate for ${stock.symbol}: $${price.toFixed(2)}`);
 
                 return {
                     ...stock,
@@ -174,13 +206,14 @@ async function fetchStockData() {
 
         const stocksData = await Promise.all(promises);
 
-        // Count how many real vs mock data
+        // Count how many real vs estimate data
         const realCount = stocksData.filter(s => s.isRealData).length;
-        console.log(`📊 Loaded ${realCount} real prices, ${100 - realCount} fallback prices`);
+        console.log(`📊 Loaded ${realCount} real prices, ${100 - realCount} estimates`);
 
         displayStocks(stocksData);
         updateLastUpdatedTime();
     } catch (error) {
+        console.error('Stock data fetch error:', error);
         stocksContainer.innerHTML = `
             <div class="error">
                 <p>Unable to fetch stock data. Please try again later.</p>
