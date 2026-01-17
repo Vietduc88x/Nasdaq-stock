@@ -111,10 +111,9 @@ async function fetchStockData() {
 
         const promises = top10Stocks.map(async (stock, index) => {
             try {
-                // Using Twelve Data API - free tier allows 8 API calls per minute
-                // Alternative: financialmodelingprep.com also has free tier
+                // Using Twelve Data API with your API key
                 const response = await fetch(
-                    `https://api.twelvedata.com/quote?symbol=${stock.symbol}&apikey=demo`
+                    `https://api.twelvedata.com/quote?symbol=${stock.symbol}&apikey=e3c55e8ac7f143e1b2aad80631345610`
                 );
 
                 if (!response.ok) {
