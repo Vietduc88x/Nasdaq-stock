@@ -462,6 +462,11 @@ function generatePriceChart(symbol, priceText, changeText, changePercent) {
     const priceData = [];
     const labels = [];
 
+    // Get current time in GMT+8 (Vietnam time)
+    const now = new Date();
+    const vietnamTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' }));
+    const currentHour = vietnamTime.getHours();
+
     // Create price movement from opening to current price
     for (let i = 0; i < dataPoints; i++) {
         const progress = i / (dataPoints - 1);
@@ -474,7 +479,18 @@ function generatePriceChart(symbol, priceText, changeText, changePercent) {
 
         const price = trendPrice + volatility;
         priceData.push(price);
-        labels.push(`${i}h`);
+
+        // Calculate hour for this data point (going back 24 hours from now)
+        const hourOffset = i - (dataPoints - 1); // -23 to 0
+        let hour = currentHour + hourOffset;
+
+        // Handle hour wrapping (0-23)
+        if (hour < 0) hour += 24;
+        if (hour >= 24) hour -= 24;
+
+        // Format hour with leading zero
+        const hourStr = hour.toString().padStart(2, '0');
+        labels.push(`${hourStr}:00`);
     }
 
     // Ensure the last price matches current price
@@ -546,7 +562,19 @@ function generatePriceChart(symbol, priceText, changeText, changePercent) {
             },
             scales: {
                 x: {
-                    display: false
+                    display: true,
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        color: '#64748B',
+                        font: {
+                            size: 9
+                        },
+                        maxRotation: 0,
+                        autoSkip: true,
+                        maxTicksLimit: 6
+                    }
                 },
                 y: {
                     display: false
