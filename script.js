@@ -176,11 +176,11 @@ async function fetchStockData() {
                     console.warn(`⚠ Yahoo also failed for ${stock.symbol}`);
                 }
 
-                // Final fallback to realistic estimates
+                // Final fallback to current market prices (Jan 2026)
                 const realPrices = {
-                    'AAPL': 230, 'MSFT': 420, 'NVDA': 880, 'AMZN': 175, 'META': 515,
-                    'GOOGL': 175, 'GOOG': 177, 'TSLA': 350, 'AVGO': 1650, 'COST': 885,
-                    'NFLX': 680, 'ASML': 950, 'AMD': 165, 'ADBE': 610, 'PEP': 170
+                    'AAPL': 277, 'MSFT': 491, 'NVDA': 185, 'AMZN': 238, 'META': 622,
+                    'GOOGL': 317, 'GOOG': 319, 'TSLA': 439, 'AVGO': 350, 'COST': 957,
+                    'NFLX': 88, 'ASML': 765, 'AMD': 228, 'ADBE': 304, 'PEP': 146
                 };
 
                 const basePrice = realPrices[stock.symbol] || 150;
