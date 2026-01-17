@@ -569,7 +569,8 @@ function generatePriceChart(symbol, priceText, changeText, changePercent) {
                     ticks: {
                         color: '#64748B',
                         font: {
-                            size: 9
+                            size: 11,
+                            weight: '600'
                         },
                         maxRotation: 0,
                         autoSkip: true,
@@ -577,7 +578,27 @@ function generatePriceChart(symbol, priceText, changeText, changePercent) {
                     }
                 },
                 y: {
-                    display: false
+                    display: true,
+                    position: 'right',
+                    grid: {
+                        display: true,
+                        color: 'rgba(226, 232, 240, 0.5)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#64748B',
+                        font: {
+                            size: 10,
+                            weight: '600'
+                        },
+                        padding: 8,
+                        callback: function(value) {
+                            return '$' + value.toLocaleString('en-US', {
+                                minimumFractionDigits: 0,
+                                maximumFractionDigits: 2
+                            });
+                        }
+                    }
                 }
             },
             interaction: {
