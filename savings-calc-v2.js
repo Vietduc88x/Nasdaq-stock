@@ -18,9 +18,9 @@ let savingsState = {
     transportExpenses: 200,
     discretionaryExpenses: 300,
     otherExpenses: 200,
-    emergencySlider: 60,
-    sinkingSlider: 20,
-    investmentSlider: 20,
+    emergencySlider: 50,
+    sinkingSlider: 25,
+    investmentSlider: 25,
     sinkingGoal: 5000,
     cryptoValue: 0,
     stockValue: 0,
@@ -236,6 +236,15 @@ function loadFromLocalStorage() {
             const loaded = JSON.parse(saved);
             savingsState = { ...savingsState, ...loaded };
 
+            // Ensure allocation sliders always total exactly 100%
+            const totalAllocation = savingsState.emergencySlider + savingsState.sinkingSlider + savingsState.investmentSlider;
+            if (totalAllocation !== 100) {
+                // Reset to default balanced allocation
+                savingsState.emergencySlider = 50;
+                savingsState.sinkingSlider = 25;
+                savingsState.investmentSlider = 25;
+            }
+
             // Update all inputs with loaded values
             document.getElementById('monthlyIncome').value = savingsState.monthlyIncome;
             document.getElementById('otherIncome').value = savingsState.otherIncome;
@@ -297,21 +306,65 @@ function initSavingsCalculatorV2() {
         saveToLocalStorage();
     });
 
-    // Allocation sliders
+    // Allocation sliders - auto-adjust others to maintain 100% total
     document.getElementById('emergencySlider').addEventListener('input', (e) => {
-        savingsState.emergencySlider = parseFloat(e.target.value) || 0;
+        const newValue = parseFloat(e.target.value) || 0;
+        savingsState.emergencySlider = Math.min(newValue, 100);
+
+        // Auto-adjust sinking and investment to maintain 100%
+        const remaining = 100 - savingsState.emergencySlider;
+        const currentOthers = savingsState.sinkingSlider + savingsState.investmentSlider;
+
+        if (currentOthers > 0 && remaining >= 0) {
+            // Distribute remaining proportionally
+            const ratio = remaining / currentOthers;
+            savingsState.sinkingSlider = Math.round(savingsState.sinkingSlider * ratio);
+            savingsState.investmentSlider = 100 - savingsState.emergencySlider - savingsState.sinkingSlider;
+        } else if (remaining >= 0) {
+            // Split remaining between the two
+            savingsState.sinkingSlider = Math.round(remaining / 2);
+            savingsState.investmentSlider = remaining - savingsState.sinkingSlider;
+        } else {
+            savingsState.sinkingSlider = 0;
+            savingsState.investmentSlider = 0;
+        }
+
+        // Update slider positions
+        document.getElementById('sinkingSlider').value = savingsState.sinkingSlider;
+        document.getElementById('investmentSlider').value = savingsState.investmentSlider;
+
         updateAllocationDisplay();
         saveToLocalStorage();
     });
 
     document.getElementById('sinkingSlider').addEventListener('input', (e) => {
-        savingsState.sinkingSlider = parseFloat(e.target.value) || 0;
+        const newValue = parseFloat(e.target.value) || 0;
+        const maxAllowed = 100 - savingsState.emergencySlider;
+        savingsState.sinkingSlider = Math.min(newValue, maxAllowed);
+
+        // Auto-adjust investment to maintain 100%
+        savingsState.investmentSlider = 100 - savingsState.emergencySlider - savingsState.sinkingSlider;
+
+        // Update slider position
+        e.target.value = savingsState.sinkingSlider;
+        document.getElementById('investmentSlider').value = savingsState.investmentSlider;
+
         updateAllocationDisplay();
         saveToLocalStorage();
     });
 
     document.getElementById('investmentSlider').addEventListener('input', (e) => {
-        savingsState.investmentSlider = parseFloat(e.target.value) || 0;
+        const newValue = parseFloat(e.target.value) || 0;
+        const maxAllowed = 100 - savingsState.emergencySlider;
+        savingsState.investmentSlider = Math.min(newValue, maxAllowed);
+
+        // Auto-adjust sinking to maintain 100%
+        savingsState.sinkingSlider = 100 - savingsState.emergencySlider - savingsState.investmentSlider;
+
+        // Update slider position
+        e.target.value = savingsState.investmentSlider;
+        document.getElementById('sinkingSlider').value = savingsState.sinkingSlider;
+
         updateAllocationDisplay();
         saveToLocalStorage();
     });
@@ -364,6 +417,12 @@ function updateAll() {
 document.addEventListener('DOMContentLoaded', function() {
     // Small delay to ensure DOM is fully loaded
     setTimeout(() => {
+        // Clear old corrupted data if version mismatch
+        const version = localStorage.getItem('savingsStateVersion');
+        if (version !== '2.1') {
+            localStorage.removeItem('savingsStateV2');
+            localStorage.setItem('savingsStateVersion', '2.1');
+        }
         loadFromLocalStorage();
         initSavingsCalculatorV2();
     }, 500);
