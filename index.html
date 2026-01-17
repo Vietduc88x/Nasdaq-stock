@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Market Tracker Pro - Stocks & Crypto</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="savings-styles.css">
     <!-- Chart.js for price charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -47,6 +48,11 @@
                     <span class="tab-label">Crypto Market</span>
                     <span class="tab-count">100</span>
                 </button>
+                <button class="tab-btn" data-tab="savings">
+                    <span class="tab-icon">💰</span>
+                    <span class="tab-label">Saving Methodology</span>
+                    <span class="tab-count">Plan</span>
+                </button>
                 <div class="tab-indicator"></div>
             </nav>
 
@@ -86,6 +92,200 @@
                         <div class="loading-spinner">
                             <div class="spinner"></div>
                             <p>Loading cryptocurrency data...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Savings Methodology Tab Content -->
+                <div id="savings-tab" class="tab-content">
+                    <div class="content-header">
+                        <div class="content-title">
+                            <h2>Saving Methodology Calculator</h2>
+                            <p class="content-description">Plan your income allocation, emergency funds, and investment strategy</p>
+                        </div>
+                    </div>
+
+                    <div class="savings-container">
+                        <!-- Income & Allocation Section -->
+                        <div class="savings-card">
+                            <h3 class="card-title">💵 Monthly Income & Allocation</h3>
+                            <div class="input-grid">
+                                <div class="input-group">
+                                    <label for="monthlyIncome">Monthly Income (VND)</label>
+                                    <input type="number" id="monthlyIncome" placeholder="74,000,000" value="74000000">
+                                </div>
+                                <div class="input-group">
+                                    <label for="otherIncome">Other Income (VND)</label>
+                                    <input type="number" id="otherIncome" placeholder="12,000,000" value="12000000">
+                                </div>
+                                <div class="result-group">
+                                    <label>Total Monthly Income</label>
+                                    <div class="result-value" id="totalIncome">86,000,000 VND</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Spending & Savings Allocation -->
+                        <div class="savings-card">
+                            <h3 class="card-title">📊 Spending & Savings Allocation</h3>
+                            <div class="allocation-grid">
+                                <div class="allocation-item">
+                                    <label for="monthlySpending">Monthly Spending (%)</label>
+                                    <input type="range" id="monthlySpending" min="0" max="100" value="23.26" step="0.1">
+                                    <span class="allocation-value" id="monthlySpendingValue">23.26%</span>
+                                    <div class="allocation-amount" id="monthlySpendingAmount">20,000,000 VND</div>
+                                </div>
+                                <div class="allocation-item">
+                                    <label for="emergencyFund">Emergency Fund (%)</label>
+                                    <input type="range" id="emergencyFund" min="0" max="100" value="69.77" step="0.1">
+                                    <span class="allocation-value" id="emergencyFundValue">69.77%</span>
+                                    <div class="allocation-amount" id="emergencyFundAmount">60,000,000 VND</div>
+                                </div>
+                                <div class="allocation-item">
+                                    <label for="otherExpenses">Other Expenses (%)</label>
+                                    <input type="range" id="otherExpenses" min="0" max="100" value="6.98" step="0.1">
+                                    <span class="allocation-value" id="otherExpensesValue">6.98%</span>
+                                    <div class="allocation-amount" id="otherExpensesAmount">6,000,000 VND</div>
+                                </div>
+                            </div>
+                            <div class="allocation-summary">
+                                <div class="summary-item">
+                                    <span>Total Allocated:</span>
+                                    <strong id="totalAllocatedPercent">100%</strong>
+                                </div>
+                                <div class="summary-item">
+                                    <span>Remaining:</span>
+                                    <strong id="remainingAmount" class="success">0 VND</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency Fund Goal -->
+                        <div class="savings-card">
+                            <h3 class="card-title">🚨 Emergency Fund Goal</h3>
+                            <div class="input-grid">
+                                <div class="input-group">
+                                    <label for="emergencyTarget">Target Amount (VND)</label>
+                                    <input type="number" id="emergencyTarget" placeholder="240,000,000" value="240000000">
+                                </div>
+                                <div class="input-group">
+                                    <label for="emergencyCurrent">Current Savings (VND)</label>
+                                    <input type="number" id="emergencyCurrent" placeholder="0" value="0">
+                                </div>
+                                <div class="result-group">
+                                    <label>Gap to Target</label>
+                                    <div class="result-value danger" id="emergencyGap">240,000,000 VND</div>
+                                </div>
+                                <div class="result-group">
+                                    <label>Months to Reach Goal</label>
+                                    <div class="result-value" id="monthsToGoal">4 months</div>
+                                </div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="emergencyProgress" style="width: 0%"></div>
+                            </div>
+                            <p class="progress-text" id="emergencyProgressText">0% of emergency fund goal</p>
+                        </div>
+
+                        <!-- Sinking Funds -->
+                        <div class="savings-card">
+                            <h3 class="card-title">🎯 Sinking Funds (Future Goals)</h3>
+                            <div class="input-grid">
+                                <div class="input-group">
+                                    <label for="sinkingTarget">Target Amount (VND)</label>
+                                    <input type="number" id="sinkingTarget" placeholder="120,000,000" value="120000000">
+                                </div>
+                                <div class="input-group">
+                                    <label for="sinkingCurrent">Current Savings (VND)</label>
+                                    <input type="number" id="sinkingCurrent" placeholder="0" value="0">
+                                </div>
+                                <div class="result-group">
+                                    <label>Gap to Target</label>
+                                    <div class="result-value danger" id="sinkingGap">120,000,000 VND</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Independence Goals -->
+                        <div class="savings-card">
+                            <h3 class="card-title">🎓 Financial Goals</h3>
+                            <div class="goals-grid">
+                                <div class="goal-item">
+                                    <div class="goal-label">Financial Security</div>
+                                    <div class="goal-value" id="financialSecurity">10,800,000,000 VND</div>
+                                    <div class="goal-desc">6 months emergency fund</div>
+                                </div>
+                                <div class="goal-item">
+                                    <div class="goal-label">Financial Independence</div>
+                                    <div class="goal-value" id="financialIndependence">32,400,000,000 VND</div>
+                                    <div class="goal-desc">25x annual expenses</div>
+                                </div>
+                                <div class="goal-item">
+                                    <div class="goal-label">Financial Freedom</div>
+                                    <div class="goal-value" id="financialFreedom">Mindset + Independence</div>
+                                    <div class="goal-desc">Living on passive income</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Investment Portfolio -->
+                        <div class="savings-card">
+                            <h3 class="card-title">📈 Investment Portfolio Rebalancing</h3>
+                            <div class="portfolio-grid">
+                                <div class="portfolio-item">
+                                    <label for="cryptoAllocation">Crypto (VND)</label>
+                                    <input type="number" id="cryptoAllocation" placeholder="0" value="0">
+                                </div>
+                                <div class="portfolio-item">
+                                    <label for="housingAllocation">Housing/Real Estate (VND)</label>
+                                    <input type="number" id="housingAllocation" placeholder="0" value="0">
+                                </div>
+                                <div class="portfolio-item">
+                                    <label for="stockAllocation">Stocks (VND)</label>
+                                    <input type="number" id="stockAllocation" placeholder="0" value="0">
+                                </div>
+                            </div>
+                            <div class="portfolio-summary">
+                                <div class="summary-row">
+                                    <span>Total Portfolio Value:</span>
+                                    <strong id="totalPortfolio">0 VND</strong>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Recommended Rebalancing:</span>
+                                    <span id="rebalanceStatus" class="info-text">Enter your portfolio values above</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Monthly Cash Flow Summary -->
+                        <div class="savings-card highlight">
+                            <h3 class="card-title">📋 Monthly Cash Flow Summary</h3>
+                            <div class="flow-chart">
+                                <div class="flow-item income">
+                                    <div class="flow-label">Total Income</div>
+                                    <div class="flow-value" id="summaryIncome">86,000,000 VND</div>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-breakdown">
+                                    <div class="flow-sub-item">
+                                        <span>Monthly Spending</span>
+                                        <span id="summarySpending">20,000,000 VND</span>
+                                    </div>
+                                    <div class="flow-sub-item">
+                                        <span>Emergency Fund</span>
+                                        <span id="summaryEmergency">60,000,000 VND</span>
+                                    </div>
+                                    <div class="flow-sub-item">
+                                        <span>Other Expenses</span>
+                                        <span id="summaryOther">6,000,000 VND</span>
+                                    </div>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-item savings">
+                                    <div class="flow-label">Net Savings</div>
+                                    <div class="flow-value" id="summaryNetSavings">0 VND</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -130,5 +330,6 @@
     </div>
 
     <script src="script.js"></script>
+    <script src="savings-calc.js"></script>
 </body>
 </html>
