@@ -1,0 +1,402 @@
+/* ===== TRADINGVIEW CHART MODAL STYLES ===== */
+
+/* Modal Overlay */
+.tv-chart-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tv-chart-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+}
+
+/* Main Container */
+.tv-chart-container {
+    position: relative;
+    width: 95%;
+    max-width: 1200px;
+    height: 90vh;
+    max-height: 800px;
+    background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 20px;
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* Header */
+.tv-chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    background: rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tv-chart-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tv-asset-icon {
+    font-size: 2.5rem;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.tv-asset-info h2 {
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+}
+
+.tv-symbol {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.tv-chart-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.tv-current-price {
+    color: #fff;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.tv-price-change {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.tv-price-change.positive {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10B981;
+}
+
+.tv-price-change.negative {
+    background: rgba(239, 68, 68, 0.2);
+    color: #EF4444;
+}
+
+.tv-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 1.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tv-close-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #EF4444;
+    transform: rotate(90deg);
+}
+
+/* Timeframe Tabs */
+.tv-timeframe-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 16px 24px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tv-timeframe-btn {
+    padding: 10px 24px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tv-timeframe-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.tv-timeframe-btn.active {
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+}
+
+/* Stats Bar */
+.tv-chart-stats {
+    display: flex;
+    gap: 24px;
+    padding: 16px 24px;
+    background: rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+}
+
+.tv-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 100px;
+}
+
+.tv-stat-label {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tv-stat-value {
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.tv-stat-value.high {
+    color: #10B981;
+}
+
+.tv-stat-value.low {
+    color: #EF4444;
+}
+
+/* Widget Container */
+.tv-widget-container {
+    flex: 1;
+    padding: 16px;
+    min-height: 400px;
+    position: relative;
+    background: #131722;
+    border-radius: 12px;
+    margin: 16px;
+}
+
+.tv-widget-container iframe {
+    border-radius: 8px;
+}
+
+/* Loading State */
+.tv-chart-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tv-chart-loading .spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(99, 102, 241, 0.2);
+    border-top-color: #6366F1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Footer */
+.tv-chart-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(0, 0, 0, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tv-data-source {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+}
+
+.tv-last-updated {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.75rem;
+}
+
+/* Asset Card Click Indicator */
+.asset-card,
+.stock-card,
+.crypto-card,
+.commodity-card,
+.featured-card {
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.asset-card:hover,
+.stock-card:hover,
+.crypto-card:hover,
+.commodity-card:hover,
+.featured-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+}
+
+.asset-card::before,
+.commodity-card::before {
+    content: '📊 View Chart';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(99, 102, 241, 0.95);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+.asset-card:hover::before,
+.commodity-card:hover::before {
+    opacity: 1;
+}
+
+.asset-card:hover > *,
+.commodity-card:hover > * {
+    opacity: 0.3;
+}
+
+.asset-card:hover::before,
+.commodity-card:hover::before {
+    opacity: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tv-chart-container {
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 0;
+    }
+
+    .tv-chart-header {
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 16px;
+    }
+
+    .tv-chart-title {
+        flex: 1;
+    }
+
+    .tv-chart-price {
+        align-items: flex-start;
+    }
+
+    .tv-current-price {
+        font-size: 1.5rem;
+    }
+
+    .tv-asset-info h2 {
+        font-size: 1.2rem;
+    }
+
+    .tv-timeframe-tabs {
+        padding: 12px 16px;
+        overflow-x: auto;
+    }
+
+    .tv-timeframe-btn {
+        padding: 8px 16px;
+        font-size: 0.85rem;
+    }
+
+    .tv-chart-stats {
+        padding: 12px 16px;
+        gap: 16px;
+    }
+
+    .tv-stat {
+        min-width: 80px;
+    }
+
+    .tv-widget-container {
+        margin: 8px;
+        min-height: 300px;
+    }
+
+    .tv-close-btn {
+        top: 12px;
+        right: 12px;
+    }
+}
+
+/* Dark Theme Overrides for TradingView */
+.tradingview-widget-container {
+    height: 100% !important;
+}
+
+#tradingview_widget {
+    height: 100% !important;
+}

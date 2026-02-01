@@ -8,8 +8,11 @@
     <link rel="stylesheet" href="savings-styles.css">
     <link rel="stylesheet" href="savings-styles-v2.css">
     <link rel="stylesheet" href="commodities-styles.css">
+    <link rel="stylesheet" href="tradingview-chart.css">
     <!-- Chart.js for price charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <!-- TradingView Widget -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
     <div class="main-container">
@@ -652,39 +655,69 @@
         </footer>
     </div>
 
-    <!-- Chart Popup -->
-    <div id="chartPopup" class="chart-popup" style="display: none;">
-        <div class="chart-popup-header">
-            <div class="chart-popup-title">
-                <span id="chartAssetName"></span>
-                <span id="chartAssetSymbol"></span>
+    <!-- TradingView Chart Modal -->
+    <div id="tvChartModal" class="tv-chart-modal" style="display: none;">
+        <div class="tv-chart-overlay"></div>
+        <div class="tv-chart-container">
+            <div class="tv-chart-header">
+                <div class="tv-chart-title">
+                    <span class="tv-asset-icon" id="tvAssetIcon"></span>
+                    <div class="tv-asset-info">
+                        <h2 id="tvAssetName">Asset Name</h2>
+                        <span id="tvAssetSymbol" class="tv-symbol">SYMBOL</span>
+                    </div>
+                </div>
+                <div class="tv-chart-price">
+                    <span class="tv-current-price" id="tvCurrentPrice">$0.00</span>
+                    <span class="tv-price-change" id="tvPriceChange">+0.00%</span>
+                </div>
+                <button class="tv-close-btn" id="tvCloseBtn">&times;</button>
             </div>
-            <div id="chartAssetPrice"></div>
-        </div>
-        <div class="chart-stats">
-            <div class="stat-item">
-                <span class="stat-label">High</span>
-                <span id="chartHigh" class="stat-value high">-</span>
+
+            <div class="tv-timeframe-tabs">
+                <button class="tv-timeframe-btn active" data-interval="60">1H</button>
+                <button class="tv-timeframe-btn" data-interval="D">1D</button>
+                <button class="tv-timeframe-btn" data-interval="W">1W</button>
+                <button class="tv-timeframe-btn" data-interval="M">1M</button>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">Low</span>
-                <span id="chartLow" class="stat-value low">-</span>
+
+            <div class="tv-chart-stats">
+                <div class="tv-stat">
+                    <span class="tv-stat-label">Open</span>
+                    <span class="tv-stat-value" id="tvOpen">-</span>
+                </div>
+                <div class="tv-stat">
+                    <span class="tv-stat-label">High</span>
+                    <span class="tv-stat-value high" id="tvHigh">-</span>
+                </div>
+                <div class="tv-stat">
+                    <span class="tv-stat-label">Low</span>
+                    <span class="tv-stat-value low" id="tvLow">-</span>
+                </div>
+                <div class="tv-stat">
+                    <span class="tv-stat-label">Volume</span>
+                    <span class="tv-stat-value" id="tvVolume">-</span>
+                </div>
+                <div class="tv-stat">
+                    <span class="tv-stat-label">Market Cap</span>
+                    <span class="tv-stat-value" id="tvMarketCap">-</span>
+                </div>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">Change</span>
-                <span id="chartChange" class="stat-value">-</span>
+
+            <div class="tv-widget-container" id="tvWidgetContainer">
+                <!-- TradingView Widget will be inserted here -->
             </div>
-        </div>
-        <div class="chart-container">
-            <canvas id="priceChart"></canvas>
-        </div>
-        <div class="chart-popup-footer">
-            <span>24H Chart</span>
+
+            <div class="tv-chart-footer">
+                <span class="tv-data-source">Powered by TradingView</span>
+                <span class="tv-last-updated" id="tvLastUpdated">Updated: --</span>
+            </div>
         </div>
     </div>
 
     <script src="script.js"></script>
     <script src="savings-calc-v2.js"></script>
     <script src="commodities.js"></script>
+    <script src="tradingview-chart.js"></script>
 </body>
 </html>

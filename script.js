@@ -257,17 +257,17 @@ function displayStocks(stocks) {
         const changeIcon = isPositive ? '↗' : '↘';
 
         return `
-            <div class="asset-card">
+            <div class="asset-card stock-card" data-symbol="${stock.symbol}" data-type="stock">
                 <div class="card-header">
                     <div class="asset-info">
-                        <div class="asset-symbol">${stock.symbol}</div>
+                        <div class="asset-symbol stock-symbol">${stock.symbol}</div>
                     </div>
                     <div class="asset-rank">#${stock.rank}</div>
                 </div>
-                <div class="asset-name">${stock.name}</div>
-                <div class="asset-price">$${stock.price}</div>
+                <div class="asset-name stock-name">${stock.name}</div>
+                <div class="asset-price stock-price">$${stock.price}</div>
                 <div class="asset-marketcap">Market Cap: ${formatMarketCap(stock.marketCap)}</div>
-                <div class="price-change ${changeClass}">
+                <div class="price-change stock-change ${changeClass}">
                     <span class="change-icon">${changeIcon}</span>
                     <span>$${Math.abs(stock.change)}</span>
                     <span>(${isPositive ? '+' : ''}${stock.changePercent}%)</span>
@@ -351,16 +351,16 @@ function displayCrypto(cryptos) {
         const changeIcon = isPositive ? '↗' : '↘';
 
         return `
-            <div class="asset-card crypto">
+            <div class="asset-card crypto crypto-card" data-id="${crypto.id}" data-symbol="${crypto.symbol}" data-type="crypto">
                 <div class="card-header">
                     <div class="asset-info">
                         <img src="${crypto.image}" alt="${crypto.name}" class="crypto-icon">
-                        <div class="asset-symbol">${crypto.symbol}</div>
+                        <div class="asset-symbol crypto-symbol">${crypto.symbol}</div>
                     </div>
                     <div class="asset-rank">#${crypto.rank}</div>
                 </div>
-                <div class="asset-name">${crypto.name}</div>
-                <div class="asset-price">$${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
+                <div class="asset-name crypto-name">${crypto.name}</div>
+                <div class="asset-price crypto-price">$${crypto.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</div>
                 <div class="crypto-metrics">
                     <div class="metric">
                         <span class="metric-label">Market Cap</span>
@@ -371,7 +371,7 @@ function displayCrypto(cryptos) {
                         <span class="metric-value">${crypto.fdv > 0 ? formatMarketCap(crypto.fdv) : 'N/A'}</span>
                     </div>
                 </div>
-                <div class="price-change ${changeClass}">
+                <div class="price-change crypto-change ${changeClass}">
                     <span class="change-icon">${changeIcon}</span>
                     <span>$${Math.abs(crypto.change).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })}</span>
                     <span>(${isPositive ? '+' : ''}${crypto.changePercent.toFixed(2)}%)</span>
