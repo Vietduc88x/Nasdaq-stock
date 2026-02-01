@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="savings-styles.css">
     <link rel="stylesheet" href="savings-styles-v2.css">
+    <link rel="stylesheet" href="commodities-styles.css">
     <!-- Chart.js for price charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
@@ -53,6 +54,11 @@
                     <span class="tab-icon">💰</span>
                     <span class="tab-label">Saving Methodology</span>
                     <span class="tab-count">Plan</span>
+                </button>
+                <button class="tab-btn" data-tab="commodities">
+                    <span class="tab-icon">🥇</span>
+                    <span class="tab-label">Commodities</span>
+                    <span class="tab-count">22</span>
                 </button>
                 <div class="tab-indicator"></div>
             </nav>
@@ -517,6 +523,98 @@
         <span class="savings-rate-desc" id="savingsRateDesc">Excellent! You're on track to financial independence</span>
     </div>
 </div>
+                    </div>
+                </div>
+
+                <!-- Commodities Tab Content -->
+                <div id="commodities-tab" class="tab-content">
+                    <div class="content-header">
+                        <div class="content-title">
+                            <h2>Commodities & Precious Metals</h2>
+                            <p class="content-description">Track Gold, Silver, and other valuable assets</p>
+                        </div>
+                        <div class="view-options">
+                            <span class="total-items">Showing 22 commodities</span>
+                        </div>
+                    </div>
+
+                    <!-- Featured Precious Metals -->
+                    <div class="commodities-featured">
+                        <div class="featured-card gold-card" id="goldCard">
+                            <div class="featured-icon">🥇</div>
+                            <div class="featured-info">
+                                <h3>Gold</h3>
+                                <span class="featured-symbol">XAU/USD</span>
+                            </div>
+                            <div class="featured-price">
+                                <span class="price" id="goldPrice">$2,035.50</span>
+                                <span class="change positive" id="goldChange">+0.45%</span>
+                            </div>
+                        </div>
+                        <div class="featured-card silver-card" id="silverCard">
+                            <div class="featured-icon">🥈</div>
+                            <div class="featured-info">
+                                <h3>Silver</h3>
+                                <span class="featured-symbol">XAG/USD</span>
+                            </div>
+                            <div class="featured-price">
+                                <span class="price" id="silverPrice">$22.85</span>
+                                <span class="change positive" id="silverChange">+0.32%</span>
+                            </div>
+                        </div>
+                        <div class="featured-card platinum-card" id="platinumCard">
+                            <div class="featured-icon">⚪</div>
+                            <div class="featured-info">
+                                <h3>Platinum</h3>
+                                <span class="featured-symbol">XPT/USD</span>
+                            </div>
+                            <div class="featured-price">
+                                <span class="price" id="platinumPrice">$895.20</span>
+                                <span class="change negative" id="platinumChange">-0.18%</span>
+                            </div>
+                        </div>
+                        <div class="featured-card palladium-card" id="palladiumCard">
+                            <div class="featured-icon">🔘</div>
+                            <div class="featured-info">
+                                <h3>Palladium</h3>
+                                <span class="featured-symbol">XPD/USD</span>
+                            </div>
+                            <div class="featured-price">
+                                <span class="price" id="palladiumPrice">$952.00</span>
+                                <span class="change positive" id="palladiumChange">+0.65%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Commodities Categories -->
+                    <div class="commodities-categories">
+                        <div class="category-section">
+                            <h3 class="category-title">⛽ Energy</h3>
+                            <div id="energyContainer" class="commodities-grid">
+                                <div class="loading-spinner small">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="category-section">
+                            <h3 class="category-title">🌾 Agriculture</h3>
+                            <div id="agricultureContainer" class="commodities-grid">
+                                <div class="loading-spinner small">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="category-section">
+                            <h3 class="category-title">🔩 Industrial Metals</h3>
+                            <div id="metalsContainer" class="commodities-grid">
+                                <div class="loading-spinner small">
+                                    <div class="spinner"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -560,5 +658,6 @@
 
     <script src="script.js"></script>
     <script src="savings-calc-v2.js"></script>
+    <script src="commodities.js"></script>
 </body>
 </html>
