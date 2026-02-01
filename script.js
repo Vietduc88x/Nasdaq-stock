@@ -100,51 +100,46 @@ const top10Stocks = [
     { symbol: 'ZM', name: 'Zoom Video Communications Inc.' }
 ];
 
-// Function to fetch stock data using multiple sources
+// Function to fetch stock data using TVC/Yahoo Finance as primary source
 async function fetchStockData() {
     const stocksContainer = document.getElementById('stocksContainer');
-    stocksContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading market data...</p></div>';
+    stocksContainer.innerHTML = '<div class="loading-spinner"><div class="spinner"></div><p>Loading market data from TVC...</p></div>';
 
     try {
-        // Fetch all stocks data using Twelve Data API (free tier, no CORS issues)
-        const symbolsString = top10Stocks.map(s => s.symbol).join(',');
-
         const promises = top10Stocks.map(async (stock, index) => {
             try {
-                // Using Twelve Data API with your API key
-                const response = await fetch(
-                    `https://api.twelvedata.com/quote?symbol=${stock.symbol}&apikey=e3c55e8ac7f143e1b2aad80631345610`
-                );
+                // Primary: TVC/Yahoo Finance with CORS proxy (same data as TradingView)
+                const corsProxy = 'https://api.allorigins.win/raw?url=';
+                const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${stock.symbol}?interval=1d&range=1d`;
+                const response = await fetch(corsProxy + encodeURIComponent(yahooUrl));
 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.chart?.result?.[0]) {
+                        const quote = data.chart.result[0].meta;
+                        const price = quote.regularMarketPrice;
+                        const previousClose = quote.chartPreviousClose || quote.previousClose;
+                        const change = price - previousClose;
+                        const changePercent = (change / previousClose) * 100;
+
+                        console.log(`✓ TVC data for ${stock.symbol}: $${price.toFixed(2)}`);
+
+                        return {
+                            ...stock,
+                            price: price.toFixed(2),
+                            change: change.toFixed(2),
+                            changePercent: changePercent.toFixed(2),
+                            marketCap: quote.marketCap || 0,
+                            rank: index + 1,
+                            isRealData: true
+                        };
+                    }
                 }
-
-                const data = await response.json();
-
-                if (data && data.symbol && data.close) {
-                    const price = parseFloat(data.close);
-                    const previousClose = parseFloat(data.previous_close);
-                    const change = price - previousClose;
-                    const changePercent = (change / previousClose) * 100;
-
-                    console.log(`✓ Real data for ${stock.symbol}: $${price.toFixed(2)}`);
-
-                    return {
-                        ...stock,
-                        price: price.toFixed(2),
-                        change: change.toFixed(2),
-                        changePercent: changePercent.toFixed(2),
-                        marketCap: data.market_cap || 0,
-                        rank: index + 1,
-                        isRealData: true
-                    };
-                }
-                throw new Error('Invalid data format');
+                throw new Error('TVC fetch failed');
             } catch (error) {
-                console.warn(`⚠ API failed for ${stock.symbol}, trying Yahoo Finance...`);
+                console.warn(`⚠ TVC failed for ${stock.symbol}, trying backup...`);
 
-                // Fallback to Yahoo Finance
+                // Backup: Direct Yahoo Finance (may have CORS issues in some browsers)
                 try {
                     const yahooResponse = await fetch(
                         `https://query1.finance.yahoo.com/v8/finance/chart/${stock.symbol}`
@@ -159,7 +154,7 @@ async function fetchStockData() {
                             const change = price - previousClose;
                             const changePercent = (change / previousClose) * 100;
 
-                            console.log(`✓ Yahoo data for ${stock.symbol}: $${price.toFixed(2)}`);
+                            console.log(`✓ Yahoo backup for ${stock.symbol}: $${price.toFixed(2)}`);
 
                             return {
                                 ...stock,
@@ -173,7 +168,7 @@ async function fetchStockData() {
                         }
                     }
                 } catch (yahooError) {
-                    console.warn(`⚠ Yahoo also failed for ${stock.symbol}`);
+                    console.warn(`⚠ Yahoo backup also failed for ${stock.symbol}`);
                 }
 
                 // Final fallback to current market prices (Jan 17, 2026)
