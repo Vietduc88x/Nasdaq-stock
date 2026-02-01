@@ -283,7 +283,7 @@
 .commodity-card,
 .featured-card {
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     position: relative;
 }
 
@@ -293,42 +293,34 @@
 .commodity-card:hover,
 .featured-card:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.2);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.25);
+    border-color: rgba(99, 102, 241, 0.5) !important;
 }
 
-.asset-card::before,
-.commodity-card::before {
-    content: '📊 View Chart';
+/* Small chart icon indicator on hover */
+.asset-card::after,
+.commodity-card::after {
+    content: '📊';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(99, 102, 241, 0.95);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
+    top: 8px;
+    right: 8px;
+    font-size: 1.2rem;
     opacity: 0;
-    transition: opacity 0.2s ease;
-    pointer-events: none;
-    z-index: 10;
-    white-space: nowrap;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: scale(0.8);
+    z-index: 5;
 }
 
-.asset-card:hover::before,
-.commodity-card:hover::before {
+.asset-card:hover::after,
+.commodity-card:hover::after {
     opacity: 1;
+    transform: scale(1);
 }
 
-.asset-card:hover > *,
-.commodity-card:hover > * {
-    opacity: 0.3;
-}
-
-.asset-card:hover::before,
-.commodity-card:hover::before {
-    opacity: 1;
+/* Subtle glow effect on hover */
+.asset-card:hover,
+.commodity-card:hover {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
 }
 
 /* Responsive Design */
