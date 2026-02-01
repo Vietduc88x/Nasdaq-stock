@@ -1,36 +1,36 @@
 // ===== COMMODITIES & PRECIOUS METALS TRACKER =====
 
-// Commodity data with fallback prices (Jan 2026 estimates)
+// Commodity data with fallback prices (Feb 2026 market prices)
 const commoditiesData = {
     preciousMetals: [
-        { symbol: 'XAU', name: 'Gold', unit: 'oz', fallbackPrice: 2650.00, icon: '🥇' },
-        { symbol: 'XAG', name: 'Silver', unit: 'oz', fallbackPrice: 31.50, icon: '🥈' },
-        { symbol: 'XPT', name: 'Platinum', unit: 'oz', fallbackPrice: 985.00, icon: '⚪' },
-        { symbol: 'XPD', name: 'Palladium', unit: 'oz', fallbackPrice: 1050.00, icon: '🔘' }
+        { symbol: 'XAU', name: 'Gold', unit: 'oz', fallbackPrice: 4895.00, icon: '🥇' },
+        { symbol: 'XAG', name: 'Silver', unit: 'oz', fallbackPrice: 56.80, icon: '🥈' },
+        { symbol: 'XPT', name: 'Platinum', unit: 'oz', fallbackPrice: 1285.00, icon: '⚪' },
+        { symbol: 'XPD', name: 'Palladium', unit: 'oz', fallbackPrice: 1150.00, icon: '🔘' }
     ],
     energy: [
-        { symbol: 'CL', name: 'Crude Oil (WTI)', unit: 'barrel', fallbackPrice: 78.50, icon: '🛢️' },
-        { symbol: 'BZ', name: 'Brent Crude', unit: 'barrel', fallbackPrice: 82.30, icon: '⛽' },
-        { symbol: 'NG', name: 'Natural Gas', unit: 'MMBtu', fallbackPrice: 3.25, icon: '🔥' },
-        { symbol: 'HO', name: 'Heating Oil', unit: 'gallon', fallbackPrice: 2.65, icon: '🏠' },
-        { symbol: 'RB', name: 'Gasoline', unit: 'gallon', fallbackPrice: 2.35, icon: '⛽' }
+        { symbol: 'CL', name: 'Crude Oil (WTI)', unit: 'barrel', fallbackPrice: 72.50, icon: '🛢️' },
+        { symbol: 'BZ', name: 'Brent Crude', unit: 'barrel', fallbackPrice: 76.80, icon: '⛽' },
+        { symbol: 'NG', name: 'Natural Gas', unit: 'MMBtu', fallbackPrice: 3.15, icon: '🔥' },
+        { symbol: 'HO', name: 'Heating Oil', unit: 'gallon', fallbackPrice: 2.45, icon: '🏠' },
+        { symbol: 'RB', name: 'Gasoline', unit: 'gallon', fallbackPrice: 2.18, icon: '⛽' }
     ],
     agriculture: [
-        { symbol: 'ZC', name: 'Corn', unit: 'bushel', fallbackPrice: 4.85, icon: '🌽' },
-        { symbol: 'ZW', name: 'Wheat', unit: 'bushel', fallbackPrice: 6.20, icon: '🌾' },
-        { symbol: 'ZS', name: 'Soybeans', unit: 'bushel', fallbackPrice: 13.50, icon: '🫘' },
-        { symbol: 'KC', name: 'Coffee', unit: 'lb', fallbackPrice: 2.45, icon: '☕' },
-        { symbol: 'SB', name: 'Sugar', unit: 'lb', fallbackPrice: 0.27, icon: '🍬' },
-        { symbol: 'CT', name: 'Cotton', unit: 'lb', fallbackPrice: 0.82, icon: '🧶' },
-        { symbol: 'CC', name: 'Cocoa', unit: 'ton', fallbackPrice: 4250.00, icon: '🍫' },
-        { symbol: 'OJ', name: 'Orange Juice', unit: 'lb', fallbackPrice: 3.85, icon: '🍊' }
+        { symbol: 'ZC', name: 'Corn', unit: 'bushel', fallbackPrice: 4.52, icon: '🌽' },
+        { symbol: 'ZW', name: 'Wheat', unit: 'bushel', fallbackPrice: 5.65, icon: '🌾' },
+        { symbol: 'ZS', name: 'Soybeans', unit: 'bushel', fallbackPrice: 10.25, icon: '🫘' },
+        { symbol: 'KC', name: 'Coffee', unit: 'lb', fallbackPrice: 4.25, icon: '☕' },
+        { symbol: 'SB', name: 'Sugar', unit: 'lb', fallbackPrice: 0.19, icon: '🍬' },
+        { symbol: 'CT', name: 'Cotton', unit: 'lb', fallbackPrice: 0.68, icon: '🧶' },
+        { symbol: 'CC', name: 'Cocoa', unit: 'ton', fallbackPrice: 9850.00, icon: '🍫' },
+        { symbol: 'OJ', name: 'Orange Juice', unit: 'lb', fallbackPrice: 4.65, icon: '🍊' }
     ],
     industrialMetals: [
-        { symbol: 'HG', name: 'Copper', unit: 'lb', fallbackPrice: 4.25, icon: '🔶' },
-        { symbol: 'ALI', name: 'Aluminum', unit: 'lb', fallbackPrice: 1.15, icon: '📦' },
-        { symbol: 'ZN', name: 'Zinc', unit: 'lb', fallbackPrice: 1.28, icon: '🔩' },
-        { symbol: 'NI', name: 'Nickel', unit: 'lb', fallbackPrice: 7.85, icon: '⚙️' },
-        { symbol: 'LBS', name: 'Lumber', unit: '1000 bf', fallbackPrice: 565.00, icon: '🪵' }
+        { symbol: 'HG', name: 'Copper', unit: 'lb', fallbackPrice: 4.15, icon: '🔶' },
+        { symbol: 'ALI', name: 'Aluminum', unit: 'lb', fallbackPrice: 1.18, icon: '📦' },
+        { symbol: 'ZN', name: 'Zinc', unit: 'lb', fallbackPrice: 1.32, icon: '🔩' },
+        { symbol: 'NI', name: 'Nickel', unit: 'lb', fallbackPrice: 7.25, icon: '⚙️' },
+        { symbol: 'LBS', name: 'Lumber', unit: '1000 bf', fallbackPrice: 545.00, icon: '🪵' }
     ]
 };
 
