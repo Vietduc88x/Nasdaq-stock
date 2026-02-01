@@ -239,6 +239,17 @@ body {
     font-size: 1.5rem;
 }
 
+.tab-icon.gold-icon {
+    color: #FFD700;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.6), 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 1.3rem;
+}
+
+.tab-btn.active .tab-icon.gold-icon {
+    color: #FFF;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
 .tab-label {
     font-size: 1.05rem;
 }
