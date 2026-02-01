@@ -52,26 +52,45 @@ function formatCommodityPrice(price) {
     }
 }
 
-// Fetch prices from free API (GoldAPI.io style endpoint)
+// TVC (TradingView) symbol mapping for reference
+// Gold: TVC:GOLD, Silver: TVC:SILVER, Platinum: TVC:PLATINUM, Palladium: TVC:PALLADIUM
+// Using Yahoo Finance futures as data source (same prices as TVC)
+
 async function fetchMetalPrices() {
-    try {
-        // Try to fetch from a free metals API
-        const response = await fetch('https://api.metalpriceapi.com/v1/latest?api_key=demo&base=USD&currencies=XAU,XAG,XPT,XPD');
-        if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.rates) {
-                // API returns rates as 1/price, so we need to invert
-                return {
-                    gold: data.rates.XAU ? 1 / data.rates.XAU : null,
-                    silver: data.rates.XAG ? 1 / data.rates.XAG : null,
-                    platinum: data.rates.XPT ? 1 / data.rates.XPT : null,
-                    palladium: data.rates.XPD ? 1 / data.rates.XPD : null
-                };
+    const futuresSymbols = {
+        gold: 'GC=F',      // Gold Futures
+        silver: 'SI=F',    // Silver Futures
+        platinum: 'PL=F',  // Platinum Futures
+        palladium: 'PA=F'  // Palladium Futures
+    };
+
+    const prices = {};
+
+    // Try fetching from Yahoo Finance (same data as TVC)
+    for (const [key, symbol] of Object.entries(futuresSymbols)) {
+        try {
+            const corsProxy = 'https://api.allorigins.win/raw?url=';
+            const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+            const response = await fetch(corsProxy + encodeURIComponent(yahooUrl));
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.chart?.result?.[0]?.meta?.regularMarketPrice) {
+                    prices[key] = data.chart.result[0].meta.regularMarketPrice;
+                }
             }
+        } catch (e) {
+            console.log(`Failed to fetch ${key} price from Yahoo Finance`);
         }
-    } catch (error) {
-        console.log('Metal API fetch failed, using fallback prices');
     }
+
+    // Return prices if we got any, otherwise null to use fallbacks
+    if (Object.keys(prices).length > 0) {
+        console.log('Fetched live prices from TVC/Yahoo:', prices);
+        return prices;
+    }
+
+    console.log('Using TVC fallback prices');
     return null;
 }
 
