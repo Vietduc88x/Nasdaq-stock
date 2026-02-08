@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="savings-styles-v2.css">
     <link rel="stylesheet" href="commodities-styles.css">
     <link rel="stylesheet" href="tradingview-chart.css">
+    <link rel="stylesheet" href="platform-thesis-styles.css">
     <!-- Chart.js for price charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <!-- TradingView Widget -->
@@ -62,6 +63,11 @@
                     <span class="tab-icon">💰</span>
                     <span class="tab-label">Saving Methodology</span>
                     <span class="tab-count">Plan</span>
+                </button>
+                <button class="tab-btn" data-tab="platform">
+                    <span class="tab-icon">🚀</span>
+                    <span class="tab-label">Platform Thesis</span>
+                    <span class="tab-count">Article</span>
                 </button>
                 <div class="tab-indicator"></div>
             </nav>
@@ -646,6 +652,13 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Platform Thesis Tab Content -->
+                <div id="platform-tab" class="tab-content">
+                    <div class="platform-article-container">
+                        <!-- Article content will be loaded here -->
+                    </div>
+                </div>
             </div>
         </main>
 
@@ -719,5 +732,6 @@
     <script src="savings-calc-v2.js"></script>
     <script src="commodities.js"></script>
     <script src="tradingview-chart.js"></script>
+    <script src="platform-thesis.js"></script>
 </body>
 </html>

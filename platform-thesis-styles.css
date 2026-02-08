@@ -1,0 +1,168 @@
+/* Platform Thesis Article Styles */
+.platform-article-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.platform-article-container .container {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 12px;
+    padding: 60px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.platform-article-container header {
+    text-align: center;
+    margin-bottom: 50px;
+    border-bottom: 2px solid rgba(148, 163, 184, 0.2);
+    padding-bottom: 30px;
+}
+
+.platform-article-container h1 {
+    font-size: 2.8em;
+    font-weight: 800;
+    margin-bottom: 15px;
+    background: linear-gradient(135deg, #9945FF, #00D4AA, #00C1DE);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -1px;
+}
+
+.platform-article-container .meta {
+    color: #94a3b8;
+    font-size: 0.95em;
+    margin-bottom: 10px;
+}
+
+.platform-article-container .author {
+    color: #cbd5e1;
+    font-style: italic;
+    margin-top: 10px;
+}
+
+.platform-article-container .author strong {
+    color: #9945FF;
+}
+
+.platform-article-container .read-time {
+    color: #94a3b8;
+    font-size: 0.9em;
+    margin-top: 15px;
+}
+
+.platform-article-container section {
+    margin: 30px 0;
+}
+
+.platform-article-container h2 {
+    font-size: 2em;
+    margin: 40px 0 25px 0;
+    color: #f1f5f9;
+    border-bottom: 2px solid rgba(153, 69, 255, 0.3);
+    padding-bottom: 15px;
+}
+
+.platform-article-container h3 {
+    font-size: 1.5em;
+    margin: 30px 0 20px 0;
+    color: #cbd5e1;
+}
+
+.platform-article-container p {
+    margin-bottom: 18px;
+    text-align: justify;
+    color: #cbd5e1;
+    line-height: 1.8;
+}
+
+.platform-article-container strong {
+    color: #f1f5f9;
+    font-weight: 600;
+}
+
+.platform-article-container em {
+    color: #a78bfa;
+    font-style: italic;
+}
+
+.platform-article-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 30px 0;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.platform-article-container th,
+.platform-article-container td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+    color: #cbd5e1;
+}
+
+.platform-article-container th {
+    background: rgba(99, 102, 241, 0.2);
+    font-weight: 600;
+    color: #a5f3fc;
+}
+
+.platform-article-container tr:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.platform-article-container ul,
+.platform-article-container ol {
+    margin: 20px 0;
+    padding-left: 40px;
+    color: #cbd5e1;
+}
+
+.platform-article-container li {
+    margin: 12px 0;
+    line-height: 1.8;
+}
+
+.platform-article-container .flywheel-section {
+    background: rgba(30, 41, 59, 0.8);
+    border: 2px solid rgba(51, 65, 85, 0.6);
+    border-radius: 16px;
+    padding: 50px 30px;
+    margin: 50px 0;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+.platform-article-container .flywheel-svg {
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 20px 50px rgba(0, 0, 0, 0.6));
+}
+
+.platform-article-container .disclaimer {
+    background: rgba(239, 68, 68, 0.1);
+    border-left: 4px solid #ef4444;
+    padding: 20px;
+    margin: 30px 0;
+    border-radius: 8px;
+    font-size: 0.95em;
+    line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+    .platform-article-container .container {
+        padding: 30px 20px;
+    }
+    
+    .platform-article-container h1 {
+        font-size: 1.8em;
+    }
+    
+    .platform-article-container h2 {
+        font-size: 1.4em;
+    }
+}
