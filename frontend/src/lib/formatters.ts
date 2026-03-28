@@ -25,6 +25,22 @@ export function tierBadge(tier: string): { label: string; color: string } {
   }
 }
 
+/**
+ * Resolve tier string to CSS class + label for badges.
+ * Single source of truth — use this everywhere instead of inline switch/ternary.
+ */
+export function resolveTier(tier: string): { tierClass: string; tierLabel: string } {
+  switch (tier) {
+    case 'live_exchange': return { tierClass: 'tier-live', tierLabel: 'Live' };
+    case 'delayed_vendor': return { tierClass: 'tier-vendor', tierLabel: 'Vendor' };
+    case 'indexed_reference': return { tierClass: 'tier-indexed', tierLabel: 'Indexed' };
+    case 'modeled_reference': return { tierClass: 'tier-reference', tierLabel: 'Ref' };
+    case 'stale_cache': return { tierClass: 'tier-stale', tierLabel: 'Stale' };
+    case 'fallback_reference': return { tierClass: 'tier-fallback', tierLabel: 'Fallback' };
+    default: return { tierClass: 'tier-reference', tierLabel: 'Ref' };
+  }
+}
+
 export function systemIcon(system: string): string {
   switch (system) {
     case 'solar': return '\u2600\uFE0F';

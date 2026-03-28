@@ -1,7 +1,7 @@
 'use client';
 
 import type { MaterialImpact } from '@/lib/types';
-import { formatUsd } from '@/lib/formatters';
+import { formatUsd, resolveTier } from '@/lib/formatters';
 import Link from 'next/link';
 
 interface Props {
@@ -14,17 +14,7 @@ export default function MaterialBreakdownTable({ materials, totalCost }: Props) 
   const materialPct = ((totalMaterialCost / totalCost) * 100).toFixed(1);
   const maxShare = Math.max(...materials.map(m => m.shareOfSystemPct));
 
-  const tierClass = (tier: string) =>
-    tier === 'live_exchange' ? 'tier-live'
-    : tier === 'delayed_vendor' ? 'tier-vendor'
-    : tier === 'indexed_reference' ? 'tier-indexed'
-    : 'tier-reference';
-
-  const tierLabel = (tier: string) =>
-    tier === 'live_exchange' ? 'Live'
-    : tier === 'delayed_vendor' ? 'Vendor'
-    : tier === 'indexed_reference' ? 'Indexed'
-    : 'Ref';
+  // Use shared resolveTier for enum completeness (handles stale_cache, fallback_reference)
 
   return (
     <div className="card-surface p-4">
@@ -61,7 +51,7 @@ export default function MaterialBreakdownTable({ materials, totalCost }: Props) 
                     </Link>
                   </td>
                   <td className="py-2.5 pr-3 text-right hidden sm:table-cell">
-                    <span className={`tier-badge ${tierClass(m.coverageTier)}`}>{tierLabel(m.coverageTier)}</span>
+                    {(() => { const t = resolveTier(m.coverageTier); return <span className={`tier-badge ${t.tierClass}`}>{t.tierLabel}</span>; })()}
                   </td>
                   <td className="py-2.5 pr-3 text-right font-price text-[12px]" style={{ color: 'var(--text-tertiary)' }}>
                     {m.currentPrice ? formatUsd(m.currentPrice.value) : '—'}

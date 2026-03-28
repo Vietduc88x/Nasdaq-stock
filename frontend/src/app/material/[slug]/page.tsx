@@ -1,5 +1,5 @@
 import { fetchMaterialDetail } from '@/lib/api';
-import { formatUsd, systemIcon } from '@/lib/formatters';
+import { formatUsd, systemIcon, resolveTier } from '@/lib/formatters';
 import Link from 'next/link';
 import MaterialIcon from '@/components/MaterialIcon';
 import PriceChart from '@/components/PriceChart';
@@ -9,15 +9,9 @@ export const revalidate = 60;
 export default async function MaterialDetailPage({ params }: { params: { slug: string } }) {
   const data = await fetchMaterialDetail(params.slug);
 
-  const tierClass = data.material.coverageTier === 'live_exchange' ? 'tier-live'
-    : data.material.coverageTier === 'delayed_vendor' ? 'tier-vendor'
-    : data.material.coverageTier === 'indexed_reference' ? 'tier-indexed'
-    : 'tier-reference';
-
-  const tierLabel = data.material.coverageTier === 'live_exchange' ? 'Live'
-    : data.material.coverageTier === 'delayed_vendor' ? 'Vendor'
-    : data.material.coverageTier === 'indexed_reference' ? 'Indexed'
-    : 'Reference';
+  // Badge reflects ACTUAL price state, not material capability
+  const priceTier = data.currentPrice?.coverageTier || data.material.coverageTier;
+  const { tierClass, tierLabel } = resolveTier(priceTier);
 
   return (
     <div className="space-y-5">

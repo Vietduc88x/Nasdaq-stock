@@ -10,12 +10,11 @@ interface Props {
   sparkline5d?: number[] | null;
 }
 
+// Only show timeframes we can actually serve.
+// Currently only 5D is available from sparkline5d data.
+// TODO: Add /api/materials/:slug/history endpoint for longer ranges.
 const TIMEFRAMES = [
   { label: '5D', range: '5d', interval: '1d' },
-  { label: '1M', range: '1mo', interval: '1d' },
-  { label: '3M', range: '3mo', interval: '1d' },
-  { label: '1Y', range: '1y', interval: '1wk' },
-  { label: '5Y', range: '5y', interval: '1mo' },
 ];
 
 export default function PriceChart({ yahooSymbol, name, currentPrice, unit, sparkline5d }: Props) {
@@ -25,7 +24,7 @@ export default function PriceChart({ yahooSymbol, name, currentPrice, unit, spar
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch real data from Yahoo via our API proxy
+  // Use sparkline5d data directly — only real data, no fake generation
   useEffect(() => {
     if (!yahooSymbol) {
       setChartData(null);
@@ -33,47 +32,14 @@ export default function PriceChart({ yahooSymbol, name, currentPrice, unit, spar
       return;
     }
 
-    const tf = TIMEFRAMES[activeTimeframe];
-
-    // For 5D, use the sparkline data we already have
-    if (tf.label === '5D' && sparkline5d && sparkline5d.length > 1) {
+    if (sparkline5d && sparkline5d.length > 1) {
       setChartData(sparkline5d);
       setError(null);
-      return;
+    } else {
+      setChartData(null);
+      setError('Price history not yet available');
     }
-
-    // Fetch longer timeframes from Yahoo via backend proxy
-    setLoading(true);
-    setError(null);
-
-    fetch(`/api/materials/${name.toLowerCase().replace(/\s+/g, '-')}/history?range=${tf.range}&interval=${tf.interval}`)
-      .then(r => {
-        if (!r.ok) throw new Error('Failed to fetch history');
-        return r.json();
-      })
-      .then(data => {
-        if (data.closes && data.closes.length > 1) {
-          setChartData(data.closes);
-        } else if (sparkline5d && sparkline5d.length > 1) {
-          // Fallback to 5D sparkline if longer range unavailable
-          setChartData(sparkline5d);
-        } else {
-          setError('Historical data not available');
-          setChartData(null);
-        }
-      })
-      .catch(() => {
-        // Fallback to sparkline5d if available
-        if (sparkline5d && sparkline5d.length > 1) {
-          setChartData(sparkline5d);
-          setError(null);
-        } else {
-          setError('Could not load price history');
-          setChartData(null);
-        }
-      })
-      .finally(() => setLoading(false));
-  }, [yahooSymbol, activeTimeframe, name]);
+  }, [yahooSymbol, sparkline5d]);
 
   // Draw chart
   useEffect(() => {
@@ -191,20 +157,11 @@ export default function PriceChart({ yahooSymbol, name, currentPrice, unit, spar
           )}
         </div>
 
-        {/* Timeframe selector — only for live materials */}
-        {yahooSymbol && (
-          <div className="segmented-control">
-            {TIMEFRAMES.map((tf, i) => (
-              <button
-                key={tf.label}
-                onClick={() => setActiveTimeframe(i)}
-                className={`segment ${i === activeTimeframe ? 'active' : ''}`}
-                style={{ padding: '4px 10px', fontSize: '11px' }}
-              >
-                {tf.label}
-              </button>
-            ))}
-          </div>
+        {/* Timeframe label — only show when we have data */}
+        {yahooSymbol && chartData && (
+          <span className="text-[11px] px-2 py-1 rounded" style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)' }}>
+            5-Day
+          </span>
         )}
       </div>
 

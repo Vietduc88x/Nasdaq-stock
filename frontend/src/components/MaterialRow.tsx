@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { formatUsd, systemIcon } from '@/lib/formatters';
+import { formatUsd, systemIcon, resolveTier } from '@/lib/formatters';
 import MaterialIcon from './MaterialIcon';
 import PriceChange from './PriceChange';
 import Sparkline from './Sparkline';
@@ -14,21 +14,8 @@ interface Props {
 
 export default function MaterialRow({ material: m, index }: Props) {
   // Badge reflects ACTUAL price state, not material capability.
-  // If Yahoo is down, a live_exchange material shows 'Fallback' not 'Live'.
   const priceTier = m.currentPrice?.coverageTier || m.coverageTier;
-  const tierClass = priceTier === 'live_exchange' ? 'tier-live'
-    : priceTier === 'delayed_vendor' ? 'tier-vendor'
-    : priceTier === 'indexed_reference' ? 'tier-indexed'
-    : priceTier === 'stale_cache' ? 'tier-stale'
-    : priceTier === 'fallback_reference' ? 'tier-fallback'
-    : 'tier-reference';
-
-  const tierLabel = priceTier === 'live_exchange' ? 'Live'
-    : priceTier === 'delayed_vendor' ? 'Vendor'
-    : priceTier === 'indexed_reference' ? 'Indexed'
-    : priceTier === 'stale_cache' ? 'Stale'
-    : priceTier === 'fallback_reference' ? 'Fallback'
-    : 'Ref';
+  const { tierClass, tierLabel } = resolveTier(priceTier);
 
   const hasChange = m.currentPrice?.change24hPct != null;
   const hasSparkline = m.currentPrice?.sparkline5d && m.currentPrice.sparkline5d.length > 1;
