@@ -1,0 +1,915 @@
+/* ========================================
+   AI Data Center Learning Dashboard Styles
+   ======================================== */
+
+/* --- Dashboard Layout --- */
+.dc-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 0 0 40px 0;
+}
+
+/* --- Overall Progress Banner --- */
+.dc-progress-banner {
+    background: linear-gradient(135deg, #1E293B 0%, #334155 100%);
+    border-radius: 16px;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    border: 1px solid #475569;
+}
+
+.dc-progress-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.dc-progress-info h3 {
+    color: #F1F5F9;
+    font-size: 1.3rem;
+    margin: 0 0 4px 0;
+}
+
+.dc-progress-info p {
+    color: #94A3B8;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.dc-progress-stats {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+}
+
+.dc-stat-box {
+    text-align: center;
+}
+
+.dc-stat-value {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #60A5FA;
+}
+
+.dc-stat-value.green { color: #34D399; }
+.dc-stat-value.orange { color: #FBBF24; }
+.dc-stat-value.purple { color: #A78BFA; }
+
+.dc-stat-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
+}
+
+.dc-overall-bar {
+    width: 100%;
+    margin-top: 16px;
+}
+
+.dc-overall-bar-track {
+    width: 100%;
+    height: 10px;
+    background: #475569;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.dc-overall-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366F1, #8B5CF6, #A78BFA);
+    border-radius: 5px;
+    transition: width 0.5s ease;
+    width: 0%;
+}
+
+.dc-overall-bar-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: #94A3B8;
+}
+
+/* --- Study Timer --- */
+.dc-timer-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #0F172A;
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: 1px solid #334155;
+    min-width: 280px;
+}
+
+.dc-timer-display {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: #60A5FA;
+    min-width: 80px;
+}
+
+.dc-timer-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dc-timer-btn.start {
+    background: #10B981;
+    color: white;
+}
+
+.dc-timer-btn.start:hover { background: #059669; }
+
+.dc-timer-btn.stop {
+    background: #EF4444;
+    color: white;
+}
+
+.dc-timer-btn.stop:hover { background: #DC2626; }
+
+.dc-timer-btn.reset {
+    background: #475569;
+    color: #E2E8F0;
+}
+
+.dc-timer-btn.reset:hover { background: #64748B; }
+
+.dc-timer-label {
+    font-size: 0.75rem;
+    color: #94A3B8;
+}
+
+/* --- Section Cards --- */
+.dc-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: box-shadow 0.3s ease;
+}
+
+.dc-card:hover {
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.dc-card-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1E293B;
+    margin: 0 0 6px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dc-card-subtitle {
+    font-size: 0.9rem;
+    color: #64748B;
+    margin: 0 0 20px 0;
+}
+
+/* --- Tabs within dashboard (sub-tabs) --- */
+.dc-subtabs {
+    display: flex;
+    gap: 4px;
+    background: #F1F5F9;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.dc-subtab {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: #64748B;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.dc-subtab.active {
+    background: #FFFFFF;
+    color: #4F46E5;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.dc-subtab:hover:not(.active) {
+    color: #1E293B;
+    background: #E2E8F0;
+}
+
+.dc-subtab-content {
+    display: none;
+}
+
+.dc-subtab-content.active {
+    display: block;
+}
+
+/* --- Week Roadmap --- */
+.dc-weeks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+
+.dc-week-card {
+    background: #F8FAFC;
+    border: 2px solid #E2E8F0;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.dc-week-card.current {
+    border-color: #6366F1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+.dc-week-card.completed {
+    border-color: #10B981;
+    background: #F0FDF4;
+}
+
+.dc-week-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dc-week-header:hover {
+    background: #F1F5F9;
+}
+
+.dc-week-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dc-week-number {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.dc-week-card.completed .dc-week-number {
+    background: linear-gradient(135deg, #10B981, #34D399);
+}
+
+.dc-week-name {
+    font-weight: 600;
+    color: #1E293B;
+    font-size: 1rem;
+}
+
+.dc-week-topic {
+    font-size: 0.8rem;
+    color: #64748B;
+}
+
+.dc-week-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dc-week-percent {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6366F1;
+}
+
+.dc-week-bar {
+    width: 60px;
+    height: 6px;
+    background: #E2E8F0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.dc-week-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #6366F1, #8B5CF6);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.dc-week-card.completed .dc-week-bar-fill {
+    background: linear-gradient(90deg, #10B981, #34D399);
+}
+
+.dc-week-card.completed .dc-week-percent {
+    color: #10B981;
+}
+
+.dc-week-expand {
+    font-size: 1.2rem;
+    color: #94A3B8;
+    transition: transform 0.3s ease;
+}
+
+.dc-week-card.expanded .dc-week-expand {
+    transform: rotate(180deg);
+}
+
+.dc-week-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid #E2E8F0;
+}
+
+.dc-week-card.expanded .dc-week-body {
+    display: block;
+}
+
+/* --- Day Tasks --- */
+.dc-day-group {
+    margin-top: 12px;
+}
+
+.dc-day-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #94A3B8;
+    margin-bottom: 8px;
+}
+
+.dc-task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #F1F5F9;
+}
+
+.dc-task-item:last-child {
+    border-bottom: none;
+}
+
+.dc-task-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #CBD5E1;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.dc-task-checkbox:hover {
+    border-color: #6366F1;
+}
+
+.dc-task-checkbox.checked {
+    background: #6366F1;
+    border-color: #6366F1;
+}
+
+.dc-task-checkbox.checked::after {
+    content: '\2713';
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.dc-task-text {
+    font-size: 0.9rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+.dc-task-item.completed .dc-task-text {
+    text-decoration: line-through;
+    color: #94A3B8;
+}
+
+.dc-task-tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.dc-task-tag.read { background: #EFF6FF; color: #3B82F6; }
+.dc-task-tag.hands-on { background: #FEF3C7; color: #D97706; }
+.dc-task-tag.teach { background: #F0FDF4; color: #16A34A; }
+.dc-task-tag.calc { background: #FDF2F8; color: #DB2777; }
+
+/* --- Calculators --- */
+.dc-calc-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+}
+
+@media (max-width: 768px) {
+    .dc-calc-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dc-calc-inputs, .dc-calc-outputs {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dc-calc-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dc-calc-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.dc-calc-group input,
+.dc-calc-group select {
+    padding: 10px 14px;
+    border: 2px solid #E2E8F0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #1E293B;
+    background: #F8FAFC;
+    transition: border-color 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dc-calc-group input:focus,
+.dc-calc-group select:focus {
+    outline: none;
+    border-color: #6366F1;
+    background: white;
+}
+
+.dc-calc-group .dc-unit {
+    font-size: 0.8rem;
+    color: #94A3B8;
+}
+
+/* --- Calculator Results --- */
+.dc-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.dc-result-item {
+    background: linear-gradient(135deg, #F8FAFC, #F1F5F9);
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+.dc-result-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1E293B;
+}
+
+.dc-result-value.highlight {
+    color: #6366F1;
+}
+
+.dc-result-value.warning {
+    color: #F59E0B;
+}
+
+.dc-result-value.success {
+    color: #10B981;
+}
+
+.dc-result-label {
+    font-size: 0.8rem;
+    color: #64748B;
+    margin-top: 4px;
+}
+
+/* --- Cooling Comparison Table --- */
+.dc-comparison-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #E2E8F0;
+    margin-top: 16px;
+}
+
+.dc-comparison-table th {
+    background: #F1F5F9;
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #475569;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.dc-comparison-table td {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: #334155;
+    border-top: 1px solid #F1F5F9;
+}
+
+.dc-comparison-table tr.recommended {
+    background: #EEF2FF;
+}
+
+.dc-comparison-table tr.recommended td:first-child::after {
+    content: ' (Recommended)';
+    color: #6366F1;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+/* --- DC Design Project --- */
+.dc-design-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dc-design-step {
+    background: #F8FAFC;
+    border: 2px solid #E2E8F0;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.dc-design-step.active {
+    border-color: #6366F1;
+}
+
+.dc-design-step.done {
+    border-color: #10B981;
+}
+
+.dc-design-step-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.dc-design-step-header:hover {
+    background: #F1F5F9;
+}
+
+.dc-design-step-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #E2E8F0;
+    color: #64748B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-right: 12px;
+}
+
+.dc-design-step.active .dc-design-step-num {
+    background: #6366F1;
+    color: white;
+}
+
+.dc-design-step.done .dc-design-step-num {
+    background: #10B981;
+    color: white;
+}
+
+.dc-design-step-title {
+    font-weight: 600;
+    color: #1E293B;
+    flex: 1;
+}
+
+.dc-design-step-status {
+    font-size: 0.8rem;
+    color: #94A3B8;
+}
+
+.dc-design-step.done .dc-design-step-status {
+    color: #10B981;
+}
+
+.dc-design-step-body {
+    display: none;
+    padding: 0 20px 20px;
+    border-top: 1px solid #E2E8F0;
+}
+
+.dc-design-step.expanded .dc-design-step-body {
+    display: block;
+}
+
+/* --- Gantt-style Timeline --- */
+.dc-gantt {
+    margin-top: 16px;
+    overflow-x: auto;
+}
+
+.dc-gantt-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.dc-gantt-label {
+    width: 180px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    flex-shrink: 0;
+}
+
+.dc-gantt-track {
+    flex: 1;
+    height: 28px;
+    background: #F1F5F9;
+    border-radius: 6px;
+    position: relative;
+    min-width: 400px;
+}
+
+.dc-gantt-bar {
+    position: absolute;
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: white;
+    min-width: 30px;
+}
+
+.dc-gantt-bar.power { background: linear-gradient(90deg, #6366F1, #818CF8); }
+.dc-gantt-bar.cooling { background: linear-gradient(90deg, #0EA5E9, #38BDF8); }
+.dc-gantt-bar.structure { background: linear-gradient(90deg, #F59E0B, #FBBF24); }
+.dc-gantt-bar.network { background: linear-gradient(90deg, #10B981, #34D399); }
+.dc-gantt-bar.commissioning { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+.dc-gantt-bar.it-deploy { background: linear-gradient(90deg, #EC4899, #F472B6); }
+
+.dc-gantt-months {
+    display: flex;
+    margin-left: 180px;
+    margin-bottom: 8px;
+}
+
+.dc-gantt-month {
+    flex: 1;
+    font-size: 0.7rem;
+    color: #94A3B8;
+    text-align: center;
+    min-width: 33px;
+}
+
+/* --- Resource Library --- */
+.dc-resources-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.dc-resource-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 12px;
+    padding: 18px;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dc-resource-card:hover {
+    border-color: #6366F1;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.1);
+    transform: translateY(-2px);
+}
+
+.dc-resource-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.dc-resource-title {
+    font-weight: 600;
+    color: #1E293B;
+    font-size: 0.95rem;
+}
+
+.dc-resource-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.dc-resource-badge.free { background: #DCFCE7; color: #16A34A; }
+.dc-resource-badge.paid { background: #FEF3C7; color: #D97706; }
+.dc-resource-badge.pdf { background: #EFF6FF; color: #3B82F6; }
+
+.dc-resource-desc {
+    font-size: 0.85rem;
+    color: #64748B;
+    line-height: 1.5;
+}
+
+.dc-resource-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+.dc-resource-week {
+    font-size: 0.75rem;
+    color: #94A3B8;
+}
+
+.dc-resource-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.dc-resource-status.not-started {
+    background: #F1F5F9;
+    color: #94A3B8;
+}
+
+.dc-resource-status.in-progress {
+    background: #FEF3C7;
+    color: #D97706;
+}
+
+.dc-resource-status.completed {
+    background: #DCFCE7;
+    color: #16A34A;
+}
+
+.dc-resource-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #6366F1;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.dc-resource-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Budget Table --- */
+.dc-budget-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #E2E8F0;
+}
+
+.dc-budget-table th {
+    background: #1E293B;
+    color: #F1F5F9;
+    padding: 12px 16px;
+    font-size: 0.8rem;
+    text-align: left;
+}
+
+.dc-budget-table td {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    border-top: 1px solid #F1F5F9;
+}
+
+.dc-budget-table tr:nth-child(even) {
+    background: #F8FAFC;
+}
+
+.dc-budget-table tr.total-row {
+    background: #EEF2FF;
+    font-weight: 700;
+}
+
+.dc-budget-table tr.total-row td {
+    border-top: 2px solid #6366F1;
+    color: #1E293B;
+}
+
+/* --- Export Button --- */
+.dc-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 16px;
+}
+
+.dc-export-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .dc-progress-banner {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .dc-progress-stats {
+        justify-content: space-around;
+        width: 100%;
+    }
+
+    .dc-timer-section {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dc-weeks-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dc-resources-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dc-gantt-label {
+        width: 100px;
+        font-size: 0.7rem;
+    }
+}
