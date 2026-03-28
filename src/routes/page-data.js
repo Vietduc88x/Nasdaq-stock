@@ -159,7 +159,13 @@ export function registerPageDataRoutes(app) {
 
     try {
       const cost = calculateBessCost(chemistry, year);
-      const bessMaterials = getSystemMaterials('bess');
+
+      // Filter materials by chemistry: LFP and NMC811 use different cathode materials
+      const LFP_ONLY = ['iron-phosphate'];          // LFP cathode precursor — not in NMC
+      const NMC_ONLY = ['nickel', 'cobalt'];         // NMC cathode metals — not in LFP
+      const EXCLUDE = chemistry === 'lfp' ? NMC_ONLY : LFP_ONLY;
+      const bessMaterials = getSystemMaterials('bess')
+        .filter(m => !EXCLUDE.includes(m.slug));
 
       let liveCoverage = 0;
       let referenceCoverage = 0;

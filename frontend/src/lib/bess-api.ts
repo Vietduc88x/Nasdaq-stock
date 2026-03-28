@@ -1,19 +1,10 @@
+import type { MaterialImpact } from './types';
+
 export interface BessPageData {
   params: { chemistry: string; year: number };
   model: { version: string; costingMethod: string; asOf: string; totalCostPerKwh: number };
   stageBreakdown: { stage: string; costPerKwh: number; components: Record<string, number> }[];
-  materialImpacts: {
-    material: string;
-    name: string;
-    icon: string;
-    coverageTier: string;
-    priceSource: string;
-    asOf: string | null;
-    currentPrice: { value: number; unit: string } | null;
-    baselineCost: number;
-    costUnit: string;
-    component: string;
-  }[];
+  materialImpacts: MaterialImpact[];
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }
 

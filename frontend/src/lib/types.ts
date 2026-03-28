@@ -38,10 +38,14 @@ export interface MaterialImpact {
   priceSource: string;
   asOf: string | null;
   currentPrice: { value: number; unit: string } | null;
-  baselineContributionPerWp: number;
-  shareOfSystemPct: number;
-  impactPer10Pct: number;
   component: string;
+  // Solar-specific ($/Wp)
+  baselineContributionPerWp?: number;
+  shareOfSystemPct?: number;
+  impactPer10Pct?: number;
+  // BESS-specific ($/kWh) — also used by generic getMaterialCost() helper
+  baselineCost?: number;
+  costUnit?: string;
 }
 
 export interface SolarPageData {

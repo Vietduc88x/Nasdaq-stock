@@ -65,7 +65,7 @@ export default async function BessPage({
 
       {/* Material Breakdown */}
       <MaterialBreakdownTable
-        materials={data.materialImpacts as any}
+        materials={data.materialImpacts}
         totalCost={data.model.totalCostPerKwh}
         costUnit="$/kWh"
         totalLabel="pack cost"

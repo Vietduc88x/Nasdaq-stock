@@ -44,7 +44,7 @@ export default function MaterialBreakdownTable({ materials, totalCost, costUnit 
               <th className="text-left pb-2 pr-3">Material</th>
               <th className="text-right pb-2 pr-3 hidden sm:table-cell">Source</th>
               <th className="text-right pb-2 pr-3">Price</th>
-              <th className="text-right pb-2 pr-3">$/Wp</th>
+              <th className="text-right pb-2 pr-3">{costUnit}</th>
               <th className="text-right pb-2 pr-3">Share</th>
               <th className="text-right pb-2">+10%</th>
             </tr>
