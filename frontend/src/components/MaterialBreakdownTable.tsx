@@ -13,7 +13,7 @@ interface Props {
 
 // Helper to get cost from either solar or BESS material impact shape
 function getMaterialCost(m: MaterialImpact): number {
-  return m.baselineContributionPerWp ?? (m as any).baselineCost ?? 0;
+  return m.baselineContributionPerWp ?? m.baselineCost ?? 0;
 }
 
 function getMaterialShare(m: MaterialImpact, totalCost: number): number {
