@@ -1,4 +1,5 @@
 import { fetchSolarPage } from '@/lib/api';
+import Link from 'next/link';
 import WaterfallChart from '@/components/WaterfallChart';
 import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
@@ -36,6 +37,12 @@ export default async function SolarPage({
           </div>
         </div>
       </div>
+
+      {/* Sub-nav: Anatomy link */}
+      <Link href="/solar/anatomy" className="inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-lg transition-colors" style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}>
+        <span>☀️</span> What&apos;s inside a solar panel? — Anatomy &amp; Cost Calculator
+        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+      </Link>
 
       {/* Controls */}
       <SolarControls
