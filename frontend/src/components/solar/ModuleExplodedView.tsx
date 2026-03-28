@@ -86,8 +86,8 @@ const SIN = Math.sin(ISO_ANGLE);
 
 function isoProject(x: number, y: number, z: number): [number, number] {
   return [
-    300 + (x - y) * COS,
-    80 + (x + y) * SIN - z,
+    330 + (x - y) * COS,
+    60 + (x + y) * SIN - z,
   ];
 }
 
@@ -147,7 +147,7 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
       <div className="card-surface p-5 overflow-hidden">
         <div className="section-label mb-3">Solar PV Module — Exploded View</div>
 
-        <svg viewBox={`0 0 600 ${svgHeight}`} className="w-full" style={{ maxHeight: '560px' }}>
+        <svg viewBox={`0 0 660 ${svgHeight}`} className="w-full mx-auto" style={{ maxHeight: '560px' }}>
           <defs>
             {layerGeometries.map(layer => (
               <linearGradient key={`g-${layer.id}`} id={`grad-${layer.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -166,9 +166,6 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
             const topFace = makeIsoRect(0, 0, layer.z + layer.thickness, panelW, panelH);
             const rightFace = makeIsoRightFace(0, 0, layer.z + layer.thickness, panelW, panelH, layer.thickness);
             const frontFace = makeIsoFrontFace(0, 0, layer.z + layer.thickness, panelW, panelH, layer.thickness);
-
-            // Label position
-            const [labelX, labelY] = isoProject(-30, panelH / 2, layer.z + layer.thickness / 2);
 
             return (
               <g
@@ -248,36 +245,41 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
                   );
                 })()}
 
-                {/* Label */}
-                <text
-                  x={labelX - 10}
-                  y={labelY}
-                  textAnchor="end"
-                  dominantBaseline="middle"
-                  fill={isActive ? '#fff' : 'rgba(255,255,255,0.45)'}
-                  fontSize="10.5"
-                  fontWeight={isActive ? 600 : 400}
-                  fontFamily="Inter, sans-serif"
-                >
-                  {layer.name}
-                </text>
-                {/* Connector dot */}
-                <circle
-                  cx={labelX - 4}
-                  cy={labelY}
-                  r="2"
-                  fill={isActive ? layer.color : 'rgba(255,255,255,0.2)'}
-                />
-                {/* Connector line */}
-                <line
-                  x1={labelX}
-                  y1={labelY}
-                  x2={labelX + 20}
-                  y2={labelY}
-                  stroke={isActive ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}
-                  strokeWidth="0.5"
-                  strokeDasharray="2 2"
-                />
+                {/* Label on right side */}
+                {(() => {
+                  const [rLabelX, rLabelY] = isoProject(panelW + 30, panelH / 2, layer.z + layer.thickness / 2);
+                  return (
+                    <>
+                      <line
+                        x1={rLabelX - 20}
+                        y1={rLabelY}
+                        x2={rLabelX - 6}
+                        y2={rLabelY}
+                        stroke={isActive ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}
+                        strokeWidth="0.5"
+                        strokeDasharray="2 2"
+                      />
+                      <circle
+                        cx={rLabelX - 3}
+                        cy={rLabelY}
+                        r="2"
+                        fill={isActive ? layer.color : 'rgba(255,255,255,0.2)'}
+                      />
+                      <text
+                        x={rLabelX + 2}
+                        y={rLabelY}
+                        textAnchor="start"
+                        dominantBaseline="middle"
+                        fill={isActive ? '#fff' : 'rgba(255,255,255,0.45)'}
+                        fontSize="10"
+                        fontWeight={isActive ? 600 : 400}
+                        fontFamily="Inter, sans-serif"
+                      >
+                        {layer.name}
+                      </text>
+                    </>
+                  );
+                })()}
               </g>
             );
           })}
