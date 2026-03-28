@@ -6,9 +6,8 @@ interface Layer {
   id: string;
   name: string;
   color: string;
-  gradientTop: string;
-  gradientBottom: string;
-  edgeColor: string;
+  borderColor: string;
+  height: string;
   material: string;
   purpose: string;
   costShare: string;
@@ -19,28 +18,28 @@ interface Layer {
 
 const LAYERS: Layer[] = [
   {
-    id: 'glass', name: 'Tempered Glass', color: '#a8d8ea',
-    gradientTop: '#c5e8f7', gradientBottom: '#7fb8d0', edgeColor: '#5a9ab5',
-    material: 'Low-iron tempered glass (3.2mm)',
+    id: 'glass', name: 'Tempered Glass', color: 'linear-gradient(135deg, #b8dce8 0%, #8cc5d9 50%, #6bafc5 100%)', borderColor: '#7dbfd4',
+    height: '3.2mm',
+    material: 'Low-iron tempered glass (3.2mm thick)',
     purpose: 'Protects cells from weather, hail, and UV. Transmits >90% of sunlight while surviving 25+ years outdoors.',
     costShare: '6.7%', costValue: '$0.012/Wp',
     materials: [{ name: 'Silica sand (SiO₂)', amount: '5.6 g/Wp', price: '$0.80/kg' }],
     funFact: 'Solar glass is 10× clearer than window glass — iron content must be below 0.01%.',
   },
   {
-    id: 'eva-front', name: 'EVA Encapsulant (Front)', color: '#e8dcc8',
-    gradientTop: '#f0e6d4', gradientBottom: '#d4c8b0', edgeColor: '#b8a890',
+    id: 'eva-front', name: 'EVA Encapsulant', color: 'linear-gradient(135deg, #f5eed8 0%, #e8dfc2 50%, #ddd4b5 100%)', borderColor: '#d4c9a8',
+    height: '0.45mm',
     material: 'Ethylene-vinyl acetate film (0.45mm)',
-    purpose: 'Bonds glass to cells. Provides electrical insulation and cushioning against thermal stress.',
+    purpose: 'Bonds glass to cells. Electrical insulation and cushioning against thermal stress.',
     costShare: '4.4%', costValue: '$0.008/Wp',
     materials: [{ name: 'EVA resin', amount: '1.2 g/Wp (both layers)', price: '$1.85/kg' }],
-    funFact: 'Laminated at 150°C for 15 minutes in a vacuum press. Turns yellow after 25 years of UV exposure.',
+    funFact: 'Laminated at 150°C for 15 minutes in a vacuum press.',
   },
   {
-    id: 'cells', name: 'Solar Cells + Interconnects', color: '#1a1a2e',
-    gradientTop: '#2a2a40', gradientBottom: '#0a0a1e', edgeColor: '#0a0a18',
-    material: 'Monocrystalline silicon wafers + silver paste contacts + copper ribbons',
-    purpose: 'Converts sunlight to electricity via the photovoltaic effect. Each cell produces ~0.5V and ~10W.',
+    id: 'cells', name: 'Solar Cells', color: 'linear-gradient(135deg, #2a3050 0%, #1a2040 50%, #101830 100%)', borderColor: '#3a4060',
+    height: '0.15mm',
+    material: 'Monocrystalline silicon wafers + silver paste + copper ribbons',
+    purpose: 'Converts sunlight to electricity. Each cell: ~0.5V, ~10W. A 72-cell module: ~700Wp.',
     costShare: '22.2%', costValue: '$0.040/Wp',
     materials: [
       { name: 'Silicon wafer', amount: '2.1 g/Wp', price: '$1.70/kg' },
@@ -51,69 +50,33 @@ const LAYERS: Layer[] = [
     funFact: 'Silver is the #1 cost swing material. The industry is racing to replace it with copper plating.',
   },
   {
-    id: 'eva-back', name: 'EVA Encapsulant (Back)', color: '#e8dcc8',
-    gradientTop: '#f0e6d4', gradientBottom: '#d4c8b0', edgeColor: '#b8a890',
+    id: 'eva-back', name: 'EVA Encapsulant', color: 'linear-gradient(135deg, #f5eed8 0%, #e8dfc2 50%, #ddd4b5 100%)', borderColor: '#d4c9a8',
+    height: '0.45mm',
     material: 'Ethylene-vinyl acetate film (0.45mm)',
-    purpose: 'Seals cells from moisture on the back side. Same material as front EVA.',
+    purpose: 'Seals cells from moisture on the back side.',
     costShare: '(incl. above)', costValue: '—',
-    materials: [{ name: 'EVA resin', amount: '(included in front EVA total)', price: '—' }],
-    funFact: 'The front and back EVA sheets are identical — they melt and fuse around the cells during lamination.',
+    materials: [{ name: 'EVA resin', amount: '(included above)', price: '—' }],
+    funFact: 'Front and back EVA are identical — they melt and fuse around cells during lamination.',
   },
   {
-    id: 'backsheet', name: 'Backsheet', color: '#d0d0d0',
-    gradientTop: '#e0e0e0', gradientBottom: '#b8b8b8', edgeColor: '#999',
-    material: 'Multi-layer polymer film (Tedlar/PET/Tedlar)',
-    purpose: 'Moisture barrier and electrical insulation. White surface reflects unused light back through cells.',
+    id: 'backsheet', name: 'Backsheet', color: 'linear-gradient(135deg, #e8e8e8 0%, #d5d5d5 50%, #c5c5c5 100%)', borderColor: '#bbb',
+    height: '0.3mm',
+    material: 'Multi-layer polymer (Tedlar/PET/Tedlar)',
+    purpose: 'Moisture barrier and electrical insulation. White surface reflects light.',
     costShare: '~2%', costValue: '$0.004/Wp',
-    materials: [{ name: 'PVF/PET/PVF layers', amount: '~0.8 g/Wp', price: '~$3/m²' }],
-    funFact: 'Bifacial modules replace the backsheet with glass, gaining 5–15% more energy from ground-reflected light.',
+    materials: [{ name: 'PVF/PET/PVF', amount: '~0.8 g/Wp', price: '~$3/m²' }],
+    funFact: 'Bifacial modules replace this with glass, gaining 5–15% more energy.',
   },
   {
-    id: 'frame', name: 'Aluminum Frame', color: '#b0b0b0',
-    gradientTop: '#c8c8c8', gradientBottom: '#888', edgeColor: '#666',
-    material: 'Anodized aluminum 6063 alloy (35mm depth)',
-    purpose: 'Structural support and mounting interface. Must withstand 5,400 Pa snow/wind loads.',
+    id: 'frame', name: 'Aluminum Frame', color: 'linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 50%, #909090 100%)', borderColor: '#888',
+    height: '35mm',
+    material: 'Anodized aluminum 6063 alloy',
+    purpose: 'Structural support. Must withstand 5,400 Pa snow/wind loads.',
     costShare: '5.3%', costValue: '$0.0095/Wp',
-    materials: [{ name: 'Aluminum 6063', amount: '1.5 g/Wp (~1.8 kg/module)', price: '$1.15/lb' }],
+    materials: [{ name: 'Aluminum 6063', amount: '1.5 g/Wp (~1.8 kg)', price: '$1.15/lb' }],
     funFact: 'Each frame uses ~1.8 kg of aluminum — about the weight of 3 soda cans.',
   },
 ];
-
-// Isometric projection helpers
-const ISO_ANGLE = Math.PI / 6; // 30 degrees
-const COS = Math.cos(ISO_ANGLE);
-const SIN = Math.sin(ISO_ANGLE);
-
-function isoProject(x: number, y: number, z: number): [number, number] {
-  return [
-    300 + (x - y) * COS,
-    350 + (x + y) * SIN - z,
-  ];
-}
-
-function makeIsoRect(x: number, y: number, z: number, w: number, h: number): string {
-  const [x1, y1] = isoProject(x, y, z);
-  const [x2, y2] = isoProject(x + w, y, z);
-  const [x3, y3] = isoProject(x + w, y + h, z);
-  const [x4, y4] = isoProject(x, y + h, z);
-  return `${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}`;
-}
-
-function makeIsoRightFace(x: number, y: number, z: number, w: number, h: number, depth: number): string {
-  const [x1, y1] = isoProject(x + w, y, z);
-  const [x2, y2] = isoProject(x + w, y + h, z);
-  const [x3, y3] = isoProject(x + w, y + h, z - depth);
-  const [x4, y4] = isoProject(x + w, y, z - depth);
-  return `${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}`;
-}
-
-function makeIsoFrontFace(x: number, y: number, z: number, w: number, h: number, depth: number): string {
-  const [x1, y1] = isoProject(x, y + h, z);
-  const [x2, y2] = isoProject(x + w, y + h, z);
-  const [x3, y3] = isoProject(x + w, y + h, z - depth);
-  const [x4, y4] = isoProject(x, y + h, z - depth);
-  return `${x1},${y1} ${x2},${y2} ${x3},${y3} ${x4},${y4}`;
-}
 
 interface Props {
   activeLayer: string | null;
@@ -123,186 +86,78 @@ interface Props {
 export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props) {
   const selected = LAYERS.find(l => l.id === activeLayer);
 
-  const panelW = 180;
-  const panelH = 140;
-  const layerThicknesses: Record<string, number> = {
-    glass: 12, 'eva-front': 5, cells: 8, 'eva-back': 5, backsheet: 4, frame: 10,
-  };
-
-  const gaps = 30;
-  // Reverse: glass on top (highest Z), frame on bottom (lowest Z)
-  const totalStack = LAYERS.reduce((s, l) => s + (layerThicknesses[l.id] || 8) + gaps, 0);
-  let currentZ = totalStack;
-
-  const layerGeometries = LAYERS.map(layer => {
-    const thickness = layerThicknesses[layer.id] || 8;
-    currentZ -= (thickness + gaps);
-    return { ...layer, z: currentZ, thickness };
-  });
-
-  const svgHeight = totalStack + 160;
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-5">
-      {/* Isometric Exploded View */}
-      <div className="card-surface p-5 overflow-hidden">
-        <div className="section-label mb-3">Solar PV Module — Exploded View</div>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      {/* Exploded Stack */}
+      <div className="card-surface p-6">
+        <div className="section-label mb-6">Solar PV Module — Exploded View</div>
 
-        <svg viewBox={`0 0 620 ${svgHeight}`} className="w-full mx-auto" style={{ maxHeight: '580px' }}>
-          <defs>
-            {layerGeometries.map(layer => (
-              <linearGradient key={`g-${layer.id}`} id={`grad-${layer.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor={layer.gradientTop} />
-                <stop offset="100%" stopColor={layer.gradientBottom} />
-              </linearGradient>
-            ))}
-            <filter id="shadow">
-              <feDropShadow dx="2" dy="4" stdDeviation="4" floodOpacity="0.25" />
-            </filter>
-          </defs>
-
-          {layerGeometries.map((layer, i) => {
+        <div className="flex flex-col items-center gap-3 py-4" style={{ perspective: '1000px' }}>
+          {LAYERS.map((layer, i) => {
             const isActive = activeLayer === layer.id;
             const isOther = activeLayer !== null && !isActive;
-            const topFace = makeIsoRect(0, 0, layer.z + layer.thickness, panelW, panelH);
-            const rightFace = makeIsoRightFace(0, 0, layer.z + layer.thickness, panelW, panelH, layer.thickness);
-            const frontFace = makeIsoFrontFace(0, 0, layer.z + layer.thickness, panelW, panelH, layer.thickness);
 
             return (
-              <g
+              <div
                 key={layer.id}
                 onClick={() => onLayerSelect(isActive ? null : layer.id)}
-                className="cursor-pointer"
+                className="relative cursor-pointer transition-all duration-300"
                 style={{
-                  opacity: isOther ? 0.3 : 1,
-                  transition: 'opacity 0.4s, filter 0.4s',
-                  filter: isActive ? 'brightness(1.15) drop-shadow(0 0 8px rgba(255,255,255,0.15))' : 'none',
+                  width: layer.id === 'frame' ? '92%' : '85%',
+                  maxWidth: layer.id === 'frame' ? '380px' : '350px',
+                  height: layer.id === 'cells' ? '52px' : layer.id === 'glass' ? '36px' : layer.id === 'frame' ? '28px' : '18px',
+                  background: layer.color,
+                  borderRadius: layer.id === 'frame' ? '4px' : '3px',
+                  border: isActive ? '2px solid #fff' : `1px solid ${layer.borderColor}40`,
+                  opacity: isOther ? 0.35 : 1,
+                  transform: `rotateX(45deg) rotateZ(-2deg) ${isActive ? 'scale(1.04) translateY(-4px)' : ''}`,
+                  transformStyle: 'preserve-3d',
+                  boxShadow: isActive
+                    ? `0 12px 24px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.2), 0 -4px 12px rgba(255,255,255,0.05) inset`
+                    : `0 4px 12px rgba(0,0,0,0.25), 0 1px 0 rgba(255,255,255,0.1) inset`,
                 }}
               >
-                {/* Front face (bottom edge) */}
-                <polygon
-                  points={frontFace}
-                  fill={layer.edgeColor}
-                  stroke="rgba(0,0,0,0.2)"
-                  strokeWidth="0.5"
-                />
-
-                {/* Right face (side edge) */}
-                <polygon
-                  points={rightFace}
-                  fill={layer.edgeColor}
-                  stroke="rgba(0,0,0,0.2)"
-                  strokeWidth="0.5"
-                  style={{ opacity: 0.8 }}
-                />
-
-                {/* Top face */}
-                <polygon
-                  points={topFace}
-                  fill={`url(#grad-${layer.id})`}
-                  stroke={isActive ? '#fff' : 'rgba(255,255,255,0.1)'}
-                  strokeWidth={isActive ? 1.5 : 0.5}
-                  filter="url(#shadow)"
-                />
-
-                {/* Cell grid overlay on cells layer */}
-                {layer.id === 'cells' && (() => {
-                  const cellRows = 6;
-                  const cellCols = 10;
-                  const elements = [];
-                  for (let r = 0; r < cellRows; r++) {
-                    for (let c = 0; c < cellCols; c++) {
-                      const cx = (c + 0.5) * (panelW / cellCols);
-                      const cy = (r + 0.5) * (panelH / cellRows);
-                      const [px, py] = isoProject(cx, cy, layer.z + layer.thickness);
-                      elements.push(
-                        <circle key={`cell-${r}-${c}`} cx={px} cy={py} r="1" fill="rgba(255,255,255,0.08)" />
-                      );
-                    }
-                  }
-                  // Busbars
-                  for (let b = 1; b <= 3; b++) {
-                    const bx = b * (panelW / 4);
-                    const [x1, y1] = isoProject(bx, 5, layer.z + layer.thickness);
-                    const [x2, y2] = isoProject(bx, panelH - 5, layer.z + layer.thickness);
-                    elements.push(
-                      <line key={`bus-${b}`} x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(192,192,192,0.25)" strokeWidth="1" />
-                    );
-                  }
-                  return elements;
-                })()}
+                {/* Cell grid on solar cells layer */}
+                {layer.id === 'cells' && (
+                  <div className="absolute inset-1 grid grid-cols-12 grid-rows-4 gap-[1px] pointer-events-none">
+                    {Array.from({ length: 48 }).map((_, j) => (
+                      <div key={j} className="bg-[#0a1025] border border-[#2a3555]/30 rounded-[0.5px]" />
+                    ))}
+                  </div>
+                )}
 
                 {/* Glass reflection */}
-                {layer.id === 'glass' && (() => {
-                  const [rx1, ry1] = isoProject(20, 15, layer.z + layer.thickness);
-                  const [rx2, ry2] = isoProject(80, 15, layer.z + layer.thickness);
-                  const [rx3, ry3] = isoProject(60, 40, layer.z + layer.thickness);
-                  const [rx4, ry4] = isoProject(10, 40, layer.z + layer.thickness);
-                  return (
-                    <polygon
-                      points={`${rx1},${ry1} ${rx2},${ry2} ${rx3},${ry3} ${rx4},${ry4}`}
-                      fill="rgba(255,255,255,0.15)"
-                    />
-                  );
-                })()}
+                {layer.id === 'glass' && (
+                  <div className="absolute inset-0 rounded-[3px] pointer-events-none" style={{
+                    background: 'linear-gradient(120deg, rgba(255,255,255,0.25) 0%, transparent 35%)',
+                  }} />
+                )}
 
-                {/* Label on right side */}
-                {(() => {
-                  const [rLabelX, rLabelY] = isoProject(panelW + 15, panelH * 0.85, layer.z + layer.thickness / 2);
-                  return (
-                    <>
-                      <line
-                        x1={rLabelX - 20}
-                        y1={rLabelY}
-                        x2={rLabelX - 6}
-                        y2={rLabelY}
-                        stroke={isActive ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.1)'}
-                        strokeWidth="0.5"
-                        strokeDasharray="2 2"
-                      />
-                      <circle
-                        cx={rLabelX - 3}
-                        cy={rLabelY}
-                        r="2"
-                        fill={isActive ? layer.color : 'rgba(255,255,255,0.2)'}
-                      />
-                      <text
-                        x={rLabelX + 2}
-                        y={rLabelY}
-                        textAnchor="start"
-                        dominantBaseline="middle"
-                        fill={isActive ? '#fff' : 'rgba(255,255,255,0.45)'}
-                        fontSize="10"
-                        fontWeight={isActive ? 600 : 400}
-                        fontFamily="Inter, sans-serif"
-                      >
-                        {layer.name}
-                      </text>
-                    </>
-                  );
-                })()}
-              </g>
+                {/* Layer name + cost overlay */}
+                <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
+                  <span className="text-[11px] font-semibold drop-shadow-md" style={{
+                    color: ['cells', 'frame'].includes(layer.id) ? 'rgba(255,255,255,0.8)' : 'rgba(0,0,0,0.5)',
+                  }}>
+                    {layer.name}
+                  </span>
+                  {layer.costValue !== '—' && (
+                    <span className="text-[10px] font-mono font-semibold drop-shadow-md" style={{
+                      color: ['cells', 'frame'].includes(layer.id) ? 'rgba(52,199,89,0.9)' : 'rgba(20,80,50,0.7)',
+                    }}>
+                      {layer.costValue}
+                    </span>
+                  )}
+                </div>
+              </div>
             );
           })}
-        </svg>
+        </div>
 
-        {/* Layer buttons */}
-        <div className="flex flex-wrap gap-1.5 mt-3 justify-center">
-          {LAYERS.map(l => (
-            <button
-              key={l.id}
-              onClick={() => onLayerSelect(activeLayer === l.id ? null : l.id)}
-              className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-[10px] font-medium transition-all"
-              style={{
-                background: activeLayer === l.id ? `${l.color}30` : 'rgba(255,255,255,0.03)',
-                border: `1px solid ${activeLayer === l.id ? `${l.color}55` : 'var(--border-subtle)'}`,
-                color: activeLayer === l.id ? '#fff' : 'var(--text-muted)',
-              }}
-            >
-              <span className="w-2 h-2 rounded-sm" style={{ background: l.color }} />
-              {l.name.replace(' (Front)', '').replace(' (Back)', '')}
-            </button>
-          ))}
+        {/* Thickness legend */}
+        <div className="flex justify-center gap-4 mt-4 text-[10px]" style={{ color: 'var(--text-faint)' }}>
+          <span>Total thickness: ~40mm</span>
+          <span>|</span>
+          <span>Total cost: $0.180/Wp</span>
         </div>
       </div>
 
@@ -310,14 +165,18 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
       <div>
         {selected ? (
           <div className="card-surface p-6 space-y-5 animate-cascade">
-            <div className="flex items-center gap-3">
-              <div className="w-5 h-5 rounded" style={{ background: selected.color }} />
-              <h3 className="text-[18px] font-semibold">{selected.name}</h3>
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <div className="w-5 h-5 rounded" style={{ background: selected.color, border: `1px solid ${selected.borderColor}` }} />
+                <h3 className="text-[18px] font-semibold">{selected.name}</h3>
+              </div>
+              <div className="text-[11px]" style={{ color: 'var(--text-faint)' }}>Thickness: {selected.height}</div>
             </div>
+
             {selected.costValue !== '—' && (
-              <div className="flex gap-3">
-                <span className="font-price text-[16px] font-bold" style={{ color: 'var(--up)' }}>{selected.costValue}</span>
-                <span className="text-[12px] self-center" style={{ color: 'var(--text-faint)' }}>{selected.costShare} of total module cost</span>
+              <div className="flex gap-3 items-baseline">
+                <span className="font-price text-[20px] font-bold" style={{ color: 'var(--up)' }}>{selected.costValue}</span>
+                <span className="text-[12px]" style={{ color: 'var(--text-faint)' }}>{selected.costShare} of module</span>
               </div>
             )}
 
@@ -349,12 +208,28 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
             </div>
           </div>
         ) : (
-          <div className="card-surface p-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '460px' }}>
+          <div className="card-surface p-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '500px' }}>
             <div className="text-[48px] mb-4 opacity-60">☀️</div>
             <div className="text-[17px] font-semibold mb-2">Click a layer to explore</div>
-            <p className="text-[13px] max-w-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
-              Each layer has different materials, costs, and supply chain dynamics. Click any layer in the exploded view or use the buttons below.
+            <p className="text-[13px] max-w-xs leading-relaxed mb-6" style={{ color: 'var(--text-muted)' }}>
+              A solar module has 6 distinct layers — each with different materials, costs, and supply chain dynamics.
             </p>
+            <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
+              {LAYERS.map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => onLayerSelect(l.id)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium text-left transition-all hover:scale-[1.02]"
+                  style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border-subtle)' }}
+                >
+                  <span className="w-3 h-3 rounded flex-shrink-0" style={{ background: l.color, border: `1px solid ${l.borderColor}` }} />
+                  <span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{l.name}</span>
+                    {l.costValue !== '—' && <span className="block text-[9px] font-mono" style={{ color: 'var(--text-faint)' }}>{l.costValue}</span>}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
