@@ -87,12 +87,12 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
   const selected = LAYERS.find(l => l.id === activeLayer);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* Exploded Stack */}
+    <div className="space-y-6">
+      {/* Exploded Stack — full width, centered */}
       <div className="card-surface p-6">
-        <div className="section-label mb-6">Solar PV Module — Exploded View</div>
+        <div className="section-label mb-6 text-center">Solar PV Module — Exploded View</div>
 
-        <div className="flex flex-col items-center gap-3 py-4" style={{ perspective: '1000px' }}>
+        <div className="flex flex-col items-center gap-3 py-4 max-w-lg mx-auto" style={{ perspective: '1000px' }}>
           {LAYERS.map((layer, i) => {
             const isActive = activeLayer === layer.id;
             const isOther = activeLayer !== null && !isActive;
@@ -161,7 +161,7 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
         </div>
       </div>
 
-      {/* Detail Panel */}
+      {/* Detail Panel — full width below */}
       <div>
         {selected ? (
           <div className="card-surface p-6 space-y-5 animate-cascade">
@@ -208,7 +208,7 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
             </div>
           </div>
         ) : (
-          <div className="card-surface p-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '500px' }}>
+          <div className="card-surface p-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '200px' }}>
             <div className="text-[48px] mb-4 opacity-60">☀️</div>
             <div className="text-[17px] font-semibold mb-2">Click a layer to explore</div>
             <p className="text-[13px] max-w-xs leading-relaxed mb-6" style={{ color: 'var(--text-muted)' }}>
