@@ -71,7 +71,11 @@ function SignInForm() {
 
         {/* Google Sign-in */}
         <button
-          onClick={() => signInWithGoogle(returnTo)}
+          onClick={async () => {
+            setError('');
+            const result = await signInWithGoogle(returnTo);
+            if (result.error) setError(result.error);
+          }}
           className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-lg border border-gray-700 bg-gray-900 hover:bg-gray-800 transition-colors text-sm font-medium"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">

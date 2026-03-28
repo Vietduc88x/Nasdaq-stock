@@ -1,7 +1,8 @@
-// Shared auth with AI Energy Analyst via api.techmadeeasy.info
-// Better Auth cookies are set with domain=.techmadeeasy.info (shared across subdomains)
+// Auth proxied through Next.js rewrites to avoid cross-origin issues
+// /auth-api/* → api.techmadeeasy.info/api/auth/* (same-origin from browser)
+// Cookies shared via .techmadeeasy.info domain (Better Auth)
 
-const AUTH_API = process.env.NEXT_PUBLIC_AUTH_API_URL || 'https://api.techmadeeasy.info';
+const AUTH_PATH = '/auth-api';
 
 export interface UserProfile {
   id: string;
@@ -12,7 +13,7 @@ export interface UserProfile {
 
 export async function getSessionUser(): Promise<UserProfile | null> {
   try {
-    const res = await fetch(`${AUTH_API}/api/auth/get-session`, {
+    const res = await fetch(`${AUTH_PATH}/get-session`, {
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
     });
@@ -34,7 +35,7 @@ export async function getSessionUser(): Promise<UserProfile | null> {
 
 export async function signInWithEmail(email: string, password: string): Promise<{ ok: boolean; error?: string }> {
   try {
-    const res = await fetch(`${AUTH_API}/api/auth/sign-in/email`, {
+    const res = await fetch(`${AUTH_PATH}/sign-in/email`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -43,7 +44,7 @@ export async function signInWithEmail(email: string, password: string): Promise<
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      return { ok: false, error: data.message || 'Sign-in failed' };
+      return { ok: false, error: data.message || data.error || 'Sign-in failed' };
     }
 
     return { ok: true };
@@ -58,7 +59,7 @@ export async function signUpWithEmail(
   name: string
 ): Promise<{ ok: boolean; error?: string }> {
   try {
-    const res = await fetch(`${AUTH_API}/api/auth/sign-up/email`, {
+    const res = await fetch(`${AUTH_PATH}/sign-up/email`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -67,7 +68,7 @@ export async function signUpWithEmail(
 
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      return { ok: false, error: data.message || 'Sign-up failed' };
+      return { ok: false, error: data.message || data.error || 'Sign-up failed' };
     }
 
     return { ok: true };
@@ -76,9 +77,9 @@ export async function signUpWithEmail(
   }
 }
 
-export async function signInWithGoogle(returnTo: string = '/'): Promise<void> {
+export async function signInWithGoogle(returnTo: string = '/'): Promise<{ error?: string }> {
   try {
-    const res = await fetch(`${AUTH_API}/api/auth/sign-in/social`, {
+    const res = await fetch(`${AUTH_PATH}/sign-in/social`, {
       method: 'POST',
       credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
@@ -91,15 +92,18 @@ export async function signInWithGoogle(returnTo: string = '/'): Promise<void> {
     const data = await res.json();
     if (data.url) {
       window.location.href = data.url;
+      return {};
     }
-  } catch {
-    // Silently fail — user stays on sign-in page
+
+    return { error: data.error || data.message || 'Google sign-in failed' };
+  } catch (e) {
+    return { error: 'Network error — please try again' };
   }
 }
 
 export async function signOut(): Promise<void> {
   try {
-    await fetch(`${AUTH_API}/api/auth/sign-out`, {
+    await fetch(`${AUTH_PATH}/sign-out`, {
       method: 'POST',
       credentials: 'include',
     });
