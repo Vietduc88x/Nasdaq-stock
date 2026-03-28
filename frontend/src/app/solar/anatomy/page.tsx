@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import ModuleExplodedView from '@/components/solar/ModuleExplodedView';
 import SupplyChainFlow from '@/components/solar/SupplyChainFlow';
-import CostFormulaExplainer from '@/components/solar/CostFormulaExplainer';
+import CostCalculator from '@/components/solar/CostCalculator';
 
 export default function SolarAnatomyPage() {
   const [activeLayer, setActiveLayer] = useState<string | null>(null);
@@ -21,12 +21,12 @@ export default function SolarAnatomyPage() {
         </Link>
         <h1 className="text-[26px] font-semibold tracking-tight">What&apos;s Inside a Solar Panel?</h1>
         <p className="text-[14px] mt-2 max-w-2xl leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>
-          A solar PV module is built from layers of materials — each with its own cost, supply chain, and market dynamics.
-          Click any layer to explore what it&apos;s made of and how it affects module cost.
+          Explore the layers, materials, and manufacturing costs of a solar PV module.
+          Adjust prices below to see how each input affects the final module cost.
         </p>
       </div>
 
-      {/* 3D Exploded View */}
+      {/* Exploded View */}
       <ModuleExplodedView activeLayer={activeLayer} onLayerSelect={setActiveLayer} />
 
       {/* Supply Chain Flow */}
@@ -35,13 +35,15 @@ export default function SolarAnatomyPage() {
         <SupplyChainFlow />
       </div>
 
-      {/* Cost Formula Explainer */}
+      {/* Interactive Cost Calculator */}
       <div>
-        <h2 className="text-[18px] font-semibold mb-2">How Module Cost is Calculated</h2>
+        <h2 className="text-[18px] font-semibold mb-2">Module Cost Calculator</h2>
         <p className="text-[13px] mb-6" style={{ color: 'var(--text-tertiary)' }}>
-          Based on IRENA&apos;s Solar PV Supply Chain Cost Tool (2026). Each stage adds cost through materials, electricity, equipment, labour, and profit.
+          Drag the sliders to adjust material prices, electricity cost, labour, and margins.
+          Watch how each change ripples through the supply chain to affect the final module price.
+          Based on IRENA&apos;s Solar PV Supply Chain Cost Tool (2026).
         </p>
-        <CostFormulaExplainer />
+        <CostCalculator />
       </div>
     </div>
   );
