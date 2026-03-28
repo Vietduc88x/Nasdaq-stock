@@ -88,17 +88,26 @@ function calculateModuleCost(values: Record<string, number>) {
   const cellCostPerWp = cellDirect * (1 + overhead + profit);
 
   // Stage 4: Module Assembly
-  const moduleElec = (0.025 * electricityPrice) / (9.67 * 72); // per module / watts per module
-  const glassPerWp = (glassPrice * 5.6) / 1000; // 5.6 g/Wp
-  const evaPerWp = (evaPrice * 1.2) / 1000; // 1.2 g/Wp
-  const alPerWp = (aluminumPrice * 1.5 / 453.592); // 1.5 g/Wp, convert lb to g
-  const otherModule = glassPerWp + evaPerWp + alPerWp + 0.015; // + backsheet, jbox etc
+  // IRENA uses $0.057/Wp as lump-sum "other materials" (glass, EVA, aluminum frame, backsheet, junction box, etc.)
+  // We decompose it: baseline glass=$0.0045, EVA=$0.0022, Al=$0.0038, rest=$0.0465 (backsheet, jbox, sealant, ribbon, etc.)
+  // When user changes glass/EVA/Al prices, we adjust from baseline; the "rest" stays fixed
+  const baseGlass = 0.0045; // 5.6 g/Wp × $0.80/kg
+  const baseEva = 0.0022;   // 1.2 g/Wp × $1.85/kg
+  const baseAl = 0.0038;    // 1.5 g/Wp × $1.15/lb ÷ 453.6g/lb
+  const baseRest = 0.057 - baseGlass - baseEva - baseAl; // ~$0.0465 (backsheet, jbox, sealant, etc.)
+
+  const glassPerWp = (glassPrice * 5.6) / 1000;
+  const evaPerWp = (evaPrice * 1.2) / 1000;
+  const alPerWp = (aluminumPrice * 1.5 / 453.592);
+  const moduleMaterials = glassPerWp + evaPerWp + alPerWp + baseRest;
+
+  const moduleElec = (0.025 * electricityPrice) / (9.67 * 72);
   const moduleEquip = (13 / 1000) / 5;
   const moduleBuild = (20 / 1000) / 20;
   const moduleMaint = 0.04 * ((13 + 20) / 1000);
   const moduleLabour = 0.000000264 * avgSalary;
   const esg = 0.0006;
-  const moduleDirect = moduleElec + otherModule + moduleEquip + moduleBuild + moduleMaint + moduleLabour + esg;
+  const moduleDirect = moduleElec + moduleMaterials + moduleEquip + moduleBuild + moduleMaint + moduleLabour + esg;
   const moduleCostPerWp = moduleDirect * (1 + overhead + profit);
 
   const total = polyCostPerWp + waferCostPerWp + cellCostPerWp + moduleCostPerWp;
