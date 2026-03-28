@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { formatUsd, systemIcon } from '@/lib/formatters';
 import MaterialIcon from './MaterialIcon';
+import PriceChange from './PriceChange';
+import Sparkline from './Sparkline';
 import type { MaterialSummary } from '@/lib/types';
 
 interface Props {
@@ -21,10 +23,13 @@ export default function MaterialRow({ material: m, index }: Props) {
     : m.coverageTier === 'indexed_reference' ? 'Indexed'
     : 'Ref';
 
+  const hasChange = m.currentPrice?.change24hPct != null;
+  const hasSparkline = m.currentPrice?.sparkline5d && m.currentPrice.sparkline5d.length > 1;
+
   return (
     <Link href={`/material/${m.slug}`}>
       <div
-        className="grid grid-cols-[2.5fr_1fr_1fr_1fr] gap-4 items-center px-4 py-3 cursor-pointer row-border animate-cascade hover:bg-[#151515] transition-colors"
+        className="grid grid-cols-[2.5fr_1fr_0.8fr_0.6fr_100px] gap-4 items-center px-4 py-3 cursor-pointer row-border animate-cascade hover:bg-[#151515] transition-colors"
         style={{ animationDelay: `${Math.min(index * 20, 200)}ms` }}
       >
         {/* Name + systems */}
@@ -48,14 +53,32 @@ export default function MaterialRow({ material: m, index }: Props) {
           </div>
         </div>
 
+        {/* 24h Change */}
+        <div className="text-right">
+          {hasChange ? (
+            <PriceChange value={m.currentPrice!.change24hPct!} />
+          ) : (
+            <span className="text-[11px]" style={{ color: 'var(--text-faint)' }}>—</span>
+          )}
+        </div>
+
         {/* Source badge */}
         <div className="text-right">
           <span className={`tier-badge ${tierClass}`}>{tierLabel}</span>
         </div>
 
-        {/* Systems used in */}
-        <div className="text-right text-[11px]" style={{ color: 'var(--text-muted)' }}>
-          {m.systems.length > 0 ? `${m.systems.length} system${m.systems.length > 1 ? 's' : ''}` : '—'}
+        {/* 5D Sparkline */}
+        <div className="flex justify-end">
+          {hasSparkline ? (
+            <Sparkline
+              data={m.currentPrice!.sparkline5d!}
+              width={90}
+              height={24}
+              positive={(m.currentPrice?.change24hPct ?? 0) >= 0}
+            />
+          ) : (
+            <span className="text-[10px]" style={{ color: 'var(--text-faint)' }}>—</span>
+          )}
         </div>
       </div>
     </Link>

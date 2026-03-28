@@ -9,43 +9,60 @@ const catalog = JSON.parse(
   readFileSync(join(__dirname, '../data/materials/catalog.json'), 'utf-8')
 );
 
-// In-memory cache: symbol -> { value, unit, asOf, source }
+// In-memory cache: slug -> { data, timestamp }
 const priceCache = new Map();
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
+// Yahoo Finance returns different units per symbol — convert to catalog unit
+const YAHOO_CONVERSIONS = {
+  'ALI=F': { divisor: 2204.62, note: 'LME $/metric ton → $/lb' },
+  'ZN=F':  { divisor: 100, note: 'cents/lb → $/lb' },
+};
+
 /**
- * Fetch a single price from Yahoo Finance.
+ * Fetch price + change + sparkline from Yahoo Finance.
+ * Returns { price, previousClose, change24hPct, sparkline5d }
  */
-async function fetchYahooPrice(yahooSymbol) {
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`;
+async function fetchYahooData(yahooSymbol) {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=5d`;
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
+  const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
 
-  try {
-    const resp = await fetch(url, { signal: controller.signal });
-    clearTimeout(timeout);
-
-    if (!resp.ok) {
-      throw new Error(`Yahoo returned ${resp.status}`);
-    }
-
-    const data = await resp.json();
-    const price = data?.chart?.result?.[0]?.meta?.regularMarketPrice;
-    if (price === undefined || price === null) {
-      throw new Error('No price in Yahoo response');
-    }
-
-    return price;
-  } catch (err) {
-    clearTimeout(timeout);
-    throw err;
+  if (!resp.ok) {
+    throw new Error(`Yahoo returned ${resp.status} for ${yahooSymbol}`);
   }
+
+  const data = await resp.json();
+  const result = data?.chart?.result?.[0];
+  if (!result?.meta?.regularMarketPrice) {
+    throw new Error('No price in Yahoo response');
+  }
+
+  let price = result.meta.regularMarketPrice;
+  let previousClose = result.meta.chartPreviousClose || price;
+
+  // Apply unit conversion if needed
+  const conv = YAHOO_CONVERSIONS[yahooSymbol];
+  if (conv) {
+    price = price / conv.divisor;
+    previousClose = previousClose / conv.divisor;
+  }
+
+  const change24hPct = previousClose > 0
+    ? ((price - previousClose) / previousClose) * 100
+    : 0;
+
+  // Extract 5-day closes for sparkline
+  const closes = result.indicators?.quote?.[0]?.close || [];
+  const sparkline5d = closes
+    .filter(c => c !== null && c !== undefined)
+    .map(c => conv ? c / conv.divisor : c);
+
+  return { price, previousClose, change24hPct, sparkline5d };
 }
 
 /**
  * Get current price for a material slug.
- * Returns { value, unit, normalizedValue, normalizedUnit, coverageTier, source, asOf, staleAfterSeconds, fallbackUsed }
  */
 export async function getPrice(slug) {
   const material = catalog.materials.find(m => m.slug === slug);
@@ -58,7 +75,7 @@ export async function getPrice(slug) {
   if (cached && (now - cached.timestamp) < CACHE_TTL_MS) {
     return {
       ...cached.data,
-      source: 'cache',
+      source: cached.data.source === 'yahoo' ? 'cache' : cached.data.source,
       staleAfterSeconds: Math.round((CACHE_TTL_MS - (now - cached.timestamp)) / 1000),
       fallbackUsed: false
     };
@@ -67,11 +84,11 @@ export async function getPrice(slug) {
   // Try live fetch for exchange-traded materials
   if (material.yahooSymbol && material.coverageTier === 'live_exchange') {
     try {
-      const price = await fetchYahooPrice(material.yahooSymbol);
-      const normalized = price * material.conversionFactor;
+      const yahoo = await fetchYahooData(material.yahooSymbol);
+      const normalized = yahoo.price * material.conversionFactor;
 
       const result = {
-        value: price,
+        value: Math.round(yahoo.price * 10000) / 10000,
         unit: material.unit,
         normalizedValue: Math.round(normalized * 100000) / 100000,
         normalizedUnit: material.normalizedUnit,
@@ -79,7 +96,10 @@ export async function getPrice(slug) {
         source: 'yahoo',
         asOf: new Date().toISOString(),
         staleAfterSeconds: Math.round(CACHE_TTL_MS / 1000),
-        fallbackUsed: false
+        fallbackUsed: false,
+        change24hPct: Math.round(yahoo.change24hPct * 100) / 100,
+        previousClose: Math.round(yahoo.previousClose * 10000) / 10000,
+        sparkline5d: yahoo.sparkline5d.map(v => Math.round(v * 10000) / 10000),
       };
 
       priceCache.set(slug, { data: result, timestamp: now });
@@ -108,7 +128,10 @@ export async function getPrice(slug) {
     source: 'reference',
     asOf: null,
     staleAfterSeconds: null,
-    fallbackUsed: material.coverageTier === 'live_exchange'
+    fallbackUsed: material.coverageTier === 'live_exchange',
+    change24hPct: null,
+    previousClose: null,
+    sparkline5d: null,
   };
 }
 
@@ -117,7 +140,6 @@ export async function getPrice(slug) {
  */
 export async function getAllPrices() {
   const results = [];
-  // Fetch live materials in parallel, reference materials synchronously
   const livePromises = [];
 
   for (const material of catalog.materials) {

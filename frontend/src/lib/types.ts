@@ -8,6 +8,9 @@ export interface MaterialPrice {
   asOf: string | null;
   staleAfterSeconds: number | null;
   fallbackUsed: boolean;
+  change24hPct: number | null;
+  previousClose: number | null;
+  sparkline5d: number[] | null;
 }
 
 export interface MaterialSummary {

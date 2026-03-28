@@ -47,11 +47,12 @@ export default async function HomePage() {
 
       {/* Desktop Table */}
       <div className="hidden sm:block">
-        <div className="grid grid-cols-[2.5fr_1fr_1fr_1fr] gap-4 px-4 py-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>
+        <div className="grid grid-cols-[2.5fr_1fr_0.8fr_0.6fr_100px] gap-4 px-4 py-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>
           <span>Material</span>
           <span className="text-right">Price</span>
+          <span className="text-right">24h</span>
           <span className="text-right">Source</span>
-          <span className="text-right">Systems</span>
+          <span className="text-right">5D</span>
         </div>
 
         {data.materials.map((m, i) => (
