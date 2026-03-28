@@ -43,7 +43,7 @@ export default function WaterfallChart({ stages, totalCost, costUnit = '$/Wp' }:
 
   const stageColors = ['#34C759', '#3B82F6', '#FBBF24', '#A855F7', '#ec4899', '#06b6d4'];
   const barColors = labels.map((_, i) =>
-    i === labels.length - 1 ? 'rgba(255,255,255,0.15)' : stageColors[i % stageColors.length]
+    i === labels.length - 1 ? '#ef4444' : stageColors[i % stageColors.length]
   );
 
   return (

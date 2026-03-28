@@ -119,19 +119,21 @@ body {
   border-radius: 8px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text-muted);
+  color: var(--text-tertiary);
   cursor: pointer;
   transition: all var(--duration-hover) var(--ease-spring);
   user-select: none;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .segment:hover {
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .segment.active {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--text-primary);
+  background: rgba(52, 199, 89, 0.12);
+  color: var(--up);
   font-weight: 600;
 }
 
