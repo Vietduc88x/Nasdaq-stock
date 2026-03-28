@@ -1,95 +1,99 @@
 import { fetchMaterialDetail } from '@/lib/api';
-import { tierBadge, formatUsd, systemIcon } from '@/lib/formatters';
+import { formatUsd, systemIcon } from '@/lib/formatters';
 import Link from 'next/link';
+import Sparkline from '@/components/Sparkline';
 
 export const revalidate = 60;
 
 export default async function MaterialDetailPage({ params }: { params: { slug: string } }) {
   const data = await fetchMaterialDetail(params.slug);
-  const badge = tierBadge(data.material.coverageTier);
+
+  const tierClass = data.material.coverageTier === 'live_exchange' ? 'tier-live'
+    : data.material.coverageTier === 'delayed_vendor' ? 'tier-vendor'
+    : data.material.coverageTier === 'indexed_reference' ? 'tier-indexed'
+    : 'tier-reference';
+
+  const tierLabel = data.material.coverageTier === 'live_exchange' ? 'Live'
+    : data.material.coverageTier === 'delayed_vendor' ? 'Vendor'
+    : data.material.coverageTier === 'indexed_reference' ? 'Indexed'
+    : 'Reference';
 
   return (
-    <div className="space-y-8">
-      {/* Back link */}
-      <Link href="/" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-white transition-colors group">
-        <svg className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div className="space-y-6">
+      {/* Back */}
+      <Link href="/" className="inline-flex items-center gap-1 text-[12px] transition-colors group" style={{ color: 'var(--text-muted)' }}>
+        <svg className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Dashboard
+        Materials
       </Link>
 
-      {/* Header */}
-      <div className="card p-6">
+      {/* Header card */}
+      <div className="card-surface p-5">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <span className="w-10 h-10 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center text-gray-400 font-mono text-sm font-bold">
-                {data.material.icon}
-              </span>
-              <div>
-                <h1 className="text-2xl font-bold">{data.material.name}</h1>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className={`badge ${badge.color}`}>{badge.label}</span>
-                  <span className="text-xs text-gray-600 capitalize">{data.material.category.replace(/_/g, ' ')}</span>
-                </div>
+          <div className="flex items-center gap-3">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-[14px] font-mono font-bold"
+              style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}
+            >
+              {data.material.icon}
+            </div>
+            <div>
+              <h1 className="text-[20px] font-semibold">{data.material.name}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className={`tier-badge ${tierClass}`}>{tierLabel}</span>
+                <span className="text-[11px] capitalize" style={{ color: 'var(--text-faint)' }}>
+                  {data.material.category.replace(/_/g, ' ')}
+                </span>
               </div>
             </div>
           </div>
           {data.currentPrice && (
             <div className="text-right">
-              <div className="text-3xl font-bold text-white font-mono">
-                {formatUsd(data.currentPrice.value)}
+              <div className="font-price text-[28px] font-bold">{formatUsd(data.currentPrice.value)}</div>
+              <div className="text-[11px]" style={{ color: 'var(--text-faint)' }}>
+                {data.currentPrice.unit} &middot; {data.currentPrice.source}
               </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {data.currentPrice.unit}
-                <span className="text-gray-600 mx-1">&middot;</span>
-                via {data.currentPrice.source}
-              </div>
-              {data.currentPrice.asOf && (
-                <div className="text-[11px] text-gray-600 mt-1">
-                  {new Date(data.currentPrice.asOf).toLocaleString()}
-                </div>
-              )}
             </div>
           )}
+        </div>
+
+        {/* Sparkline preview */}
+        <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+          <Sparkline width={600} height={60} positive={true} />
         </div>
       </div>
 
       {/* Cross-System Impact */}
       {data.crossSystemImpact.length > 0 && (
         <div>
-          <h2 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-4">
-            Cross-System Impact (+10% price change)
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="section-label mb-3">Cross-System Impact (+10% price change)</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {data.crossSystemImpact.map((impact, i) => (
-              <div key={i} className="card p-5">
-                <div className="flex items-center gap-2.5 mb-3">
-                  <span className="text-xl">{systemIcon(impact.system)}</span>
-                  <span className="font-semibold text-white capitalize text-lg">{impact.system}</span>
+              <div key={i} className="card-surface p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-[18px]">{systemIcon(impact.system)}</span>
+                  <span className="text-[15px] font-semibold capitalize">{impact.system}</span>
                 </div>
-                <p className="text-xs text-gray-500 mb-4 leading-relaxed">{impact.component}</p>
-                <div className="space-y-2.5">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Baseline cost</span>
-                    <span className="text-white font-mono">
-                      {formatUsd(impact.baselineCost)}
-                      <span className="text-gray-500 text-xs ml-1">{impact.costUnit}</span>
+                <p className="text-[11px] mb-4" style={{ color: 'var(--text-faint)' }}>{impact.component}</p>
+                <div className="space-y-2">
+                  <div className="flex justify-between text-[12px]">
+                    <span style={{ color: 'var(--text-muted)' }}>Baseline</span>
+                    <span className="font-price font-medium">
+                      {formatUsd(impact.baselineCost)} <span style={{ color: 'var(--text-faint)' }}>{impact.costUnit}</span>
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Usage</span>
-                    <span className="text-gray-300 font-mono">
-                      {impact.usagePerUnit.toLocaleString()}
-                      <span className="text-gray-500 text-xs ml-1">{impact.usageUnit}</span>
+                  <div className="flex justify-between text-[12px]">
+                    <span style={{ color: 'var(--text-muted)' }}>Usage</span>
+                    <span className="font-price" style={{ color: 'var(--text-tertiary)' }}>
+                      {impact.usagePerUnit.toLocaleString()} {impact.usageUnit}
                     </span>
                   </div>
-                  <div className="border-t border-gray-800 pt-2.5">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">+10% impact</span>
-                      <span className="font-mono font-semibold text-yellow-400 bg-yellow-400/10 px-2 py-0.5 rounded">
-                        +{formatUsd(impact.delta)}
-                        <span className="text-yellow-500/70 text-xs ml-1">{impact.costUnit}</span>
+                  <div className="pt-2" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+                    <div className="flex justify-between text-[12px]">
+                      <span style={{ color: 'var(--text-muted)' }}>+10% impact</span>
+                      <span className="font-price font-semibold" style={{ color: 'var(--up-bright)' }}>
+                        +{formatUsd(impact.delta)} {impact.costUnit}
                       </span>
                     </div>
                   </div>
@@ -101,10 +105,9 @@ export default async function MaterialDetailPage({ params }: { params: { slug: s
       )}
 
       {data.crossSystemImpact.length === 0 && (
-        <div className="card p-10 text-center">
-          <div className="text-gray-500 text-lg mb-2">Reference Material</div>
-          <p className="text-gray-600 text-sm">
-            This material is tracked as a market reference anchor and is not directly modeled in any system cost engine.
+        <div className="card-surface p-8 text-center">
+          <p className="text-[14px]" style={{ color: 'var(--text-muted)' }}>
+            Reference anchor — not directly modeled in system cost engines.
           </p>
         </div>
       )}

@@ -4,27 +4,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#4ade80',
-          500: '#22c55e',
-          600: '#16a34a',
-          700: '#15803d',
-          800: '#166534',
-          900: '#14532d',
-        },
-        accent: {
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-        },
+        page: '#050505',
+        surface: '#0F0F0F',
+        elevated: '#151515',
+        up: { DEFAULT: '#34C759', bright: '#30D158' },
+        down: { DEFAULT: '#FF3B30', bright: '#FF453A' },
+        gold: '#C4A47C',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'sans-serif'],
+        mono: ['SF Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
     },
   },

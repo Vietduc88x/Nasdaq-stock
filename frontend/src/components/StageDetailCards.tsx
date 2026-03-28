@@ -2,11 +2,11 @@
 
 import type { StageBreakdown } from '@/lib/types';
 
-const STAGE_CONFIG: Record<string, { color: string; border: string }> = {
-  polysilicon: { color: 'text-green-400', border: 'border-green-500/40' },
-  wafer: { color: 'text-blue-400', border: 'border-blue-500/40' },
-  cell: { color: 'text-yellow-400', border: 'border-yellow-500/40' },
-  module: { color: 'text-purple-400', border: 'border-purple-500/40' },
+const STAGE_COLORS: Record<string, string> = {
+  polysilicon: '#34C759',
+  wafer: '#3B82F6',
+  cell: '#FBBF24',
+  module: '#A855F7',
 };
 
 interface Props {
@@ -16,37 +16,35 @@ interface Props {
 
 export default function StageDetailCards({ stages, totalCost }: Props) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {stages.map(stage => {
         const pct = ((stage.costPerWp / totalCost) * 100).toFixed(1);
-        const config = STAGE_CONFIG[stage.stage] || { color: 'text-gray-400', border: 'border-gray-700' };
+        const color = STAGE_COLORS[stage.stage] || '#888';
 
         return (
-          <div key={stage.stage} className={`card ${config.border} p-4`}>
-            <div className="flex items-center justify-between mb-3">
-              <h4 className={`text-sm font-semibold capitalize ${config.color}`}>{stage.stage}</h4>
-              <span className="text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded-full">{pct}%</span>
+          <div key={stage.stage} className="card-surface p-4" style={{ borderColor: `${color}20` }}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[13px] font-semibold capitalize" style={{ color }}>{stage.stage}</span>
+              <span className="text-[10px] font-medium px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,255,255,0.04)', color: 'var(--text-muted)' }}>
+                {pct}%
+              </span>
             </div>
-            <div className="text-xl font-bold text-white font-mono mb-4">${stage.costPerWp.toFixed(4)}</div>
+            <div className="font-price text-[17px] font-bold mb-3">${stage.costPerWp.toFixed(4)}</div>
             <div className="space-y-1.5">
               {Object.entries(stage.components)
                 .filter(([, v]) => v > 0)
                 .sort(([, a], [, b]) => b - a)
+                .slice(0, 5)
                 .map(([name, value]) => {
-                  const compPct = ((value / stage.costPerWp) * 100);
+                  const barPct = (value / stage.costPerWp) * 100;
                   return (
-                    <div key={name} className="flex items-center gap-2 text-xs">
-                      <div className="flex-1">
-                        <div className="flex justify-between mb-0.5">
-                          <span className="text-gray-400 capitalize">{name}</span>
-                          <span className="text-gray-300 font-mono">${value.toFixed(4)}</span>
-                        </div>
-                        <div className="w-full bg-gray-800 rounded-full h-1">
-                          <div
-                            className={`h-1 rounded-full ${config.border.replace('border-', 'bg-').replace('/40', '/60')}`}
-                            style={{ width: `${Math.min(compPct, 100)}%` }}
-                          />
-                        </div>
+                    <div key={name}>
+                      <div className="flex justify-between text-[10px] mb-0.5">
+                        <span style={{ color: 'var(--text-muted)' }} className="capitalize">{name}</span>
+                        <span className="font-price" style={{ color: 'var(--text-tertiary)' }}>${value.toFixed(4)}</span>
+                      </div>
+                      <div className="w-full h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
+                        <div className="h-1 rounded-full" style={{ width: `${Math.min(barPct, 100)}%`, background: `${color}60` }} />
                       </div>
                     </div>
                   );

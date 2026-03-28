@@ -8,11 +8,10 @@ import {
   BarElement,
   Title,
   Tooltip,
-  Legend,
 } from 'chart.js';
 import type { StageBreakdown } from '@/lib/types';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 
 interface Props {
   stages: StageBreakdown[];
@@ -20,7 +19,6 @@ interface Props {
 }
 
 export default function WaterfallChart({ stages, totalCost }: Props) {
-  // Build waterfall data: each bar starts where the previous one ended
   let cumulative = 0;
   const labels = [...stages.map(s => s.stage.charAt(0).toUpperCase() + s.stage.slice(1)), 'Total'];
 
@@ -32,18 +30,18 @@ export default function WaterfallChart({ stages, totalCost }: Props) {
     visible.push(stage.costPerWp);
     cumulative += stage.costPerWp;
   }
-  // Total bar starts from 0
   hidden.push(0);
   visible.push(totalCost);
 
-  const colors = ['#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
+  const stageColors = ['#34C759', '#3B82F6', '#FBBF24', '#A855F7'];
+  const barColors = labels.map((_, i) =>
+    i === labels.length - 1 ? 'rgba(255,255,255,0.15)' : stageColors[i % stageColors.length]
+  );
 
   return (
-    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4">
-      <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">
-        Cost Waterfall ($/Wp)
-      </h3>
-      <div className="h-72">
+    <div className="card-surface p-4">
+      <div className="section-label mb-4">Cost Waterfall</div>
+      <div className="h-64 sm:h-72">
         <Bar
           data={{
             labels,
@@ -53,16 +51,15 @@ export default function WaterfallChart({ stages, totalCost }: Props) {
                 data: hidden,
                 backgroundColor: 'transparent',
                 borderWidth: 0,
-                barPercentage: 0.6,
+                barPercentage: 0.5,
               },
               {
                 label: 'Cost',
                 data: visible,
-                backgroundColor: labels.map((_, i) =>
-                  i === labels.length - 1 ? '#ef4444' : colors[i % colors.length]
-                ),
+                backgroundColor: barColors,
                 borderWidth: 0,
-                barPercentage: 0.6,
+                barPercentage: 0.5,
+                borderRadius: 3,
               },
             ],
           }}
@@ -72,6 +69,13 @@ export default function WaterfallChart({ stages, totalCost }: Props) {
             plugins: {
               legend: { display: false },
               tooltip: {
+                backgroundColor: '#1a1a1a',
+                borderColor: 'rgba(255,255,255,0.1)',
+                borderWidth: 1,
+                titleColor: 'rgba(255,255,255,0.7)',
+                bodyColor: 'rgba(255,255,255,0.95)',
+                bodyFont: { family: 'SF Mono, monospace' },
+                padding: 10,
                 callbacks: {
                   label: (ctx) => {
                     if (ctx.datasetIndex === 0) return '';
@@ -84,15 +88,18 @@ export default function WaterfallChart({ stages, totalCost }: Props) {
               x: {
                 stacked: true,
                 grid: { display: false },
-                ticks: { color: '#9ca3af' },
+                ticks: { color: 'rgba(255,255,255,0.35)', font: { size: 12 } },
+                border: { display: false },
               },
               y: {
                 stacked: true,
-                grid: { color: '#1f2937' },
+                grid: { color: 'rgba(255,255,255,0.04)' },
                 ticks: {
-                  color: '#9ca3af',
+                  color: 'rgba(255,255,255,0.25)',
+                  font: { size: 11, family: 'SF Mono, monospace' },
                   callback: (v) => `$${(v as number).toFixed(3)}`,
                 },
+                border: { display: false },
                 min: 0,
               },
             },
