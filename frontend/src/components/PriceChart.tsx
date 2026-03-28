@@ -3,57 +3,82 @@
 import { useEffect, useRef, useState } from 'react';
 
 interface Props {
-  symbol: string | null; // Yahoo symbol like "SI=F" or null for reference materials
+  yahooSymbol: string | null;
   name: string;
   currentPrice?: number;
   unit?: string;
+  sparkline5d?: number[] | null;
 }
 
 const TIMEFRAMES = [
-  { label: '1D', range: '1d', interval: '5m' },
-  { label: '1W', range: '5d', interval: '15m' },
+  { label: '5D', range: '5d', interval: '1d' },
   { label: '1M', range: '1mo', interval: '1d' },
+  { label: '3M', range: '3mo', interval: '1d' },
   { label: '1Y', range: '1y', interval: '1wk' },
-  { label: 'ALL', range: '5y', interval: '1mo' },
+  { label: '5Y', range: '5y', interval: '1mo' },
 ];
 
-export default function PriceChart({ symbol, name, currentPrice, unit }: Props) {
+export default function PriceChart({ yahooSymbol, name, currentPrice, unit, sparkline5d }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [activeTimeframe, setActiveTimeframe] = useState(4); // ALL by default
-  const [chartData, setChartData] = useState<number[] | null>(null);
+  const [activeTimeframe, setActiveTimeframe] = useState(0);
+  const [chartData, setChartData] = useState<number[] | null>(sparkline5d || null);
   const [loading, setLoading] = useState(false);
-  const [priceRange, setPriceRange] = useState<{ min: number; max: number; change: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch real data from Yahoo via our API proxy
   useEffect(() => {
-    if (!canvasRef.current) return;
-
-    // Generate simulated historical data based on current price
-    const basePrice = currentPrice || 50;
-    const tf = TIMEFRAMES[activeTimeframe];
-    const points = tf.label === '1D' ? 78 : tf.label === '1W' ? 100 : tf.label === '1M' ? 30 : tf.label === '1Y' ? 52 : 60;
-
-    const data: number[] = [];
-    let price = basePrice * (0.5 + Math.random() * 0.3); // Start lower for uptrend
-    const volatility = tf.label === '1D' ? 0.005 : tf.label === '1W' ? 0.01 : 0.03;
-    const trend = (basePrice - price) / points; // Trend toward current price
-
-    for (let i = 0; i < points; i++) {
-      price += trend + (Math.random() - 0.45) * basePrice * volatility;
-      price = Math.max(price, basePrice * 0.1);
-      data.push(price);
+    if (!yahooSymbol) {
+      setChartData(null);
+      setError('No live market data available for this material');
+      return;
     }
-    // Last point = current price
-    data[data.length - 1] = basePrice;
 
-    const min = Math.min(...data);
-    const max = Math.max(...data);
-    const startPrice = data[0];
-    const change = ((basePrice - startPrice) / startPrice) * 100;
+    const tf = TIMEFRAMES[activeTimeframe];
 
-    setChartData(data);
-    setPriceRange({ min, max, change });
+    // For 5D, use the sparkline data we already have
+    if (tf.label === '5D' && sparkline5d && sparkline5d.length > 1) {
+      setChartData(sparkline5d);
+      setError(null);
+      return;
+    }
 
-    // Draw on canvas
+    // Fetch longer timeframes from Yahoo via backend proxy
+    setLoading(true);
+    setError(null);
+
+    fetch(`/api/materials/${name.toLowerCase().replace(/\s+/g, '-')}/history?range=${tf.range}&interval=${tf.interval}`)
+      .then(r => {
+        if (!r.ok) throw new Error('Failed to fetch history');
+        return r.json();
+      })
+      .then(data => {
+        if (data.closes && data.closes.length > 1) {
+          setChartData(data.closes);
+        } else if (sparkline5d && sparkline5d.length > 1) {
+          // Fallback to 5D sparkline if longer range unavailable
+          setChartData(sparkline5d);
+        } else {
+          setError('Historical data not available');
+          setChartData(null);
+        }
+      })
+      .catch(() => {
+        // Fallback to sparkline5d if available
+        if (sparkline5d && sparkline5d.length > 1) {
+          setChartData(sparkline5d);
+          setError(null);
+        } else {
+          setError('Could not load price history');
+          setChartData(null);
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [yahooSymbol, activeTimeframe, name]);
+
+  // Draw chart
+  useEffect(() => {
+    if (!canvasRef.current || !chartData || chartData.length < 2) return;
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -66,21 +91,26 @@ export default function PriceChart({ symbol, name, currentPrice, unit }: Props) 
 
     const w = rect.width;
     const h = rect.height;
-    const padding = { top: 10, right: 60, bottom: 30, left: 10 };
+    const padding = { top: 10, right: 60, bottom: 20, left: 10 };
     const chartW = w - padding.left - padding.right;
     const chartH = h - padding.top - padding.bottom;
+
+    const data = chartData;
+    const min = Math.min(...data);
+    const max = Math.max(...data);
     const range = max - min || 1;
 
-    const isPositive = change >= 0;
+    const first = data[0];
+    const last = data[data.length - 1];
+    const isPositive = last >= first;
     const lineColor = isPositive ? '#34C759' : '#FF3B30';
-    const gradientTop = isPositive ? 'rgba(52,199,89,0.25)' : 'rgba(255,59,48,0.25)';
+    const gradientTop = isPositive ? 'rgba(52,199,89,0.20)' : 'rgba(255,59,48,0.20)';
     const gradientBottom = isPositive ? 'rgba(52,199,89,0)' : 'rgba(255,59,48,0)';
 
-    // Clear
     ctx.clearRect(0, 0, w, h);
 
-    // Y-axis grid lines + labels
-    const ySteps = 5;
+    // Y-axis grid
+    const ySteps = 4;
     ctx.strokeStyle = 'rgba(255,255,255,0.04)';
     ctx.lineWidth = 1;
     ctx.fillStyle = 'rgba(255,255,255,0.25)';
@@ -125,56 +155,75 @@ export default function PriceChart({ symbol, name, currentPrice, unit }: Props) 
     ctx.fill();
 
     // Current price label
-    const lastY = getY(data[data.length - 1]);
+    const lastY = getY(last);
     ctx.fillStyle = lineColor;
-    ctx.fillRect(w - padding.right + 2, lastY - 9, 55, 18);
+    const labelW = 55;
+    const labelH = 18;
+    ctx.fillRect(w - padding.right + 2, lastY - labelH / 2, labelW, labelH);
     ctx.fillStyle = '#000';
     ctx.font = 'bold 10px SF Mono, monospace';
     ctx.textAlign = 'left';
-    ctx.fillText(`$${basePrice.toFixed(basePrice >= 100 ? 0 : 2)}`, w - padding.right + 6, lastY + 3);
+    ctx.fillText(`$${last.toFixed(last >= 100 ? 0 : 2)}`, w - padding.right + 6, lastY + 3);
 
-  }, [activeTimeframe, currentPrice]);
+  }, [chartData]);
+
+  const changePct = chartData && chartData.length >= 2
+    ? ((chartData[chartData.length - 1] - chartData[0]) / chartData[0]) * 100
+    : null;
 
   return (
     <div>
-      {/* Header: price + timeframe selector */}
+      {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
-          {currentPrice && (
-            <>
-              <div className="font-price text-[28px] font-bold" style={{ color: priceRange && priceRange.change >= 0 ? 'var(--up)' : 'var(--down)' }}>
-                ${currentPrice.toFixed(currentPrice >= 100 ? 2 : 2)}
-              </div>
-              {priceRange && (
-                <span className="text-[13px] font-semibold" style={{ color: priceRange.change >= 0 ? 'var(--up)' : 'var(--down)' }}>
-                  {priceRange.change >= 0 ? '+' : ''}{priceRange.change.toFixed(2)}%
-                </span>
-              )}
-            </>
+          {currentPrice != null && (
+            <div className="font-price text-[28px] font-bold" style={{ color: changePct != null && changePct >= 0 ? 'var(--up)' : changePct != null ? 'var(--down)' : 'var(--text-primary)' }}>
+              ${currentPrice.toFixed(currentPrice >= 100 ? 2 : 2)}
+            </div>
+          )}
+          {changePct != null && (
+            <span className="text-[13px] font-semibold" style={{ color: changePct >= 0 ? 'var(--up)' : 'var(--down)' }}>
+              {changePct >= 0 ? '+' : ''}{changePct.toFixed(2)}%
+              <span className="text-[11px] font-normal ml-1" style={{ color: 'var(--text-faint)' }}>
+                {TIMEFRAMES[activeTimeframe].label}
+              </span>
+            </span>
           )}
         </div>
 
-        {/* Timeframe buttons */}
-        <div className="segmented-control">
-          {TIMEFRAMES.map((tf, i) => (
-            <button
-              key={tf.label}
-              onClick={() => setActiveTimeframe(i)}
-              className={`segment ${i === activeTimeframe ? 'active' : ''}`}
-              style={{ padding: '4px 10px', fontSize: '11px' }}
-            >
-              {tf.label}
-            </button>
-          ))}
-        </div>
+        {/* Timeframe selector — only for live materials */}
+        {yahooSymbol && (
+          <div className="segmented-control">
+            {TIMEFRAMES.map((tf, i) => (
+              <button
+                key={tf.label}
+                onClick={() => setActiveTimeframe(i)}
+                className={`segment ${i === activeTimeframe ? 'active' : ''}`}
+                style={{ padding: '4px 10px', fontSize: '11px' }}
+              >
+                {tf.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Chart canvas */}
-      <div className="relative" style={{ height: '280px' }}>
+      {/* Chart */}
+      <div className="relative" style={{ height: '240px' }}>
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center" style={{ color: 'var(--text-faint)' }}>
+            Loading...
+          </div>
+        )}
+        {error && !chartData && (
+          <div className="absolute inset-0 flex items-center justify-center text-[13px]" style={{ color: 'var(--text-faint)' }}>
+            {error}
+          </div>
+        )}
         <canvas
           ref={canvasRef}
           className="w-full h-full"
-          style={{ display: 'block' }}
+          style={{ display: chartData ? 'block' : 'none' }}
         />
       </div>
     </div>

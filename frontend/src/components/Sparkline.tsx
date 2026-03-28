@@ -1,33 +1,22 @@
 'use client';
 
 interface Props {
-  data?: number[];
+  data: number[];     // Required — no fake data generation
   width?: number;
   height?: number;
   positive?: boolean;
 }
 
-// Generate a simple random sparkline if no data provided
-function generateSparkline(seed: number, points = 24): number[] {
-  const data: number[] = [];
-  let value = 50 + (seed * 17 % 30);
-  for (let i = 0; i < points; i++) {
-    value += (Math.sin(seed * 0.3 + i * 0.5) * 3) + (Math.cos(seed * 0.7 + i * 0.3) * 2);
-    value = Math.max(10, Math.min(90, value));
-    data.push(value);
-  }
-  return data;
-}
-
 export default function Sparkline({ data, width = 100, height = 32, positive = true }: Props) {
-  const points = data || generateSparkline(Math.floor(Math.random() * 1000));
-  const min = Math.min(...points);
-  const max = Math.max(...points);
+  if (!data || data.length < 2) return null;
+
+  const min = Math.min(...data);
+  const max = Math.max(...data);
   const range = max - min || 1;
 
-  const pathData = points
+  const pathData = data
     .map((v, i) => {
-      const x = (i / (points.length - 1)) * width;
+      const x = (i / (data.length - 1)) * width;
       const y = height - ((v - min) / range) * (height * 0.8) - height * 0.1;
       return `${i === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
     })

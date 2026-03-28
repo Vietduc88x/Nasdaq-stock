@@ -134,7 +134,8 @@ export function registerPageDataRoutes(app) {
         icon: material.icon,
         category: material.category,
         coverageTier: material.coverageTier,
-        unit: material.unit
+        unit: material.unit,
+        yahooSymbol: material.yahooSymbol || null,
       },
       currentPrice: price,
       crossSystemImpact: impact?.impacts || [],

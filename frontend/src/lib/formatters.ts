@@ -19,6 +19,8 @@ export function tierBadge(tier: string): { label: string; color: string } {
     case 'delayed_vendor': return { label: 'Vendor', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' };
     case 'indexed_reference': return { label: 'Indexed', color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' };
     case 'modeled_reference': return { label: 'Reference', color: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
+    case 'stale_cache': return { label: 'Stale', color: 'bg-orange-500/20 text-orange-400 border-orange-500/30' };
+    case 'fallback_reference': return { label: 'Fallback', color: 'bg-red-500/20 text-red-400 border-red-500/30' };
     default: return { label: tier, color: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
   }
 }

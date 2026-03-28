@@ -13,14 +13,21 @@ interface Props {
 }
 
 export default function MaterialRow({ material: m, index }: Props) {
-  const tierClass = m.coverageTier === 'live_exchange' ? 'tier-live'
-    : m.coverageTier === 'delayed_vendor' ? 'tier-vendor'
-    : m.coverageTier === 'indexed_reference' ? 'tier-indexed'
+  // Badge reflects ACTUAL price state, not material capability.
+  // If Yahoo is down, a live_exchange material shows 'Fallback' not 'Live'.
+  const priceTier = m.currentPrice?.coverageTier || m.coverageTier;
+  const tierClass = priceTier === 'live_exchange' ? 'tier-live'
+    : priceTier === 'delayed_vendor' ? 'tier-vendor'
+    : priceTier === 'indexed_reference' ? 'tier-indexed'
+    : priceTier === 'stale_cache' ? 'tier-stale'
+    : priceTier === 'fallback_reference' ? 'tier-fallback'
     : 'tier-reference';
 
-  const tierLabel = m.coverageTier === 'live_exchange' ? 'Live'
-    : m.coverageTier === 'delayed_vendor' ? 'Vendor'
-    : m.coverageTier === 'indexed_reference' ? 'Indexed'
+  const tierLabel = priceTier === 'live_exchange' ? 'Live'
+    : priceTier === 'delayed_vendor' ? 'Vendor'
+    : priceTier === 'indexed_reference' ? 'Indexed'
+    : priceTier === 'stale_cache' ? 'Stale'
+    : priceTier === 'fallback_reference' ? 'Fallback'
     : 'Ref';
 
   const hasChange = m.currentPrice?.change24hPct != null;

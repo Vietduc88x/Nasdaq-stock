@@ -110,21 +110,26 @@ export async function getPrice(slug) {
         return {
           ...cached.data,
           source: 'stale_cache',
+          coverageTier: 'stale_cache',
           staleAfterSeconds: 0,
-          fallbackUsed: false
+          fallbackUsed: true
         };
       }
     }
   }
 
   // Return reference/fallback price
+  // IMPORTANT: override coverageTier to 'modeled_reference' when falling back,
+  // even if the material is normally live_exchange. The UI badge must reflect
+  // the actual price state, not the material's potential capability.
   const normalized = material.fallbackPrice * material.conversionFactor;
+  const isLiveMaterialFallingBack = material.coverageTier === 'live_exchange';
   return {
     value: material.fallbackPrice,
     unit: material.unit,
     normalizedValue: Math.round(normalized * 100000) / 100000,
     normalizedUnit: material.normalizedUnit,
-    coverageTier: material.coverageTier,
+    coverageTier: isLiveMaterialFallingBack ? 'fallback_reference' : material.coverageTier,
     source: 'reference',
     asOf: null,
     staleAfterSeconds: null,

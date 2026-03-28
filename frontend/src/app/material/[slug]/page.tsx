@@ -48,13 +48,14 @@ export default async function MaterialDetailPage({ params }: { params: { slug: s
         </div>
       </div>
 
-      {/* Price Chart */}
+      {/* Price Chart — real data for live materials, message for reference */}
       <div className="card-surface p-5">
         <PriceChart
-          symbol={null}
-          name={data.material.name}
+          yahooSymbol={data.material.yahooSymbol}
+          name={data.material.slug}
           currentPrice={data.currentPrice?.value}
           unit={data.currentPrice?.unit}
+          sparkline5d={data.currentPrice?.sparkline5d}
         />
       </div>
 
