@@ -1,33 +1,15 @@
 import { fetchHomePage } from '@/lib/api';
 import { formatUsd, systemIcon } from '@/lib/formatters';
 import Link from 'next/link';
-import Sparkline from '@/components/Sparkline';
-import PriceChange from '@/components/PriceChange';
-import MaterialFilters from '@/components/MaterialFilters';
+import MaterialRow from '@/components/MaterialRow';
 import MaterialIcon from '@/components/MaterialIcon';
-
-const CATEGORY_ORDER = ['critical', 'structural', 'battery', 'wind_specific', 'reference_anchor'];
-const CATEGORY_LABELS: Record<string, string> = {
-  critical: 'Critical Materials',
-  structural: 'Structural',
-  battery: 'Battery',
-  wind_specific: 'Wind',
-  reference_anchor: 'Reference',
-};
+import MaterialFilters from '@/components/MaterialFilters';
+import PriceChange from '@/components/PriceChange';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
   const data = await fetchHomePage();
-
-  // Group by category
-  const grouped = new Map<string, typeof data.materials>();
-  for (const m of data.materials) {
-    const cat = m.category || 'other';
-    if (!grouped.has(cat)) grouped.set(cat, []);
-    grouped.get(cat)!.push(m);
-  }
-
   const livePct = data.meta.liveCoveragePct;
   const totalMaterials = data.materials.length;
 
@@ -64,9 +46,8 @@ export default async function HomePage() {
       {/* Filters */}
       <MaterialFilters />
 
-      {/* Material Rows — Desktop Table */}
+      {/* Desktop Table */}
       <div className="hidden sm:block">
-        {/* Table header */}
         <div className="grid grid-cols-[2.5fr_1fr_1fr_1fr_120px] gap-4 px-4 py-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>
           <span>Material</span>
           <span className="text-right">Price</span>
@@ -75,62 +56,9 @@ export default async function HomePage() {
           <span className="text-right">7D Trend</span>
         </div>
 
-        {data.materials.map((m, i) => {
-          const change = Math.sin(i * 2.1) * 8; // Simulated change for display
-          return (
-            <Link key={m.slug} href={`/material/${m.slug}`}>
-              <div
-                className="grid grid-cols-[2.5fr_1fr_1fr_1fr_120px] gap-4 items-center px-4 py-3 cursor-pointer row-border animate-cascade"
-                style={{
-                  animationDelay: `${Math.min(i * 20, 200)}ms`,
-                  transition: 'background var(--duration-hover) var(--ease-spring)',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-row-hover)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                {/* Name + systems */}
-                <div className="flex items-center gap-3">
-                  <MaterialIcon slug={m.slug} symbol={m.icon} size={32} />
-                  <div>
-                    <div className="text-[14px] font-medium" style={{ color: 'var(--text-primary)' }}>
-                      {m.name}
-                    </div>
-                    <div className="flex gap-1 mt-0.5">
-                      {m.systems.map(s => (
-                        <span key={s} className="system-pill">{systemIcon(s)}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Price */}
-                <div className="text-right font-price text-[14px] font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  {m.currentPrice ? formatUsd(m.currentPrice.value) : '—'}
-                  <div className="text-[10px] font-normal font-sans" style={{ color: 'var(--text-faint)' }}>
-                    {m.currentPrice?.unit || ''}
-                  </div>
-                </div>
-
-                {/* Change */}
-                <div className="text-right">
-                  <PriceChange value={change} />
-                </div>
-
-                {/* Source badge */}
-                <div className="text-right">
-                  <span className={`tier-badge tier-${m.coverageTier === 'live_exchange' ? 'live' : m.coverageTier === 'delayed_vendor' ? 'vendor' : m.coverageTier === 'indexed_reference' ? 'indexed' : 'reference'}`}>
-                    {m.coverageTier === 'live_exchange' ? 'Live' : m.coverageTier === 'delayed_vendor' ? 'Vendor' : m.coverageTier === 'indexed_reference' ? 'Indexed' : 'Ref'}
-                  </span>
-                </div>
-
-                {/* Sparkline */}
-                <div className="flex justify-end">
-                  <Sparkline width={100} height={28} positive={change >= 0} />
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+        {data.materials.map((m, i) => (
+          <MaterialRow key={m.slug} material={m} index={i} />
+        ))}
       </div>
 
       {/* Mobile Cards */}
