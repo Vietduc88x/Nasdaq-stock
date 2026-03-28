@@ -7,6 +7,7 @@ import { useSession } from '@/hooks/useSession';
 const links = [
   { href: '/', label: 'Materials' },
   { href: '/solar', label: 'Solar PV' },
+  { href: '/solar/anatomy', label: 'Anatomy' },
 ];
 
 export default function Nav() {
