@@ -86,8 +86,8 @@ const SIN = Math.sin(ISO_ANGLE);
 
 function isoProject(x: number, y: number, z: number): [number, number] {
   return [
-    330 + (x - y) * COS,
-    60 + (x + y) * SIN - z,
+    300 + (x - y) * COS,
+    350 + (x + y) * SIN - z,
   ];
 }
 
@@ -123,23 +123,24 @@ interface Props {
 export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props) {
   const selected = LAYERS.find(l => l.id === activeLayer);
 
-  const panelW = 200;
-  const panelH = 160;
+  const panelW = 180;
+  const panelH = 140;
   const layerThicknesses: Record<string, number> = {
     glass: 12, 'eva-front': 5, cells: 8, 'eva-back': 5, backsheet: 4, frame: 10,
   };
 
-  const gaps = 28; // Gap between exploded layers
-  let currentZ = 0;
+  const gaps = 30;
+  // Reverse: glass on top (highest Z), frame on bottom (lowest Z)
+  const totalStack = LAYERS.reduce((s, l) => s + (layerThicknesses[l.id] || 8) + gaps, 0);
+  let currentZ = totalStack;
 
   const layerGeometries = LAYERS.map(layer => {
     const thickness = layerThicknesses[layer.id] || 8;
-    const z = currentZ;
-    currentZ += thickness + gaps;
-    return { ...layer, z, thickness };
+    currentZ -= (thickness + gaps);
+    return { ...layer, z: currentZ, thickness };
   });
 
-  const svgHeight = currentZ + 80;
+  const svgHeight = totalStack + 160;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-5">
@@ -147,7 +148,7 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
       <div className="card-surface p-5 overflow-hidden">
         <div className="section-label mb-3">Solar PV Module — Exploded View</div>
 
-        <svg viewBox={`0 0 660 ${svgHeight}`} className="w-full mx-auto" style={{ maxHeight: '560px' }}>
+        <svg viewBox={`0 0 620 ${svgHeight}`} className="w-full mx-auto" style={{ maxHeight: '580px' }}>
           <defs>
             {layerGeometries.map(layer => (
               <linearGradient key={`g-${layer.id}`} id={`grad-${layer.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
@@ -247,7 +248,7 @@ export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props
 
                 {/* Label on right side */}
                 {(() => {
-                  const [rLabelX, rLabelY] = isoProject(panelW + 30, panelH / 2, layer.z + layer.thickness / 2);
+                  const [rLabelX, rLabelY] = isoProject(panelW + 15, panelH * 0.85, layer.z + layer.thickness / 2);
                   return (
                     <>
                       <line
