@@ -1,0 +1,154 @@
+{
+  "version": "bess-argonne-v2024",
+  "source": "Argonne National Laboratory BatPaC v5.0 (ANL/CSE-24/1, 2024) + Faraday Insights Issue 6",
+  "provenanceNote": "Bottom-up engineering cost model. Outputs reflect ideal manufacturing at scale, not current market selling prices. BNEF 2025 pack prices ($81/kWh LFP, $128/kWh NMC) include supply chain premiums, margins, and regional variations not captured here.",
+  "validYears": [2025, 2026, 2028, 2030, 2035],
+  "chemistries": ["lfp", "nmc811"],
+  "unit": "$/kWh",
+
+  "materialPrices": {
+    "2025": {
+      "lfp_cathode_usdPerKg": 12.0,
+      "nmc811_cathode_usdPerKg": 34.0,
+      "graphite_anode_usdPerKg": 9.5,
+      "silicon_anode_usdPerKg": 30.0,
+      "electrolyte_usdPerL": 10.0,
+      "separator_usdPerM2": 0.50,
+      "cu_foil_usdPerM2": 1.20,
+      "al_foil_usdPerM2": 0.20,
+      "carbon_additive_usdPerKg": 7.0,
+      "binder_positive_usdPerKg": 15.0,
+      "binder_negative_usdPerKg": 10.0
+    },
+    "2026": {
+      "lfp_cathode_usdPerKg": 11.5,
+      "nmc811_cathode_usdPerKg": 34.0,
+      "graphite_anode_usdPerKg": 9.0,
+      "silicon_anode_usdPerKg": 30.0,
+      "electrolyte_usdPerL": 10.0,
+      "separator_usdPerM2": 0.50,
+      "cu_foil_usdPerM2": 1.20,
+      "al_foil_usdPerM2": 0.20,
+      "carbon_additive_usdPerKg": 7.0,
+      "binder_positive_usdPerKg": 15.0,
+      "binder_negative_usdPerKg": 10.0
+    },
+    "2028": {
+      "lfp_cathode_usdPerKg": 10.5,
+      "nmc811_cathode_usdPerKg": 32.0,
+      "graphite_anode_usdPerKg": 8.5,
+      "silicon_anode_usdPerKg": 30.0,
+      "electrolyte_usdPerL": 10.0,
+      "separator_usdPerM2": 0.50,
+      "cu_foil_usdPerM2": 1.20,
+      "al_foil_usdPerM2": 0.20,
+      "carbon_additive_usdPerKg": 7.0,
+      "binder_positive_usdPerKg": 15.0,
+      "binder_negative_usdPerKg": 10.0
+    },
+    "2030": {
+      "lfp_cathode_usdPerKg": 10.0,
+      "nmc811_cathode_usdPerKg": 31.3,
+      "graphite_anode_usdPerKg": 8.0,
+      "silicon_anode_usdPerKg": 30.0,
+      "electrolyte_usdPerL": 10.0,
+      "separator_usdPerM2": 0.50,
+      "cu_foil_usdPerM2": 1.20,
+      "al_foil_usdPerM2": 0.20,
+      "carbon_additive_usdPerKg": 7.0,
+      "binder_positive_usdPerKg": 15.0,
+      "binder_negative_usdPerKg": 10.0
+    },
+    "2035": {
+      "lfp_cathode_usdPerKg": 9.5,
+      "nmc811_cathode_usdPerKg": 17.3,
+      "graphite_anode_usdPerKg": 8.0,
+      "silicon_anode_usdPerKg": 30.0,
+      "electrolyte_usdPerL": 10.0,
+      "separator_usdPerM2": 0.50,
+      "cu_foil_usdPerM2": 1.20,
+      "al_foil_usdPerM2": 0.20,
+      "carbon_additive_usdPerKg": 7.0,
+      "binder_positive_usdPerKg": 15.0,
+      "binder_negative_usdPerKg": 10.0
+    }
+  },
+
+  "materialIntensity": {
+    "lfp": {
+      "cathode_kgPerKwh": 1.25,
+      "lithium_kgPerKwh": 0.10,
+      "iron_kgPerKwh": 0.88,
+      "phosphorus_kgPerKwh": 0.49,
+      "nickel_kgPerKwh": 0,
+      "cobalt_kgPerKwh": 0,
+      "manganese_kgPerKwh": 0,
+      "graphite_kgPerKwh": 1.10,
+      "silicon_anode_fraction": 0.0,
+      "electrolyte_LPerKwh": 0.30,
+      "separator_m2PerKwh": 1.50,
+      "cu_foil_m2PerKwh": 0.80,
+      "al_foil_m2PerKwh": 0.60,
+      "carbon_additive_kgPerKwh": 0.02,
+      "binder_positive_kgPerKwh": 0.03,
+      "binder_negative_kgPerKwh": 0.02
+    },
+    "nmc811": {
+      "cathode_kgPerKwh": 1.09,
+      "lithium_kgPerKwh": 0.11,
+      "nickel_kgPerKwh": 0.75,
+      "cobalt_kgPerKwh": 0.09,
+      "manganese_kgPerKwh": 0.09,
+      "iron_kgPerKwh": 0,
+      "phosphorus_kgPerKwh": 0,
+      "graphite_kgPerKwh": 1.10,
+      "silicon_anode_fraction": 0.05,
+      "electrolyte_LPerKwh": 0.30,
+      "separator_m2PerKwh": 1.50,
+      "cu_foil_m2PerKwh": 0.80,
+      "al_foil_m2PerKwh": 0.60,
+      "carbon_additive_kgPerKwh": 0.02,
+      "binder_positive_kgPerKwh": 0.03,
+      "binder_negative_kgPerKwh": 0.02
+    }
+  },
+
+  "manufacturing": {
+    "lfp": {
+      "electrode_coating_usdPerKwh": 4.0,
+      "cell_assembly_usdPerKwh": 3.5,
+      "formation_cycling_usdPerKwh": 3.0,
+      "quality_testing_usdPerKwh": 1.5
+    },
+    "nmc811": {
+      "electrode_coating_usdPerKwh": 4.5,
+      "cell_assembly_usdPerKwh": 4.0,
+      "formation_cycling_usdPerKwh": 3.5,
+      "quality_testing_usdPerKwh": 2.0
+    }
+  },
+
+  "pack": {
+    "bms_usdPerKwh": 5.0,
+    "thermal_management_usdPerKwh": 4.0,
+    "pack_housing_usdPerKwh": 6.0,
+    "wiring_connectors_usdPerKwh": 3.0,
+    "module_assembly_labor_usdPerKwh": 4.0,
+    "pack_assembly_labor_usdPerKwh": 3.0
+  },
+
+  "technologyRoadmap": {
+    "2025": { "cellYield": 0.91, "plantCapacity_GWh": 40, "electrodeThickness_um": 85 },
+    "2026": { "cellYield": 0.92, "plantCapacity_GWh": 50, "electrodeThickness_um": 90 },
+    "2028": { "cellYield": 0.93, "plantCapacity_GWh": 60, "electrodeThickness_um": 100 },
+    "2030": { "cellYield": 0.95, "plantCapacity_GWh": 70, "electrodeThickness_um": 110 },
+    "2035": { "cellYield": 0.95, "plantCapacity_GWh": 70, "electrodeThickness_um": 130 }
+  },
+
+  "benchmarks": {
+    "lfp_2025": { "cellTotal": 43, "packTotal": 68 },
+    "lfp_2030": { "cellTotal": 36, "packTotal": 61 },
+    "nmc811_2025": { "cellTotal": 67, "packTotal": 92 },
+    "nmc811_2030": { "cellTotal": 55, "packTotal": 80 }
+  }
+}

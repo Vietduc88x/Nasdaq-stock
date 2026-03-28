@@ -16,24 +16,32 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip);
 interface Props {
   stages: StageBreakdown[];
   totalCost: number;
+  costUnit?: string; // '$/Wp' or '$/kWh'
 }
 
-export default function WaterfallChart({ stages, totalCost }: Props) {
+export default function WaterfallChart({ stages, totalCost, costUnit = '$/Wp' }: Props) {
+  const isKwh = costUnit === '$/kWh';
+  const decimals = isKwh ? 1 : 4;
+  const getStageCost = (s: StageBreakdown) => s.costPerWp ?? s.costPerKwh ?? 0;
   let cumulative = 0;
-  const labels = [...stages.map(s => s.stage.charAt(0).toUpperCase() + s.stage.slice(1)), 'Total'];
+  const labels = [...stages.map(s => {
+    const name = s.stage.replace(/([A-Z])/g, ' $1').trim();
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }), 'Total'];
 
   const hidden: number[] = [];
   const visible: number[] = [];
 
   for (const stage of stages) {
+    const cost = getStageCost(stage);
     hidden.push(cumulative);
-    visible.push(stage.costPerWp);
-    cumulative += stage.costPerWp;
+    visible.push(cost);
+    cumulative += cost;
   }
   hidden.push(0);
   visible.push(totalCost);
 
-  const stageColors = ['#34C759', '#3B82F6', '#FBBF24', '#A855F7'];
+  const stageColors = ['#34C759', '#3B82F6', '#FBBF24', '#A855F7', '#ec4899', '#06b6d4'];
   const barColors = labels.map((_, i) =>
     i === labels.length - 1 ? 'rgba(255,255,255,0.15)' : stageColors[i % stageColors.length]
   );
@@ -79,7 +87,7 @@ export default function WaterfallChart({ stages, totalCost }: Props) {
                 callbacks: {
                   label: (ctx) => {
                     if (ctx.datasetIndex === 0) return '';
-                    return `$${(ctx.raw as number).toFixed(4)}/Wp`;
+                    return `$${(ctx.raw as number).toFixed(decimals)}${costUnit.replace('$', '')}`;
                   },
                 },
               },
@@ -97,7 +105,7 @@ export default function WaterfallChart({ stages, totalCost }: Props) {
                 ticks: {
                   color: 'rgba(255,255,255,0.25)',
                   font: { size: 11, family: 'SF Mono, monospace' },
-                  callback: (v) => `$${(v as number).toFixed(3)}`,
+                  callback: (v) => `$${(v as number).toFixed(isKwh ? 0 : 3)}`,
                 },
                 border: { display: false },
                 min: 0,

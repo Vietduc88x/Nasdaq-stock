@@ -25,7 +25,8 @@ export interface MaterialSummary {
 
 export interface StageBreakdown {
   stage: string;
-  costPerWp: number;
+  costPerWp?: number;    // Solar: $/Wp
+  costPerKwh?: number;   // BESS: $/kWh
   components: Record<string, number>;
 }
 

@@ -1,4 +1,5 @@
 import { calculateSolarCost } from '../services/solar-model-service.js';
+import { calculateBessCost } from '../services/bess-cost-engine.js';
 import { getSystemMaterials, getAllMaterials } from '../services/impact-service.js';
 import { getAllPrices, getPrice } from '../services/market-data-service.js';
 import { buildProvenance } from '../services/provenance-service.js';
@@ -143,5 +144,68 @@ export function registerPageDataRoutes(app) {
         asOf: new Date().toISOString()
       }
     };
+  });
+
+  // GET /api/page/bess?chemistry=lfp&year=2025
+  app.get('/api/page/bess', async (request, reply) => {
+    const chemistry = (request.query.chemistry || 'lfp').toLowerCase();
+    const year = parseInt(request.query.year || '2025', 10);
+
+    const VALID_CHEMISTRIES = ['lfp', 'nmc811'];
+    if (!VALID_CHEMISTRIES.includes(chemistry) || year < 2025 || year > 2035) {
+      reply.code(400);
+      return { error: 'Invalid parameters. chemistry: lfp|nmc811, year: 2025-2035' };
+    }
+
+    try {
+      const cost = calculateBessCost(chemistry, year);
+      const bessMaterials = getSystemMaterials('bess');
+
+      let liveCoverage = 0;
+      let referenceCoverage = 0;
+      const fallbacksUsed = [];
+
+      const materialImpacts = await Promise.all(
+        bessMaterials.map(async (m) => {
+          const price = await getPrice(m.slug);
+          if (price?.coverageTier === 'live_exchange' && !price?.fallbackUsed) {
+            liveCoverage++;
+          } else {
+            referenceCoverage++;
+            if (price?.fallbackUsed) fallbacksUsed.push(m.slug);
+          }
+
+          return {
+            material: m.slug,
+            name: m.name,
+            icon: m.icon,
+            coverageTier: price?.coverageTier || m.coverageTier,
+            priceSource: price?.source || 'reference',
+            asOf: price?.asOf || null,
+            currentPrice: price ? { value: price.value, unit: price.unit } : null,
+            baselineCost: m.baselineCost,
+            costUnit: m.costUnit,
+            component: m.component,
+          };
+        })
+      );
+
+      return {
+        params: { chemistry, year },
+        model: {
+          version: cost.model.version,
+          costingMethod: cost.model.costingMethod,
+          asOf: new Date().toISOString(),
+          totalCostPerKwh: cost.totalCostPerKwh,
+        },
+        stageBreakdown: cost.stageBreakdown,
+        materialImpacts,
+        meta: buildProvenance('bess', { liveCoverage, referenceCoverage, fallbacksUsed }),
+      };
+    } catch (err) {
+      request.log.error({ err, chemistry, year }, 'Page BESS error');
+      reply.code(500);
+      return { error: 'Calculation error' };
+    }
   });
 }
