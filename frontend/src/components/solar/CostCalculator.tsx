@@ -163,7 +163,7 @@ export default function CostCalculator() {
 
               <div className="space-y-4">
                 {params.map(param => {
-                  const val = values[param.id];
+                  const val = values[param.id as keyof CostInputs];
                   const def = param.defaultValue;
                   const changed = val !== def;
                   const pctChange = ((val - def) / def) * 100;
