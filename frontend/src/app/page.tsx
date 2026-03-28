@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Sparkline from '@/components/Sparkline';
 import PriceChange from '@/components/PriceChange';
 import MaterialFilters from '@/components/MaterialFilters';
+import MaterialIcon from '@/components/MaterialIcon';
 
 const CATEGORY_ORDER = ['critical', 'structural', 'battery', 'wind_specific', 'reference_anchor'];
 const CATEGORY_LABELS: Record<string, string> = {
@@ -89,9 +90,7 @@ export default async function HomePage() {
               >
                 {/* Name + systems */}
                 <div className="flex items-center gap-3">
-                  <span className="text-[13px] font-mono w-8" style={{ color: 'var(--text-faint)' }}>
-                    {m.icon}
-                  </span>
+                  <MaterialIcon slug={m.slug} symbol={m.icon} size={32} />
                   <div>
                     <div className="text-[14px] font-medium" style={{ color: 'var(--text-primary)' }}>
                       {m.name}
@@ -141,7 +140,7 @@ export default async function HomePage() {
           return (
             <Link key={m.slug} href={`/material/${m.slug}`}>
               <div className="flex items-center gap-3 py-3 row-border animate-cascade" style={{ animationDelay: `${Math.min(i * 20, 200)}ms` }}>
-                <span className="text-[13px] font-mono w-7" style={{ color: 'var(--text-faint)' }}>{m.icon}</span>
+                <MaterialIcon slug={m.slug} symbol={m.icon} size={28} />
                 <div className="flex-1 min-w-0">
                   <div className="text-[15px] font-medium">{m.name}</div>
                   <div className="flex gap-1 mt-0.5">
