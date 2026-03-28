@@ -6,122 +6,87 @@ interface Layer {
   id: string;
   name: string;
   color: string;
-  thickness: number; // visual thickness in px
-  yOffset: number; // px from top
+  height: number;
   material: string;
   purpose: string;
   costShare: string;
+  costValue: string;
   materials: { name: string; amount: string; price: string }[];
   funFact: string;
 }
 
 const LAYERS: Layer[] = [
   {
-    id: 'glass',
-    name: 'Tempered Glass',
-    color: '#87CEEB',
-    thickness: 28,
-    yOffset: 0,
+    id: 'glass', name: 'Tempered Glass', color: '#87CEEB', height: 48,
     material: 'Low-iron tempered glass (3.2mm)',
-    purpose: 'Protects cells from weather, hail, and UV. Must transmit >90% of sunlight.',
-    costShare: '6.7% of module cost ($0.012/Wp)',
+    purpose: 'Protects cells from weather, hail, and UV. Must transmit >90% of sunlight while surviving 25+ years outdoors.',
+    costShare: '6.7%', costValue: '$0.012/Wp',
     materials: [
       { name: 'Silica sand (SiO₂)', amount: '5.6 g/Wp', price: '$0.80/kg' },
-      { name: 'Soda ash', amount: 'trace', price: '—' },
+      { name: 'Soda ash + limestone', amount: 'trace', price: '—' },
     ],
-    funFact: 'Solar glass is 10x clearer than window glass. The iron content must be below 0.01% to avoid absorbing sunlight.',
+    funFact: 'Solar glass is 10× clearer than window glass — iron content must be below 0.01% to avoid absorbing sunlight.',
   },
   {
-    id: 'eva-front',
-    name: 'EVA Encapsulant (Front)',
-    color: '#F5E6CC',
-    thickness: 16,
-    yOffset: 38,
+    id: 'eva-front', name: 'EVA Encapsulant', color: '#F5DEB3', height: 24,
     material: 'Ethylene-vinyl acetate film (0.45mm)',
-    purpose: 'Bonds glass to cells. Provides electrical insulation and cushioning against thermal stress.',
-    costShare: '2.2% of module cost ($0.004/Wp)',
+    purpose: 'Bonds glass to cells. Provides electrical insulation and cushioning against thermal expansion stress.',
+    costShare: '4.4%', costValue: '$0.008/Wp',
     materials: [
-      { name: 'EVA resin', amount: '0.6 g/Wp', price: '$1.85/kg' },
-      { name: 'UV stabilizers', amount: 'trace', price: '—' },
+      { name: 'EVA resin', amount: '1.2 g/Wp (both layers)', price: '$1.85/kg' },
+      { name: 'UV stabilizers + peroxides', amount: 'trace', price: '—' },
     ],
-    funFact: 'EVA turns yellow over 25 years of UV exposure. Newer modules use POE (polyolefin) which lasts longer.',
+    funFact: 'EVA yellows over 25 years of UV. Newer modules use POE (polyolefin elastomer) which stays transparent longer.',
   },
   {
-    id: 'cells',
-    name: 'Solar Cells + Interconnects',
-    color: '#1a237e',
-    thickness: 24,
-    yOffset: 64,
-    material: 'Monocrystalline silicon wafers with silver paste contacts',
-    purpose: 'Converts sunlight into electricity via the photovoltaic effect. Each cell produces ~0.5V.',
-    costShare: '22.2% of module cost ($0.040/Wp) — THE most expensive layer',
+    id: 'cells', name: 'Solar Cells', color: '#1565C0', height: 40,
+    material: 'Monocrystalline silicon wafers + silver paste contacts + copper ribbons',
+    purpose: 'Converts sunlight into electricity via the photovoltaic effect. Each cell produces ~0.5V and ~10W. A 72-cell module produces ~700W.',
+    costShare: '22.2%', costValue: '$0.040/Wp',
     materials: [
       { name: 'Silicon wafer', amount: '2.1 g/Wp', price: '$1.70/kg (metal Si)' },
-      { name: 'Silver paste', amount: '11.5 mg/Wp', price: '$853/kg ($27/oz)' },
-      { name: 'Copper ribbons', amount: '0.28 g/Wp', price: '$4.08/lb' },
+      { name: 'Silver paste (contacts)', amount: '11.5 mg/Wp', price: '$853/kg' },
+      { name: 'Copper ribbon (interconnects)', amount: '0.28 g/Wp', price: '$4.08/lb' },
       { name: 'Tin solder', amount: '0.05 g/Wp', price: '$12.85/lb' },
+      { name: 'Anti-reflective coating (SiNx)', amount: 'nm-scale', price: '—' },
     ],
-    funFact: 'Silver is the #1 cost swing material. If silver goes up 10%, the cell cost increases ~$0.001/Wp. The industry is racing to replace silver with copper.',
+    funFact: 'Silver is the #1 cost swing material — if silver rises 10%, cell cost rises ~$0.001/Wp. The industry is racing to replace silver with copper plating.',
   },
   {
-    id: 'eva-back',
-    name: 'EVA Encapsulant (Back)',
-    color: '#F5E6CC',
-    thickness: 16,
-    yOffset: 98,
-    material: 'Ethylene-vinyl acetate film (0.45mm)',
-    purpose: 'Seals cells from moisture ingress from the back side. Same material as front EVA.',
-    costShare: '2.2% of module cost ($0.004/Wp)',
-    materials: [
-      { name: 'EVA resin', amount: '0.6 g/Wp', price: '$1.85/kg' },
-    ],
-    funFact: 'The front and back EVA layers are laminated at 150°C for 15 minutes in a vacuum press.',
-  },
-  {
-    id: 'backsheet',
-    name: 'Backsheet',
-    color: '#E0E0E0',
-    thickness: 14,
-    yOffset: 124,
-    material: 'Multi-layer polymer film (TPT or TPE)',
-    purpose: 'Electrical insulation and moisture barrier. The white surface also reflects unused light back through the cells.',
-    costShare: '~2% of module cost',
+    id: 'backsheet', name: 'Backsheet', color: '#E0E0E0', height: 22,
+    material: 'Multi-layer polymer film (TPT or glass-glass for bifacial)',
+    purpose: 'Electrical insulation and moisture barrier. White surface reflects unused light. Must last 25+ years without cracking.',
+    costShare: '~2%', costValue: '~$0.004/Wp',
     materials: [
       { name: 'PVF/PET/PVF layers', amount: '~0.8 g/Wp', price: '~$3/m²' },
     ],
-    funFact: 'Bifacial modules replace the backsheet with a second glass layer, gaining 5-15% more energy from reflected light.',
+    funFact: 'Bifacial modules replace the backsheet with a second glass layer, gaining 5–15% more energy from ground-reflected light.',
   },
   {
-    id: 'frame',
-    name: 'Aluminum Frame',
-    color: '#A8A9AD',
-    thickness: 20,
-    yOffset: 148,
-    material: 'Anodized aluminum extrusion (35mm depth)',
-    purpose: 'Structural support, mounting interface, and edge sealing. Must withstand 5400 Pa snow/wind loads.',
-    costShare: '5.3% of module cost ($0.0095/Wp)',
+    id: 'frame', name: 'Aluminum Frame', color: '#9E9E9E', height: 36,
+    material: 'Anodized aluminum extrusion (6063 alloy, 35mm depth)',
+    purpose: 'Structural support and mounting interface. Must withstand 5,400 Pa snow/wind loads. Protects glass edges from chipping.',
+    costShare: '5.3%', costValue: '$0.0095/Wp',
     materials: [
-      { name: 'Aluminum alloy 6063', amount: '1.5 g/Wp', price: '$1.15/lb' },
+      { name: 'Aluminum alloy 6063', amount: '1.5 g/Wp (~1.8 kg/module)', price: '$1.15/lb' },
     ],
-    funFact: 'Some manufacturers are going frameless to save cost and reduce shipping weight. Each frame uses ~1.8 kg of aluminum per module.',
+    funFact: 'Some manufacturers go frameless to save cost and weight. Each frame uses ~1.8 kg of aluminum — about 3 soda cans worth.',
   },
   {
-    id: 'junction-box',
-    name: 'Junction Box + Cables',
-    color: '#424242',
-    thickness: 18,
-    yOffset: 178,
-    material: 'PPO plastic housing with bypass diodes and MC4 connectors',
-    purpose: 'Collects electricity from cell strings, protects against reverse current with bypass diodes, and connects to the system via standard cables.',
-    costShare: '~3% of module cost',
+    id: 'jbox', name: 'Junction Box', color: '#616161', height: 28,
+    material: 'PPO plastic housing + bypass diodes + MC4 connectors + cables',
+    purpose: 'Collects electricity from cell strings. Bypass diodes prevent hot spots when cells are shaded. MC4 connectors allow easy series wiring.',
+    costShare: '~3%', costValue: '~$0.005/Wp',
     materials: [
       { name: 'Copper conductors', amount: '~0.1 g/Wp', price: '$4.08/lb' },
-      { name: 'Bypass diodes (x3)', amount: '3 per module', price: '$0.15 each' },
-      { name: 'PPO plastic', amount: '~50g per box', price: '—' },
+      { name: 'Bypass diodes (×3)', amount: '3 per module', price: '$0.15 each' },
+      { name: 'PPO plastic housing', amount: '~50g', price: '—' },
     ],
-    funFact: 'The junction box is the most common failure point in solar modules. High-quality boxes are rated IP68 (fully submersible).',
+    funFact: 'The junction box is the most common failure point. High-quality boxes are rated IP68 — fully submersible in water.',
   },
 ];
+
+const TOTAL_HEIGHT = LAYERS.reduce((s, l) => s + l.height, 0) + (LAYERS.length - 1) * 12; // 12px gap
 
 interface Props {
   activeLayer: string | null;
@@ -129,161 +94,205 @@ interface Props {
 }
 
 export default function ModuleExplodedView({ activeLayer, onLayerSelect }: Props) {
-  const selectedLayer = LAYERS.find(l => l.id === activeLayer);
+  const selected = LAYERS.find(l => l.id === activeLayer);
+
+  let yPos = 0;
+  const layerPositions = LAYERS.map(l => {
+    const pos = yPos;
+    yPos += l.height + 12;
+    return pos;
+  });
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-6">
-      {/* 3D Exploded View */}
-      <div className="card-surface p-6" style={{ minHeight: '500px' }}>
-        <div className="section-label mb-4">Module Cross-Section (Exploded View)</div>
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.3fr] gap-5">
+      {/* SVG Cross-Section */}
+      <div className="card-surface p-5">
+        <div className="section-label mb-4">Module Cross-Section</div>
 
-        <div className="relative mx-auto" style={{ width: '320px', height: '420px', perspective: '800px' }}>
+        <svg
+          viewBox={`0 0 500 ${TOTAL_HEIGHT + 20}`}
+          className="w-full"
+          style={{ maxHeight: '520px' }}
+        >
           {LAYERS.map((layer, i) => {
+            const y = layerPositions[i];
             const isActive = activeLayer === layer.id;
-            const isOtherActive = activeLayer !== null && !isActive;
-            const explodeOffset = i * 8; // Separation between layers
+            const isOther = activeLayer !== null && !isActive;
+
+            // Main rectangle
+            const rectX = 160;
+            const rectW = 300;
 
             return (
-              <div
+              <g
                 key={layer.id}
                 onClick={() => onLayerSelect(isActive ? null : layer.id)}
-                className="absolute cursor-pointer transition-all duration-500"
-                style={{
-                  left: '20px',
-                  right: '20px',
-                  top: `${layer.yOffset + explodeOffset}px`,
-                  height: `${layer.thickness}px`,
-                  background: layer.color,
-                  opacity: isOtherActive ? 0.3 : 1,
-                  transform: `
-                    rotateX(-15deg) rotateY(15deg) rotateZ(-2deg)
-                    ${isActive ? 'translateZ(30px) translateX(-10px) scale(1.05)' : 'translateZ(0)'}
-                  `,
-                  transformStyle: 'preserve-3d',
-                  boxShadow: isActive
-                    ? `0 8px 32px rgba(0,0,0,0.4), 0 0 0 2px ${layer.color}88, inset 0 1px 0 rgba(255,255,255,0.3)`
-                    : '0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)',
-                  borderRadius: layer.id === 'frame' ? '4px' : '2px',
-                  border: `1px solid ${layer.color}66`,
-                  zIndex: isActive ? 10 : LAYERS.length - i,
-                }}
+                className="cursor-pointer"
+                style={{ transition: 'opacity 0.3s' }}
+                opacity={isOther ? 0.35 : 1}
               >
-                {/* Layer label */}
-                <div
-                  className="absolute right-full mr-3 whitespace-nowrap text-[11px] font-medium flex items-center gap-1.5"
-                  style={{
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
-                  }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full" style={{ background: layer.color }} />
-                  {layer.name}
-                </div>
+                {/* Layer body */}
+                <rect
+                  x={rectX}
+                  y={y}
+                  width={rectW}
+                  height={layer.height}
+                  rx={4}
+                  fill={layer.color}
+                  stroke={isActive ? '#fff' : `${layer.color}88`}
+                  strokeWidth={isActive ? 2 : 1}
+                  style={{ filter: isActive ? 'brightness(1.2)' : 'none', transition: 'all 0.3s' }}
+                />
 
-                {/* 3D side face */}
-                <div
-                  className="absolute"
-                  style={{
-                    right: '-8px',
-                    top: '0',
-                    width: '8px',
-                    height: '100%',
-                    background: `linear-gradient(90deg, ${layer.color}88, ${layer.color}44)`,
-                    transform: 'skewY(-45deg)',
-                    transformOrigin: 'top left',
-                  }}
+                {/* Cell grid pattern */}
+                {layer.id === 'cells' && (
+                  <>
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(j => (
+                      <line key={`v${j}`} x1={rectX + j * (rectW / 12)} y1={y + 2} x2={rectX + j * (rectW / 12)} y2={y + layer.height - 2} stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+                    ))}
+                    {[1, 2, 3, 4, 5].map(j => (
+                      <line key={`h${j}`} x1={rectX + 2} y1={y + j * (layer.height / 6)} x2={rectX + rectW - 2} y2={y + j * (layer.height / 6)} stroke="rgba(255,255,255,0.15)" strokeWidth="0.5" />
+                    ))}
+                    {/* Silver busbars */}
+                    <line x1={rectX + rectW * 0.33} y1={y} x2={rectX + rectW * 0.33} y2={y + layer.height} stroke="rgba(192,192,192,0.5)" strokeWidth="1.5" />
+                    <line x1={rectX + rectW * 0.67} y1={y} x2={rectX + rectW * 0.67} y2={y + layer.height} stroke="rgba(192,192,192,0.5)" strokeWidth="1.5" />
+                  </>
+                )}
+
+                {/* Glass reflection */}
+                {layer.id === 'glass' && (
+                  <rect x={rectX + 20} y={y + 6} width={80} height={8} rx={4} fill="rgba(255,255,255,0.2)" />
+                )}
+
+                {/* Label + connector line */}
+                <line
+                  x1={rectX - 8}
+                  y1={y + layer.height / 2}
+                  x2={rectX - 40}
+                  y2={y + layer.height / 2}
+                  stroke={isActive ? '#fff' : 'rgba(255,255,255,0.15)'}
+                  strokeWidth={1}
+                  strokeDasharray={isActive ? 'none' : '2 2'}
                 />
-                {/* 3D bottom face */}
-                <div
-                  className="absolute"
-                  style={{
-                    left: '0',
-                    bottom: '-6px',
-                    width: '100%',
-                    height: '6px',
-                    background: `linear-gradient(180deg, ${layer.color}66, ${layer.color}22)`,
-                    transform: 'skewX(-45deg)',
-                    transformOrigin: 'top left',
-                  }}
+                <circle
+                  cx={rectX - 40}
+                  cy={y + layer.height / 2}
+                  r={3}
+                  fill={isActive ? layer.color : 'rgba(255,255,255,0.2)'}
                 />
-              </div>
+                <text
+                  x={rectX - 48}
+                  y={y + layer.height / 2}
+                  textAnchor="end"
+                  dominantBaseline="middle"
+                  fill={isActive ? '#fff' : 'rgba(255,255,255,0.5)'}
+                  fontSize="11"
+                  fontWeight={isActive ? 600 : 400}
+                  fontFamily="Inter, sans-serif"
+                >
+                  {layer.name}
+                </text>
+
+                {/* Cost label on right */}
+                <text
+                  x={rectX + rectW + 12}
+                  y={y + layer.height / 2}
+                  dominantBaseline="middle"
+                  fill={isActive ? 'var(--up, #34C759)' : 'rgba(255,255,255,0.25)'}
+                  fontSize="10"
+                  fontWeight={500}
+                  fontFamily="SF Mono, monospace"
+                >
+                  {layer.costValue}
+                </text>
+
+                {/* Hover overlay */}
+                <rect
+                  x={rectX}
+                  y={y}
+                  width={rectW}
+                  height={layer.height}
+                  rx={4}
+                  fill="transparent"
+                  className="hover:fill-white/5 transition-all"
+                />
+              </g>
             );
           })}
 
-          {/* Cell grid pattern on the cell layer */}
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              left: '20px',
-              right: '20px',
-              top: `${LAYERS[2].yOffset + 2 * 8}px`,
-              height: `${LAYERS[2].thickness}px`,
-              transform: 'rotateX(-15deg) rotateY(15deg) rotateZ(-2deg)',
-              transformStyle: 'preserve-3d',
-            }}
-          >
-            {/* Grid lines to simulate cell pattern */}
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={`v${i}`} className="absolute top-0 bottom-0" style={{ left: `${i * 16.66}%`, width: '1px', background: 'rgba(255,255,255,0.1)' }} />
-            ))}
-            {[1, 2].map(i => (
-              <div key={`h${i}`} className="absolute left-0 right-0" style={{ top: `${i * 33.33}%`, height: '1px', background: 'rgba(255,255,255,0.1)' }} />
-            ))}
-          </div>
-        </div>
+          {/* Dimension arrow on the right */}
+          <line x1={475} y1={0} x2={475} y2={TOTAL_HEIGHT} stroke="rgba(255,255,255,0.08)" strokeWidth={1} />
+          <text x={480} y={TOTAL_HEIGHT / 2} fill="rgba(255,255,255,0.15)" fontSize="9" fontFamily="SF Mono, monospace" dominantBaseline="middle" transform={`rotate(90, 480, ${TOTAL_HEIGHT / 2})`}>
+            ~40mm total thickness
+          </text>
+        </svg>
       </div>
 
       {/* Detail Panel */}
       <div>
-        {selectedLayer ? (
+        {selected ? (
           <div className="card-surface p-6 space-y-5 animate-cascade">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="w-3 h-3 rounded" style={{ background: selectedLayer.color }} />
-                <h3 className="text-[18px] font-semibold">{selectedLayer.name}</h3>
-              </div>
-              <p className="text-[13px]" style={{ color: 'var(--text-secondary)' }}>{selectedLayer.material}</p>
+            {/* Header */}
+            <div className="flex items-center gap-3">
+              <div className="w-4 h-4 rounded" style={{ background: selected.color }} />
+              <h3 className="text-[18px] font-semibold">{selected.name}</h3>
+              <span className="font-price text-[14px] font-semibold" style={{ color: 'var(--up)' }}>{selected.costValue}</span>
+              <span className="text-[11px]" style={{ color: 'var(--text-faint)' }}>({selected.costShare} of module)</span>
             </div>
 
+            {/* Material */}
             <div>
-              <div className="section-label mb-2">Purpose</div>
-              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{selectedLayer.purpose}</p>
+              <div className="section-label mb-1.5">What it is</div>
+              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{selected.material}</p>
             </div>
 
+            {/* Purpose */}
             <div>
-              <div className="section-label mb-2">Cost Contribution</div>
-              <div className="text-[14px] font-semibold" style={{ color: 'var(--up)' }}>{selectedLayer.costShare}</div>
+              <div className="section-label mb-1.5">Why it matters</div>
+              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{selected.purpose}</p>
             </div>
 
+            {/* Raw Materials Table */}
             <div>
               <div className="section-label mb-2">Raw Materials</div>
-              <div className="space-y-2">
-                {selectedLayer.materials.map((m, i) => (
-                  <div key={i} className="flex justify-between items-center py-1.5 px-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.03)' }}>
+              <div className="space-y-1">
+                {selected.materials.map((m, i) => (
+                  <div key={i} className="flex justify-between items-center py-2 px-3 rounded-lg" style={{ background: 'rgba(255,255,255,0.025)' }}>
                     <div>
                       <div className="text-[13px] font-medium">{m.name}</div>
                       <div className="text-[11px]" style={{ color: 'var(--text-faint)' }}>{m.amount}</div>
                     </div>
-                    <div className="font-price text-[12px]" style={{ color: 'var(--text-tertiary)' }}>{m.price}</div>
+                    <div className="font-price text-[12px] font-medium" style={{ color: 'var(--text-tertiary)' }}>{m.price}</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="pt-3" style={{ borderTop: '1px solid var(--border-subtle)' }}>
-              <div className="text-[11px] font-medium mb-1" style={{ color: 'var(--accent-gold)' }}>Did you know?</div>
-              <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>{selectedLayer.funFact}</p>
+            {/* Fun fact */}
+            <div className="p-3 rounded-lg" style={{ background: 'rgba(196,164,124,0.06)', borderLeft: '3px solid var(--accent-gold)' }}>
+              <div className="text-[10px] font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--accent-gold)' }}>Did you know?</div>
+              <p className="text-[12px] leading-relaxed" style={{ color: 'var(--text-tertiary)' }}>{selected.funFact}</p>
             </div>
           </div>
         ) : (
-          <div className="card-surface p-6 flex flex-col items-center justify-center text-center" style={{ minHeight: '400px' }}>
-            <div className="text-[40px] mb-4">👆</div>
-            <div className="text-[16px] font-semibold mb-2">Click a layer to explore</div>
-            <p className="text-[13px] max-w-xs" style={{ color: 'var(--text-muted)' }}>
-              Each layer of a solar panel has different materials, costs, and supply chain dynamics.
-              Click any layer in the exploded view to see the details.
+          <div className="card-surface p-8 flex flex-col items-center justify-center text-center" style={{ minHeight: '480px' }}>
+            <div className="text-[48px] mb-4 opacity-60">☀️</div>
+            <div className="text-[17px] font-semibold mb-2">Click a layer to explore</div>
+            <p className="text-[13px] max-w-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
+              A solar module has 7 distinct layers — each with different materials, supply chains, and cost dynamics. Click any layer in the cross-section to see what it&apos;s made of.
             </p>
+            <div className="mt-6 grid grid-cols-3 gap-2 text-[10px]" style={{ color: 'var(--text-faint)' }}>
+              {LAYERS.map(l => (
+                <button
+                  key={l.id}
+                  onClick={() => onLayerSelect(l.id)}
+                  className="flex items-center gap-1.5 px-2 py-1 rounded hover:bg-white/5 transition-colors"
+                >
+                  <span className="w-2 h-2 rounded-sm flex-shrink-0" style={{ background: l.color }} />
+                  {l.name}
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>
