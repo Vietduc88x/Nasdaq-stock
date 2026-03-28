@@ -24,31 +24,46 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       {/* Hero */}
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Raw Materials Dashboard</h1>
-        <p className="text-gray-400 text-sm max-w-2xl">
-          {data.materials.length} materials tracked across solar PV, battery storage, and wind systems.
-          Live coverage: {data.meta.liveCoveragePct}% | Reference: {data.meta.referenceCoveragePct}%
+      <div className="space-y-3">
+        <h1 className="text-3xl font-bold tracking-tight">Raw Materials Dashboard</h1>
+        <p className="text-gray-400 text-sm max-w-2xl leading-relaxed">
+          Tracking {data.materials.length} renewable energy materials across solar PV, battery storage, and wind systems.
         </p>
+        <div className="flex gap-4 text-xs">
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-green-500" />
+            Live: {data.meta.liveCoveragePct}%
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-gray-500" />
+            Reference: {data.meta.referenceCoveragePct}%
+          </span>
+        </div>
       </div>
 
       {/* Featured Solar */}
-      <Link href="/solar" className="block">
-        <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-primary-500/50 transition-colors">
+      <Link href="/solar" className="block group">
+        <div className="card p-5 group-hover:border-primary-500/40 transition-all duration-300">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs text-gray-500 uppercase tracking-wider">Featured: Solar PV Module Cost</div>
-              <div className="text-2xl font-bold text-primary-400 mt-1">
-                ${data.featuredSolar.totalCostPerWp.toFixed(3)}/Wp
+              <div className="text-[11px] text-gray-500 uppercase tracking-widest font-medium">Solar PV Module Cost</div>
+              <div className="text-3xl font-bold text-primary-400 mt-2 font-mono">
+                ${data.featuredSolar.totalCostPerWp.toFixed(3)}
+                <span className="text-lg text-gray-500 font-sans">/Wp</span>
               </div>
-              <div className="text-xs text-gray-500 mt-1">
-                {data.featuredSolar.country} / {data.featuredSolar.tech.toUpperCase()} / {data.featuredSolar.year}
+              <div className="text-xs text-gray-500 mt-2 flex gap-2">
+                <span className="bg-gray-800 px-2 py-0.5 rounded">{data.featuredSolar.country}</span>
+                <span className="bg-gray-800 px-2 py-0.5 rounded">{data.featuredSolar.tech.toUpperCase()}</span>
+                <span className="bg-gray-800 px-2 py-0.5 rounded">{data.featuredSolar.year}</span>
               </div>
             </div>
-            <div className="text-right text-sm text-gray-500">
-              View full model &rarr;
+            <div className="text-sm text-gray-500 group-hover:text-primary-400 transition-colors flex items-center gap-1">
+              View model
+              <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </div>
           </div>
         </div>
@@ -61,33 +76,35 @@ export default async function HomePage() {
 
         return (
           <section key={cat}>
-            <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
+            <h2 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-4">
               {CATEGORY_LABELS[cat] || cat}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {materials.map(m => {
                 const badge = tierBadge(m.coverageTier);
                 return (
-                  <Link key={m.slug} href={`/material/${m.slug}`}>
-                    <div className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-gray-600 transition-colors h-full">
-                      <div className="flex items-start justify-between mb-2">
+                  <Link key={m.slug} href={`/material/${m.slug}`} className="group">
+                    <div className="card-hover p-4 h-full">
+                      <div className="flex items-start justify-between mb-3">
                         <div>
-                          <div className="font-medium text-white">{m.name}</div>
-                          <div className="text-xs text-gray-500">{m.icon}</div>
+                          <div className="font-semibold text-white group-hover:text-primary-400 transition-colors">
+                            {m.name}
+                          </div>
+                          <div className="text-xs text-gray-600 font-mono">{m.icon}</div>
                         </div>
-                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${badge.color}`}>
+                        <span className={`badge ${badge.color}`}>
                           {badge.label}
                         </span>
                       </div>
-                      <div className="text-lg font-semibold text-white">
+                      <div className="text-xl font-bold text-white font-mono">
                         {m.currentPrice ? formatUsd(m.currentPrice.value) : '---'}
-                        <span className="text-xs text-gray-500 font-normal ml-1">
+                        <span className="text-[11px] text-gray-500 font-sans font-normal ml-1.5">
                           {m.currentPrice?.unit || ''}
                         </span>
                       </div>
-                      <div className="flex gap-1 mt-2">
+                      <div className="flex gap-1.5 mt-3">
                         {m.systems.map(s => (
-                          <span key={s} className="text-xs bg-gray-800 px-1.5 py-0.5 rounded">
+                          <span key={s} className="text-[11px] bg-gray-800/80 px-2 py-0.5 rounded-full text-gray-400">
                             {systemIcon(s)} {s}
                           </span>
                         ))}

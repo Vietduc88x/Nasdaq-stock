@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 body {
-  @apply bg-gray-950 text-gray-100;
+  @apply bg-black text-gray-100 font-sans antialiased;
+}
+
+/* Subtle card elevation */
+.card {
+  @apply bg-gray-900/80 border border-gray-800 rounded-xl backdrop-blur-sm;
+}
+
+.card-hover {
+  @apply card hover:border-gray-600 hover:bg-gray-900 transition-all duration-200;
+}
+
+/* Badge styles */
+.badge {
+  @apply text-[11px] px-2 py-0.5 rounded-full border font-medium;
 }

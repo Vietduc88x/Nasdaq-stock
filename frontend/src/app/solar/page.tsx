@@ -2,71 +2,69 @@ import { fetchSolarPage } from '@/lib/api';
 import WaterfallChart from '@/components/WaterfallChart';
 import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
+import SolarControls from '@/components/SolarControls';
 
 export const revalidate = 60;
 
-export default async function SolarPage() {
-  const data = await fetchSolarPage('VN', 'topcon', 2025);
+export default async function SolarPage({
+  searchParams,
+}: {
+  searchParams: { country?: string; tech?: string; year?: string };
+}) {
+  const country = searchParams.country?.toUpperCase() || 'VN';
+  const tech = searchParams.tech?.toLowerCase() || 'topcon';
+  const year = parseInt(searchParams.year || '2025', 10);
+
+  const data = await fetchSolarPage(country, tech, year);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">Solar PV Module Cost Model</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Solar PV Module Cost</h1>
           <p className="text-gray-400 text-sm mt-1">
-            IRENA-based bottom-up cost model &middot; {data.model.version}
+            Bottom-up cost model
+            <span className="text-gray-600 mx-1.5">&middot;</span>
+            <span className="font-mono text-gray-500">{data.model.version}</span>
           </p>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold text-primary-400">
-            ${data.model.totalCostPerWp.toFixed(3)}/Wp
+          <div className="text-4xl font-bold text-primary-400 font-mono tracking-tight">
+            ${data.model.totalCostPerWp.toFixed(3)}
           </div>
-          <div className="text-xs text-gray-500 mt-1">
-            {data.params.country} / {data.params.tech.toUpperCase()} / {data.params.year}
-          </div>
+          <div className="text-sm text-gray-500 mt-1">USD per Watt-peak</div>
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex gap-3 flex-wrap">
-        {['topcon', 'mono'].map(t => (
-          <span key={t} className={`px-3 py-1.5 rounded-md text-sm border ${
-            t === data.params.tech
-              ? 'bg-primary-500/20 border-primary-500/40 text-primary-400'
-              : 'bg-gray-900 border-gray-700 text-gray-500'
-          }`}>
-            {t.toUpperCase()}
-          </span>
-        ))}
-        <span className="text-gray-600 mx-1">|</span>
-        {['CN', 'VN', 'IN', 'DE', 'US', 'AU'].map(c => (
-          <span key={c} className={`px-3 py-1.5 rounded-md text-sm border ${
-            c === data.params.country
-              ? 'bg-primary-500/20 border-primary-500/40 text-primary-400'
-              : 'bg-gray-900 border-gray-700 text-gray-500'
-          }`}>
-            {c}
-          </span>
-        ))}
-      </div>
+      {/* Interactive Controls */}
+      <SolarControls
+        currentCountry={data.params.country}
+        currentTech={data.params.tech}
+        currentYear={data.params.year}
+      />
 
-      {/* Freshness indicator */}
-      <div className="flex items-center gap-2 text-xs text-gray-500">
+      {/* Freshness */}
+      <div className="flex items-center gap-3 text-xs text-gray-500">
         <span className={`w-2 h-2 rounded-full ${
           data.meta.freshness === 'fresh' ? 'bg-green-500' :
           data.meta.freshness === 'mixed' ? 'bg-yellow-500' : 'bg-gray-500'
         }`} />
-        Data freshness: {data.meta.freshness} &middot;
-        Live: {data.meta.liveCoveragePct}% &middot;
-        Reference: {data.meta.referenceCoveragePct}%
+        <span>
+          Data: {data.meta.liveCoveragePct}% live, {data.meta.referenceCoveragePct}% reference
+        </span>
       </div>
 
       {/* Waterfall Chart */}
       <WaterfallChart stages={data.stageBreakdown} totalCost={data.model.totalCostPerWp} />
 
       {/* Stage Detail Cards */}
-      <StageDetailCards stages={data.stageBreakdown} totalCost={data.model.totalCostPerWp} />
+      <div>
+        <h2 className="text-[11px] font-semibold text-gray-500 uppercase tracking-widest mb-4">
+          Stage Breakdown
+        </h2>
+        <StageDetailCards stages={data.stageBreakdown} totalCost={data.model.totalCostPerWp} />
+      </div>
 
       {/* Material Breakdown Table */}
       <MaterialBreakdownTable materials={data.materialImpacts} totalCost={data.model.totalCostPerWp} />
