@@ -1,4 +1,23 @@
-# Temporary files
+# Dependencies
+node_modules/
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Environment
+.env
+.env.local
+
+# Build
+*.tsbuildinfo
+next-env.d.ts
+
+# Temp
 tmpclaude-*
 *.tmp
 .DS_Store
+.gstack/
+
+# Old vanilla (archived)
+old-vanilla/

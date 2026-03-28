@@ -1,0 +1,181 @@
+{
+  "version": "solar-irena-v2026.03",
+  "source": "IRENA (2026), Solar PV Supply Chain Cost Tool",
+  "validYears": [2025, 2026, 2027, 2028, 2029, 2030],
+  "technologies": ["topcon", "mono"],
+  "countries": ["CN", "VN", "IN", "DE", "US", "AU"],
+
+  "assumptions": {
+    "polysilicon": {
+      "topcon": {
+        "electricityConsumption_kWhPerKg": 40,
+        "equipmentLifetime_years": 10,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "siliconMetalPrice_usdPerKg": 1.7,
+        "otherMaterials_usdPerKg": 1.2,
+        "conversionRate_gPerW": 2.1,
+        "siliconConversionRatio_pct": 0.0126,
+        "overheads_pct": 0.10,
+        "labourPerKg": 0.000021
+      },
+      "mono": {
+        "electricityConsumption_kWhPerKg": 40,
+        "equipmentLifetime_years": 10,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "siliconMetalPrice_usdPerKg": 1.7,
+        "otherMaterials_usdPerKg": 1.2,
+        "conversionRate_gPerW": 1.9,
+        "siliconConversionRatio_pct": 0.0126,
+        "overheads_pct": 0.10,
+        "labourPerKg": 0.000021
+      }
+    },
+    "wafer": {
+      "topcon": {
+        "waferArea_m2": 0.03822,
+        "waferThickness_um": 130,
+        "equipmentLifetime_years": 7,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "electricityConsumption_kWhPerWafer": 0.9,
+        "otherMaterials_usdPerWp": 0.015,
+        "overheads_pct": 0.10,
+        "labourPerW": 0.000000215,
+        "irradiance_wPerM2": 1000
+      },
+      "mono": {
+        "waferArea_m2": 0.033124,
+        "waferThickness_um": 145,
+        "equipmentLifetime_years": 7,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "electricityConsumption_kWhPerWafer": 0.81,
+        "otherMaterials_usdPerWp": 0.014,
+        "overheads_pct": 0.10,
+        "labourPerW": 0.000000215,
+        "irradiance_wPerM2": 1000
+      }
+    },
+    "cell": {
+      "topcon": {
+        "equipmentLifetime_years": 5,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "electricityConsumption_kWhPerW": 0.056,
+        "silverPrice_usdPerKg": 853,
+        "silverConsumption_kgPerWp": 0.01,
+        "overheads_pct": 0.10,
+        "labourPerW": 0.000000215
+      },
+      "mono": {
+        "equipmentLifetime_years": 5,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "electricityConsumption_kWhPerW": 0.0504,
+        "silverPrice_usdPerKg": 853,
+        "silverConsumption_kgPerWp": 0.01,
+        "overheads_pct": 0.10,
+        "labourPerW": 0.000000215
+      }
+    },
+    "module": {
+      "topcon": {
+        "equipmentLifetime_years": 5,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "electricityConsumption_kWhPerModule": 0.025,
+        "otherMaterials_usdPerWp": 0.057,
+        "overheads_pct": 0.10,
+        "labourPerW": 0.000000264,
+        "esgCertification_usdPerW": 0.0006
+      },
+      "mono": {
+        "equipmentLifetime_years": 5,
+        "buildingLifetime_years": 20,
+        "maintenance_pctCapex": 0.04,
+        "electricityConsumption_kWhPerModule": 0.025,
+        "otherMaterials_usdPerWp": 0.0513,
+        "overheads_pct": 0.10,
+        "labourPerW": 0.000000264,
+        "esgCertification_usdPerW": 0.0006
+      }
+    }
+  },
+
+  "countryInputs": {
+    "CN": {
+      "electricityPrice_usdPerKWh": 0.06,
+      "avgSalary_usdPerYear": 12000,
+      "polysilicon": { "equipment_usdPerKg": 10, "building_usdPerKg": 3 },
+      "wafer": { "equipment_usdPerKW": 30, "building_usdPerKWp": 20, "capacity_Wp": 5000000000, "projectedCapacity2030_Wp": 10000000000 },
+      "cell": { "equipment_usdPerKW": 25, "building_usdPerKWp": 20, "capacity_Wp": 5000000000, "projectedCapacity2030_Wp": 10000000000 },
+      "module": { "equipment_usdPerKW": 10, "building_usdPerKWp": 15, "capacity_Wp": 5000000000, "projectedCapacity2030_Wp": 10000000000 },
+      "polysiliconCapacity_kg": 50000, "projectedPolysiliconCapacity2030_kg": 70000
+    },
+    "VN": {
+      "electricityPrice_usdPerKWh": 0.07,
+      "avgSalary_usdPerYear": 9000,
+      "polysilicon": { "equipment_usdPerKg": 15, "building_usdPerKg": 5 },
+      "wafer": { "equipment_usdPerKW": 40, "building_usdPerKWp": 30, "capacity_Wp": 4000000000, "projectedCapacity2030_Wp": 6000000000 },
+      "cell": { "equipment_usdPerKW": 35, "building_usdPerKWp": 30, "capacity_Wp": 4000000000, "projectedCapacity2030_Wp": 6000000000 },
+      "module": { "equipment_usdPerKW": 13, "building_usdPerKWp": 20, "capacity_Wp": 4000000000, "projectedCapacity2030_Wp": 6000000000 },
+      "polysiliconCapacity_kg": 50000, "projectedPolysiliconCapacity2030_kg": 70000
+    },
+    "IN": {
+      "electricityPrice_usdPerKWh": 0.08,
+      "avgSalary_usdPerYear": 7000,
+      "polysilicon": { "equipment_usdPerKg": 15, "building_usdPerKg": 5 },
+      "wafer": { "equipment_usdPerKW": 40, "building_usdPerKWp": 30, "capacity_Wp": 4000000000, "projectedCapacity2030_Wp": 10000000000 },
+      "cell": { "equipment_usdPerKW": 35, "building_usdPerKWp": 30, "capacity_Wp": 4000000000, "projectedCapacity2030_Wp": 10000000000 },
+      "module": { "equipment_usdPerKW": 13, "building_usdPerKWp": 20, "capacity_Wp": 4000000000, "projectedCapacity2030_Wp": 10000000000 },
+      "polysiliconCapacity_kg": 50000, "projectedPolysiliconCapacity2030_kg": 70000
+    },
+    "DE": {
+      "electricityPrice_usdPerKWh": 0.15,
+      "avgSalary_usdPerYear": 45000,
+      "polysilicon": { "equipment_usdPerKg": 25, "building_usdPerKg": 10 },
+      "wafer": { "equipment_usdPerKW": 60, "building_usdPerKWp": 50, "capacity_Wp": 200000000, "projectedCapacity2030_Wp": 2000000000 },
+      "cell": { "equipment_usdPerKW": 50, "building_usdPerKWp": 50, "capacity_Wp": 200000000, "projectedCapacity2030_Wp": 2000000000 },
+      "module": { "equipment_usdPerKW": 20, "building_usdPerKWp": 35, "capacity_Wp": 200000000, "projectedCapacity2030_Wp": 2000000000 },
+      "polysiliconCapacity_kg": 50000, "projectedPolysiliconCapacity2030_kg": 70000
+    },
+    "US": {
+      "electricityPrice_usdPerKWh": 0.07,
+      "avgSalary_usdPerYear": 55000,
+      "polysilicon": { "equipment_usdPerKg": 30, "building_usdPerKg": 12 },
+      "wafer": { "equipment_usdPerKW": 60, "building_usdPerKWp": 55, "capacity_Wp": 1000000000, "projectedCapacity2030_Wp": 5000000000 },
+      "cell": { "equipment_usdPerKW": 55, "building_usdPerKWp": 55, "capacity_Wp": 1000000000, "projectedCapacity2030_Wp": 5000000000 },
+      "module": { "equipment_usdPerKW": 20, "building_usdPerKWp": 40, "capacity_Wp": 1000000000, "projectedCapacity2030_Wp": 5000000000 },
+      "polysiliconCapacity_kg": 50000, "projectedPolysiliconCapacity2030_kg": 70000
+    },
+    "AU": {
+      "electricityPrice_usdPerKWh": 0.10,
+      "avgSalary_usdPerYear": 50000,
+      "polysilicon": { "equipment_usdPerKg": 30, "building_usdPerKg": 12 },
+      "wafer": { "equipment_usdPerKW": 60, "building_usdPerKWp": 55, "capacity_Wp": 500000000, "projectedCapacity2030_Wp": 2000000000 },
+      "cell": { "equipment_usdPerKW": 55, "building_usdPerKWp": 55, "capacity_Wp": 500000000, "projectedCapacity2030_Wp": 2000000000 },
+      "module": { "equipment_usdPerKW": 20, "building_usdPerKWp": 40, "capacity_Wp": 500000000, "projectedCapacity2030_Wp": 2000000000 },
+      "polysiliconCapacity_kg": 50000, "projectedPolysiliconCapacity2030_kg": 70000
+    }
+  },
+
+  "technologyRoadmap": {
+    "2025": { "polyElectricity_kWhPerKg": 40.0, "waferElectricity_kWhPerWafer": 0.90, "cellElectricity_kWhPerW": 0.056, "moduleElectricity_kWhPerModule": 0.025, "siliconConversion_pct": 0.0126, "polysiliconToW_gPerW": 2.10, "silverConsumption_kgPerWp": 0.0115, "cellEfficiency_pct": 0.253, "moduleEfficiency_pct": 0.250, "cellPower_W": 9.67 },
+    "2026": { "polyElectricity_kWhPerKg": 39.6, "waferElectricity_kWhPerWafer": 0.89, "cellElectricity_kWhPerW": 0.053, "moduleElectricity_kWhPerModule": 0.024, "siliconConversion_pct": 0.0124, "polysiliconToW_gPerW": 2.06, "silverConsumption_kgPerWp": 0.0108, "cellEfficiency_pct": 0.254, "moduleEfficiency_pct": 0.252, "cellPower_W": 9.72 },
+    "2027": { "polyElectricity_kWhPerKg": 39.2, "waferElectricity_kWhPerWafer": 0.88, "cellElectricity_kWhPerW": 0.050, "moduleElectricity_kWhPerModule": 0.023, "siliconConversion_pct": 0.0122, "polysiliconToW_gPerW": 2.02, "silverConsumption_kgPerWp": 0.0101, "cellEfficiency_pct": 0.256, "moduleEfficiency_pct": 0.254, "cellPower_W": 9.78 },
+    "2028": { "polyElectricity_kWhPerKg": 38.7, "waferElectricity_kWhPerWafer": 0.87, "cellElectricity_kWhPerW": 0.047, "moduleElectricity_kWhPerModule": 0.022, "siliconConversion_pct": 0.0121, "polysiliconToW_gPerW": 1.97, "silverConsumption_kgPerWp": 0.0094, "cellEfficiency_pct": 0.257, "moduleEfficiency_pct": 0.256, "cellPower_W": 9.83 },
+    "2029": { "polyElectricity_kWhPerKg": 38.2, "waferElectricity_kWhPerWafer": 0.86, "cellElectricity_kWhPerW": 0.044, "moduleElectricity_kWhPerModule": 0.021, "siliconConversion_pct": 0.0119, "polysiliconToW_gPerW": 1.93, "silverConsumption_kgPerWp": 0.0087, "cellEfficiency_pct": 0.259, "moduleEfficiency_pct": 0.258, "cellPower_W": 9.89 },
+    "2030": { "polyElectricity_kWhPerKg": 37.8, "waferElectricity_kWhPerWafer": 0.85, "cellElectricity_kWhPerW": 0.042, "moduleElectricity_kWhPerModule": 0.020, "siliconConversion_pct": 0.0118, "polysiliconToW_gPerW": 1.89, "silverConsumption_kgPerWp": 0.0086, "cellEfficiency_pct": 0.260, "moduleEfficiency_pct": 0.260, "cellPower_W": 9.94 }
+  },
+
+  "operatingProfit_pct": 0.15,
+  "unitsSoldRatio": 0.90,
+
+  "benchmarks": {
+    "VN_topcon_2025": { "total": 0.180, "polysilicon": 0.023, "wafer": 0.033, "cell": 0.040, "module": 0.083 },
+    "VN_topcon_2030": { "total": 0.168 },
+    "VN_mono_2025": { "total": 0.177 }
+  }
+}

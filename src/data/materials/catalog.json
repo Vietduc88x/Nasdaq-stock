@@ -1,0 +1,344 @@
+{
+  "version": "materials-v2026.03",
+  "materials": [
+    {
+      "slug": "silver",
+      "name": "Silver",
+      "symbol": "XAG",
+      "icon": "Ag",
+      "unit": "USD/oz",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.032151,
+      "fallbackPrice": 85.31,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "SI=F",
+      "category": "critical",
+      "systems": [
+        { "system": "solar", "component": "Cell metallization paste", "usage_gPerWp": 0.11, "baselineCost_usdPerWp": 0.0085 }
+      ]
+    },
+    {
+      "slug": "copper",
+      "name": "Copper",
+      "symbol": "HG",
+      "icon": "Cu",
+      "unit": "USD/lb",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.00220462,
+      "fallbackPrice": 4.08,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "HG=F",
+      "category": "critical",
+      "systems": [
+        { "system": "solar", "component": "Cell interconnects, wiring", "usage_gPerWp": 0.28, "baselineCost_usdPerWp": 0.0012 },
+        { "system": "bess", "component": "BMS wiring, busbars", "usage_gPerWh": 1.8, "baselineCost_usdPerKWh": 0.017 },
+        { "system": "wind", "component": "Generator windings, cables", "usage_gPerKW": 3200, "baselineCost_usdPerKW": 48.0 }
+      ]
+    },
+    {
+      "slug": "aluminum",
+      "name": "Aluminum",
+      "symbol": "ALI",
+      "icon": "Al",
+      "unit": "USD/lb",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.00220462,
+      "fallbackPrice": 1.15,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "ALI=F",
+      "category": "structural",
+      "systems": [
+        { "system": "solar", "component": "Module frame", "usage_gPerWp": 1.50, "baselineCost_usdPerWp": 0.0095 },
+        { "system": "wind", "component": "Nacelle housing", "usage_gPerKW": 2500, "baselineCost_usdPerKW": 28.0 }
+      ]
+    },
+    {
+      "slug": "silicon",
+      "name": "Silicon Metal",
+      "symbol": "SI",
+      "icon": "Si",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 1.70,
+      "coverageTier": "modeled_reference",
+      "yahooSymbol": null,
+      "category": "critical",
+      "systems": [
+        { "system": "solar", "component": "Polysilicon feedstock", "usage_gPerWp": 2.10, "baselineCost_usdPerWp": 0.0060 }
+      ]
+    },
+    {
+      "slug": "tin",
+      "name": "Tin",
+      "symbol": "SN",
+      "icon": "Sn",
+      "unit": "USD/lb",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.00220462,
+      "fallbackPrice": 12.85,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "SN=F",
+      "category": "structural",
+      "systems": [
+        { "system": "solar", "component": "Solder for cell connections", "usage_gPerWp": 0.05, "baselineCost_usdPerWp": 0.0003 }
+      ]
+    },
+    {
+      "slug": "zinc",
+      "name": "Zinc",
+      "symbol": "ZN",
+      "icon": "Zn",
+      "unit": "USD/lb",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.00220462,
+      "fallbackPrice": 1.28,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "ZN=F",
+      "category": "structural",
+      "systems": [
+        { "system": "wind", "component": "Galvanizing / anti-corrosion coating", "usage_gPerKW": 800, "baselineCost_usdPerKW": 4.5 }
+      ]
+    },
+    {
+      "slug": "nickel",
+      "name": "Nickel",
+      "symbol": "NI",
+      "icon": "Ni",
+      "unit": "USD/lb",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.00220462,
+      "fallbackPrice": 7.15,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "NI=F",
+      "category": "battery",
+      "systems": [
+        { "system": "bess", "component": "NMC cathode", "usage_gPerWh": 0.9, "baselineCost_usdPerKWh": 0.014 }
+      ]
+    },
+    {
+      "slug": "gold",
+      "name": "Gold",
+      "symbol": "XAU",
+      "icon": "Au",
+      "unit": "USD/oz",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.032151,
+      "fallbackPrice": 4895.0,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "GC=F",
+      "category": "reference_anchor",
+      "systems": []
+    },
+    {
+      "slug": "steel",
+      "name": "Steel (HRC)",
+      "symbol": "HRC",
+      "icon": "Fe",
+      "unit": "USD/ton",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.000001,
+      "fallbackPrice": 645.0,
+      "coverageTier": "live_exchange",
+      "yahooSymbol": "HRC=F",
+      "category": "structural",
+      "systems": [
+        { "system": "solar", "component": "Mounting racking", "usage_gPerWp": 2.80, "baselineCost_usdPerWp": 0.0025 },
+        { "system": "bess", "component": "Battery rack enclosure", "usage_gPerWh": 3.5, "baselineCost_usdPerKWh": 0.015 },
+        { "system": "wind", "component": "Tower structure (80% of mass)", "usage_gPerKW": 85000, "baselineCost_usdPerKW": 680.0 }
+      ]
+    },
+    {
+      "slug": "glass",
+      "name": "Solar Glass",
+      "symbol": "GLASS",
+      "icon": "SiO2",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 0.80,
+      "coverageTier": "modeled_reference",
+      "yahooSymbol": null,
+      "category": "structural",
+      "systems": [
+        { "system": "solar", "component": "Module front cover glass", "usage_gPerWp": 5.60, "baselineCost_usdPerWp": 0.0120 }
+      ]
+    },
+    {
+      "slug": "eva",
+      "name": "EVA Encapsulant",
+      "symbol": "EVA",
+      "icon": "EVA",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 1.85,
+      "coverageTier": "modeled_reference",
+      "yahooSymbol": null,
+      "category": "structural",
+      "systems": [
+        { "system": "solar", "component": "Cell encapsulant film", "usage_gPerWp": 1.20, "baselineCost_usdPerWp": 0.0080 }
+      ]
+    },
+    {
+      "slug": "lithium",
+      "name": "Lithium Carbonate",
+      "symbol": "LI",
+      "icon": "Li",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 12.50,
+      "coverageTier": "delayed_vendor",
+      "yahooSymbol": null,
+      "category": "battery",
+      "systems": [
+        { "system": "bess", "component": "LFP/NMC cathode active material", "usage_gPerWh": 0.8, "baselineCost_usdPerKWh": 0.010 }
+      ]
+    },
+    {
+      "slug": "cobalt",
+      "name": "Cobalt",
+      "symbol": "CO",
+      "icon": "Co",
+      "unit": "USD/lb",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.00220462,
+      "fallbackPrice": 14.25,
+      "coverageTier": "delayed_vendor",
+      "yahooSymbol": null,
+      "category": "battery",
+      "systems": [
+        { "system": "bess", "component": "NMC cathode", "usage_gPerWh": 0.3, "baselineCost_usdPerKWh": 0.009 }
+      ]
+    },
+    {
+      "slug": "graphite",
+      "name": "Graphite",
+      "symbol": "GR",
+      "icon": "C",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 1.20,
+      "coverageTier": "indexed_reference",
+      "yahooSymbol": null,
+      "category": "battery",
+      "systems": [
+        { "system": "bess", "component": "Anode active material", "usage_gPerWh": 1.1, "baselineCost_usdPerKWh": 0.005 }
+      ]
+    },
+    {
+      "slug": "manganese",
+      "name": "Manganese",
+      "symbol": "MN",
+      "icon": "Mn",
+      "unit": "USD/ton",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.000001,
+      "fallbackPrice": 4850.0,
+      "coverageTier": "indexed_reference",
+      "yahooSymbol": null,
+      "category": "battery",
+      "systems": [
+        { "system": "bess", "component": "LFP cathode precursor", "usage_gPerWh": 0.4, "baselineCost_usdPerKWh": 0.002 }
+      ]
+    },
+    {
+      "slug": "neodymium",
+      "name": "Neodymium Oxide",
+      "symbol": "ND",
+      "icon": "Nd",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 125.0,
+      "coverageTier": "indexed_reference",
+      "yahooSymbol": null,
+      "category": "wind_specific",
+      "systems": [
+        { "system": "wind", "component": "Permanent magnets (direct-drive generator)", "usage_gPerKW": 500, "baselineCost_usdPerKW": 62.5 }
+      ]
+    },
+    {
+      "slug": "dysprosium",
+      "name": "Dysprosium Oxide",
+      "symbol": "DY",
+      "icon": "Dy",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 285.0,
+      "coverageTier": "indexed_reference",
+      "yahooSymbol": null,
+      "category": "wind_specific",
+      "systems": [
+        { "system": "wind", "component": "High-temperature magnet stabilizer", "usage_gPerKW": 50, "baselineCost_usdPerKW": 14.25 }
+      ]
+    },
+    {
+      "slug": "carbon-fiber",
+      "name": "Carbon Fiber",
+      "symbol": "CF",
+      "icon": "CF",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 15.0,
+      "coverageTier": "indexed_reference",
+      "yahooSymbol": null,
+      "category": "wind_specific",
+      "systems": [
+        { "system": "wind", "component": "Blade spar caps (large turbines)", "usage_gPerKW": 5000, "baselineCost_usdPerKW": 75.0 }
+      ]
+    },
+    {
+      "slug": "fiberglass",
+      "name": "Fiberglass / Epoxy",
+      "symbol": "FG",
+      "icon": "FG",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 4.0,
+      "coverageTier": "modeled_reference",
+      "yahooSymbol": null,
+      "category": "wind_specific",
+      "systems": [
+        { "system": "wind", "component": "Blade shell, nacelle cover", "usage_gPerKW": 15000, "baselineCost_usdPerKW": 60.0 }
+      ]
+    },
+    {
+      "slug": "iron-phosphate",
+      "name": "Iron Phosphate",
+      "symbol": "FP",
+      "icon": "FePO4",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 3.50,
+      "coverageTier": "modeled_reference",
+      "yahooSymbol": null,
+      "category": "battery",
+      "systems": [
+        { "system": "bess", "component": "LFP cathode precursor", "usage_gPerWh": 1.2, "baselineCost_usdPerKWh": 0.004 }
+      ]
+    },
+    {
+      "slug": "electrolyte",
+      "name": "Battery Electrolyte",
+      "symbol": "ELEC",
+      "icon": "LiPF6",
+      "unit": "USD/kg",
+      "normalizedUnit": "USD/g",
+      "conversionFactor": 0.001,
+      "fallbackPrice": 10.0,
+      "coverageTier": "modeled_reference",
+      "yahooSymbol": null,
+      "category": "battery",
+      "systems": [
+        { "system": "bess", "component": "Cell electrolyte solution", "usage_gPerWh": 0.8, "baselineCost_usdPerKWh": 0.008 }
+      ]
+    }
+  ]
+}
