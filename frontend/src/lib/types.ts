@@ -68,7 +68,7 @@ export interface CrossSystemImpact {
 }
 
 export interface MaterialDetailData {
-  material: { slug: string; name: string; icon: string; category: string; coverageTier: string; unit: string };
+  material: { slug: string; name: string; icon: string; category: string; coverageTier: string; unit: string; yahooSymbol: string | null };
   currentPrice: MaterialPrice | null;
   crossSystemImpact: CrossSystemImpact[];
   meta: { asOf: string };
