@@ -38,10 +38,24 @@ export default async function SolarPage({
         </div>
       </div>
 
-      {/* Sub-nav: Anatomy link */}
-      <Link href="/solar/anatomy" className="inline-flex items-center gap-1.5 text-[12px] font-medium px-3 py-1.5 rounded-lg transition-colors" style={{ background: 'rgba(255,255,255,0.03)', color: 'var(--text-muted)', border: '1px solid var(--border-subtle)' }}>
-        <span>☀️</span> What&apos;s inside a solar panel? — Anatomy &amp; Cost Calculator
-        <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+      {/* Anatomy CTA */}
+      <Link href="/solar/anatomy" className="block group">
+        <div className="card-surface p-4 flex items-center justify-between group-hover:border-[var(--up)] transition-all" style={{ borderColor: 'rgba(52,199,89,0.2)', background: 'rgba(52,199,89,0.04)' }}>
+          <div className="flex items-center gap-4">
+            <span className="text-[32px]">☀️</span>
+            <div>
+              <div className="text-[15px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+                What&apos;s Inside a Solar Panel?
+              </div>
+              <div className="text-[12px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                Explore layers, materials, supply chain &amp; interactive cost calculator
+              </div>
+            </div>
+          </div>
+          <svg className="w-5 h-5 opacity-40 group-hover:opacity-80 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--up)' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
       </Link>
 
       {/* Controls */}
