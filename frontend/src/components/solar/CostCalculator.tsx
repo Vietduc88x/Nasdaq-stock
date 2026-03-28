@@ -1,6 +1,20 @@
 'use client';
 
+/**
+ * SYNC NOTE: The calculateModuleCost() function below replicates the IRENA model
+ * from the backend (src/services/solar-model-service.js). Both must produce identical
+ * results for VN/TOPCon/2025 = $0.1786/Wp.
+ *
+ * The frontend version exists for instant slider response (no network round trip).
+ * The backend POST /api/scenarios/solar can be used to validate results.
+ *
+ * If you update the model in either place, update the other and run:
+ *   Backend: npx vitest run (97 tests must pass)
+ *   Frontend: verify baseline matches $0.1786/Wp
+ */
+
 import { useState, useMemo } from 'react';
+import { calculateModuleCost, DEFAULTS, type CostInputs } from '@/lib/solar-cost-model';
 
 interface InputParam {
   id: string;
@@ -41,94 +55,13 @@ const CATEGORY_META: Record<string, { label: string; icon: string; color: string
   business: { label: 'Business', icon: '📊', color: '#ec4899' },
 };
 
-// Simplified IRENA cost model
-function calculateModuleCost(values: Record<string, number>) {
-  const {
-    siliconPrice, silverPrice, aluminumPrice, glassPrice, evaPrice,
-    electricityPrice, avgSalary, cellEfficiency,
-    overheadPct, profitPct
-  } = values;
-
-  const eff = cellEfficiency / 100;
-  const overhead = overheadPct / 100;
-  const profit = profitPct / 100;
-
-  // Stage 1: Polysilicon
-  const polyElectricity = 40 * electricityPrice; // kWh/kg * $/kWh = $/kg
-  const polyMaterials = siliconPrice + 1.2; // silicon metal + other
-  const polyEquipment = 15 / 10; // equipment/lifetime
-  const polyBuilding = 5 / 20;
-  const polyMaint = 0.04 * (15 + 5);
-  const polyLabour = 0.000021 * avgSalary;
-  const polyDirectPerKg = polyElectricity + polyMaterials + polyEquipment + polyBuilding + polyMaint + polyLabour;
-  const polyPerKg = polyDirectPerKg * (1 + overhead + profit);
-  const polyCostPerWp = polyPerKg * 2.1 / 1000; // 2.1 g/W conversion
-
-  // Stage 2: Wafer
-  const waferArea = 0.03822; // m2
-  const wattsPerWafer = waferArea * 1000 * eff;
-  const waferElec = (0.9 * electricityPrice) / wattsPerWafer;
-  const waferMaterials = 0.015; // other materials $/Wp (crucibles, diamond wire)
-  const waferEquip = (40 / 1000) / 7;
-  const waferBuild = (30 / 1000) / 20;
-  const waferMaint = 0.04 * ((40 + 30) / 1000);
-  const waferLabour = 0.000000215 * avgSalary;
-  const waferDirect = waferElec + waferMaterials + waferEquip + waferBuild + waferMaint + waferLabour;
-  const waferCostPerWp = waferDirect * (1 + overhead + profit);
-
-  // Stage 3: Cell
-  const silverConsumption = 0.0000115; // 11.5 mg/Wp in kg/Wp
-  const cellElec = 0.056 * electricityPrice;
-  const cellSilver = silverConsumption * silverPrice;
-  const cellEquip = (35 / 1000) / 5;
-  const cellBuild = (30 / 1000) / 20;
-  const cellMaint = 0.04 * ((35 + 30) / 1000);
-  const cellLabour = 0.000000215 * avgSalary;
-  const cellDirect = cellElec + cellSilver + cellEquip + cellBuild + cellMaint + cellLabour;
-  const cellCostPerWp = cellDirect * (1 + overhead + profit);
-
-  // Stage 4: Module Assembly
-  // IRENA uses $0.057/Wp as lump-sum "other materials" (glass, EVA, aluminum frame, backsheet, junction box, etc.)
-  // We decompose it: baseline glass=$0.0045, EVA=$0.0022, Al=$0.0038, rest=$0.0465 (backsheet, jbox, sealant, ribbon, etc.)
-  // When user changes glass/EVA/Al prices, we adjust from baseline; the "rest" stays fixed
-  const baseGlass = 0.0045; // 5.6 g/Wp × $0.80/kg
-  const baseEva = 0.0022;   // 1.2 g/Wp × $1.85/kg
-  const baseAl = 0.0038;    // 1.5 g/Wp × $1.15/lb ÷ 453.6g/lb
-  const baseRest = 0.057 - baseGlass - baseEva - baseAl; // ~$0.0465 (backsheet, jbox, sealant, etc.)
-
-  const glassPerWp = (glassPrice * 5.6) / 1000;
-  const evaPerWp = (evaPrice * 1.2) / 1000;
-  const alPerWp = (aluminumPrice * 1.5 / 453.592);
-  const moduleMaterials = glassPerWp + evaPerWp + alPerWp + baseRest;
-
-  const moduleElec = (0.025 * electricityPrice) / (9.67 * 72);
-  const moduleEquip = (13 / 1000) / 5;
-  const moduleBuild = (20 / 1000) / 20;
-  const moduleMaint = 0.04 * ((13 + 20) / 1000);
-  const moduleLabour = 0.000000264 * avgSalary;
-  const esg = 0.0006;
-  const moduleDirect = moduleElec + moduleMaterials + moduleEquip + moduleBuild + moduleMaint + moduleLabour + esg;
-  const moduleCostPerWp = moduleDirect * (1 + overhead + profit);
-
-  const total = polyCostPerWp + waferCostPerWp + cellCostPerWp + moduleCostPerWp;
-
-  return {
-    total: Math.round(total * 10000) / 10000,
-    stages: [
-      { name: 'Polysilicon', cost: Math.round(polyCostPerWp * 10000) / 10000, color: '#34C759' },
-      { name: 'Wafer', cost: Math.round(waferCostPerWp * 10000) / 10000, color: '#3b82f6' },
-      { name: 'Cell', cost: Math.round(cellCostPerWp * 10000) / 10000, color: '#f59e0b' },
-      { name: 'Module', cost: Math.round(moduleCostPerWp * 10000) / 10000, color: '#a855f7' },
-    ],
-  };
-}
+// Model logic extracted to @/lib/solar-cost-model.ts (DRY — shared with tests)
 
 export default function CostCalculator() {
-  const defaults = Object.fromEntries(PARAMS.map(p => [p.id, p.defaultValue]));
-  const [values, setValues] = useState<Record<string, number>>(defaults);
+  const [values, setValues] = useState<CostInputs>({ ...DEFAULTS });
 
   const result = useMemo(() => calculateModuleCost(values), [values]);
-  const baseline = useMemo(() => calculateModuleCost(defaults), []);
+  const baseline = useMemo(() => calculateModuleCost(DEFAULTS), []);
   const delta = result.total - baseline.total;
   const deltaPct = (delta / baseline.total) * 100;
 
@@ -137,10 +70,10 @@ export default function CostCalculator() {
   }
 
   function resetAll() {
-    setValues(defaults);
+    setValues({ ...DEFAULTS });
   }
 
-  const isChanged = Object.keys(values).some(k => values[k] !== defaults[k]);
+  const isChanged = (Object.keys(values) as (keyof CostInputs)[]).some(k => values[k] !== DEFAULTS[k]);
 
   // Group params by category
   const grouped = new Map<string, InputParam[]>();

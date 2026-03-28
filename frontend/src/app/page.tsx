@@ -4,7 +4,6 @@ import Link from 'next/link';
 import MaterialRow from '@/components/MaterialRow';
 import MaterialIcon from '@/components/MaterialIcon';
 import MaterialFilters from '@/components/MaterialFilters';
-import PriceChange from '@/components/PriceChange';
 
 export const revalidate = 60;
 
@@ -48,12 +47,11 @@ export default async function HomePage() {
 
       {/* Desktop Table */}
       <div className="hidden sm:block">
-        <div className="grid grid-cols-[2.5fr_1fr_1fr_1fr_120px] gap-4 px-4 py-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>
+        <div className="grid grid-cols-[2.5fr_1fr_1fr_1fr] gap-4 px-4 py-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>
           <span>Material</span>
           <span className="text-right">Price</span>
-          <span className="text-right">Change</span>
           <span className="text-right">Source</span>
-          <span className="text-right">7D Trend</span>
+          <span className="text-right">Systems</span>
         </div>
 
         {data.materials.map((m, i) => (
@@ -64,7 +62,6 @@ export default async function HomePage() {
       {/* Mobile Cards */}
       <div className="sm:hidden space-y-0">
         {data.materials.map((m, i) => {
-          const change = Math.sin(i * 2.1) * 8;
           return (
             <Link key={m.slug} href={`/material/${m.slug}`}>
               <div className="flex items-center gap-3 py-3 row-border animate-cascade" style={{ animationDelay: `${Math.min(i * 20, 200)}ms` }}>
@@ -81,7 +78,9 @@ export default async function HomePage() {
                   <div className="font-price text-[16px] font-semibold">
                     {m.currentPrice ? formatUsd(m.currentPrice.value) : '—'}
                   </div>
-                  <PriceChange value={change} />
+                  <div className="text-[10px]" style={{ color: 'var(--text-faint)' }}>
+                    {m.currentPrice?.unit || ''}
+                  </div>
                 </div>
               </div>
             </Link>
