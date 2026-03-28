@@ -116,6 +116,62 @@ export function registerPageDataRoutes(app) {
     }
   });
 
+  // GET /api/page/solar-compare?countries=VN,CN,IN&tech=topcon&year=2025
+  app.get('/api/page/solar-compare', async (request, reply) => {
+    const countriesParam = request.query.countries || 'VN,CN,IN';
+    const countries = [...new Set(countriesParam.split(',').map(c => c.trim().toUpperCase()).filter(Boolean))];
+    const tech = (request.query.tech || 'topcon').toLowerCase();
+    const year = parseInt(request.query.year || '2025', 10);
+
+    const VALID_COUNTRIES = ['CN', 'VN', 'IN', 'DE', 'US', 'AU'];
+    const VALID_TECHS = ['topcon', 'mono'];
+
+    const invalidCountries = countries.filter(c => !VALID_COUNTRIES.includes(c));
+    if (invalidCountries.length > 0 || countries.length < 2 || countries.length > 6) {
+      reply.code(400);
+      return { error: 'Provide 2-6 valid countries (CN, VN, IN, DE, US, AU)' };
+    }
+    if (!VALID_TECHS.includes(tech) || year < 2025 || year > 2030) {
+      reply.code(400);
+      return { error: 'Invalid tech or year' };
+    }
+
+    try {
+      const results = countries.map(country => {
+        const cost = calculateSolarCost(country, tech, year);
+        return {
+          country,
+          totalCostPerWp: cost.totalCostPerWp,
+          stageBreakdown: cost.stageBreakdown,
+          model: cost.model,
+        };
+      });
+
+      const cheapest = Math.min(...results.map(r => r.totalCostPerWp));
+
+      const comparison = results.map(r => ({
+        country: r.country,
+        totalCostPerWp: r.totalCostPerWp,
+        deltaVsCheapest: Math.round((r.totalCostPerWp - cheapest) * 10000) / 10000,
+        deltaPct: Math.round(((r.totalCostPerWp - cheapest) / cheapest) * 1000) / 10,
+        isCheapest: r.totalCostPerWp === cheapest,
+        stageBreakdown: r.stageBreakdown,
+      }));
+
+      return {
+        params: { countries, tech, year },
+        cheapestCountry: results.find(r => r.totalCostPerWp === cheapest).country,
+        cheapestCost: cheapest,
+        comparison,
+        model: { version: results[0].model.version, asOf: new Date().toISOString() },
+      };
+    } catch (err) {
+      request.log.error({ err, countries, tech, year }, 'Page solar-compare error');
+      reply.code(500);
+      return { error: 'Calculation error' };
+    }
+  });
+
   // GET /api/page/material/:slug
   app.get('/api/page/material/:slug', async (request, reply) => {
     const { getAllMaterials, getMaterial, calculateImpact } = await import('../services/impact-service.js');

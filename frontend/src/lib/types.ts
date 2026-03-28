@@ -56,6 +56,23 @@ export interface SolarPageData {
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }
 
+export interface CountryComparison {
+  country: string;
+  totalCostPerWp: number;
+  deltaVsCheapest: number;
+  deltaPct: number;
+  isCheapest: boolean;
+  stageBreakdown: StageBreakdown[];
+}
+
+export interface SolarCompareData {
+  params: { countries: string[]; tech: string; year: number };
+  cheapestCountry: string;
+  cheapestCost: number;
+  comparison: CountryComparison[];
+  model: { version: string; asOf: string };
+}
+
 export interface HomePageData {
   materials: MaterialSummary[];
   featuredSolar: { country: string; tech: string; year: number; totalCostPerWp: number };

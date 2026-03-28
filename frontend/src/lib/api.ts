@@ -1,4 +1,4 @@
-import type { HomePageData, SolarPageData, MaterialDetailData } from './types';
+import type { HomePageData, SolarPageData, SolarCompareData, MaterialDetailData } from './types';
 
 // Server-side (build/SSR) needs absolute URL; client-side uses relative (rewrite handles it)
 const BASE = typeof window === 'undefined'
@@ -21,6 +21,19 @@ export async function fetchSolarPage(
     { next: { revalidate: 60 } }
   );
   if (!res.ok) throw new Error(`Solar page fetch failed: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchSolarCompare(
+  countries: string[] = ['VN', 'CN', 'IN'],
+  tech = 'topcon',
+  year = 2025
+): Promise<SolarCompareData> {
+  const res = await fetch(
+    `${BASE}/api/page/solar-compare?countries=${countries.join(',')}&tech=${tech}&year=${year}`,
+    { next: { revalidate: 60 } }
+  );
+  if (!res.ok) throw new Error(`Solar compare fetch failed: ${res.status}`);
   return res.json();
 }
 

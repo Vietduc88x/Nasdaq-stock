@@ -1,9 +1,10 @@
-import { fetchSolarPage } from '@/lib/api';
+import { fetchSolarPage, fetchSolarCompare } from '@/lib/api';
 import Link from 'next/link';
 import WaterfallChart from '@/components/WaterfallChart';
 import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
 import SolarControls from '@/components/SolarControls';
+import CountryComparisonPanel from '@/components/CountryComparisonPanel';
 
 export const revalidate = 60;
 
@@ -16,7 +17,15 @@ export default async function SolarPage({
   const tech = searchParams.tech?.toLowerCase() || 'topcon';
   const year = parseInt(searchParams.year || '2025', 10);
 
-  const data = await fetchSolarPage(country, tech, year);
+  const ALL_COUNTRIES = ['CN', 'VN', 'IN', 'DE', 'US', 'AU'];
+  const compareCountries = ALL_COUNTRIES.filter(c => c !== country);
+  // Include current country + up to 5 others = max 6
+  const comparisonList = [country, ...compareCountries].slice(0, 6);
+
+  const [data, compareData] = await Promise.all([
+    fetchSolarPage(country, tech, year),
+    fetchSolarCompare(comparisonList, tech, year),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -79,6 +88,9 @@ export default async function SolarPage({
 
       {/* Waterfall Chart */}
       <WaterfallChart stages={data.stageBreakdown} totalCost={data.model.totalCostPerWp} />
+
+      {/* Country Comparison */}
+      <CountryComparisonPanel data={compareData} />
 
       {/* Stage Cards */}
       <div>
