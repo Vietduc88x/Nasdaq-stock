@@ -171,6 +171,34 @@ export interface LandedCostPageData {
   routes: { from: string; to: string; label: string; confidence: string }[];
 }
 
+export interface SolarImportTradeAdders {
+  product: string;
+  exportExw: number;
+  fob: number;
+  cif: number;
+  ddp: number;
+  tradeAdder: number;
+}
+
+export interface SolarImportScenario {
+  scenario: string;
+  label: string;
+  totalCostPerWp: number;
+  deltaVsDomestic: number;
+  deltaPct: number;
+  stageBreakdown: { stage: string; costPerWp: number }[];
+  tradeAdders: SolarImportTradeAdders | null;
+  mainDriver: string | null;
+  driverDetail?: { manufacturingDelta: number; tradeBurden: number; netDelta: number };
+}
+
+export interface SolarImportPageData {
+  params: { dest: string; source: string; tech: string; year: number };
+  baseline: { scenario: string; totalCostPerWp: number };
+  scenarios: SolarImportScenario[];
+  model: { solarModelVersion: string; tradeModelVersion: string };
+}
+
 export interface CrossSystemImpact {
   system: string;
   component: string;

@@ -6,8 +6,12 @@ describe('Landed Cost Engine', () => {
     it('returns valid metadata', () => {
       const meta = getLandedCostMeta();
       expect(meta.version).toBe('landed-cost-v2026.03');
-      expect(meta.product).toBe('module');
-      expect(meta.hsCode).toBe('8541.43');
+      expect(meta.supportedProducts).toContain('module');
+      expect(meta.supportedProducts).toContain('cell');
+      expect(meta.supportedProducts).toContain('wafer');
+      expect(meta.productHsCodes.module).toBe('8541.43');
+      expect(meta.productHsCodes.cell).toBe('8541.42');
+      expect(meta.productHsCodes.wafer).toBe('8541.49');
       expect(meta.routeCount).toBeGreaterThanOrEqual(6);
     });
 

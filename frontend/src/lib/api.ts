@@ -1,4 +1,4 @@
-import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, LandedCostPageData, MaterialDetailData } from './types';
+import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, LandedCostPageData, SolarImportPageData, MaterialDetailData } from './types';
 
 // Server-side (build/SSR) needs absolute URL; client-side uses relative (rewrite handles it)
 const BASE = typeof window === 'undefined'
@@ -52,6 +52,20 @@ export async function fetchWindPage(
     { next: { revalidate: 60 } }
   );
   if (!res.ok) throw new Error(`Wind page fetch failed: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchSolarImportPage(
+  dest = 'VN',
+  source = 'CN',
+  tech = 'topcon',
+  year = 2025
+): Promise<SolarImportPageData> {
+  const res = await fetch(
+    `${BASE}/api/page/solar-import?dest=${dest}&source=${source}&tech=${tech}&year=${year}`,
+    { next: { revalidate: 60 } }
+  );
+  if (!res.ok) throw new Error(`Solar import fetch failed: ${res.status}`);
   return res.json();
 }
 

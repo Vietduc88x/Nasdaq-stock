@@ -358,3 +358,45 @@ describe('GET /api/page/landed-cost — route integration', () => {
     expect(res.statusCode).toBe(400);
   });
 });
+
+describe('GET /api/page/solar-import — route integration', () => {
+  it('returns 200 with 4 scenarios for VN/CN', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar-import?dest=VN&source=CN&tech=topcon&year=2025',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.scenarios).toHaveLength(4);
+    expect(body.baseline.totalCostPerWp).toBeGreaterThan(0);
+    expect(body.model.solarModelVersion).toMatch(/^solar-irena/);
+    expect(body.model.tradeModelVersion).toMatch(/^landed-cost/);
+  });
+
+  it('uses defaults (VN/CN/topcon/2025) when no params', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar-import',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.params.dest).toBe('VN');
+    expect(body.params.source).toBe('CN');
+  });
+
+  it('rejects same source and dest', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar-import?dest=VN&source=VN',
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('rejects invalid tech', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar-import?tech=perovskite',
+    });
+    expect(res.statusCode).toBe(400);
+  });
+});

@@ -58,8 +58,9 @@ function findRoute(from, to) {
  * @returns {object} Full breakdown with FOB, CIF, DDP stages
  */
 export function calculateLandedCost({ from, to, product = 'module', exw }) {
-  if (product !== 'module') {
-    throw new RangeError(`Unsupported product: ${product}. Only 'module' is supported.`);
+  const validProducts = tradeData.supportedProducts || ['module'];
+  if (!validProducts.includes(product)) {
+    throw new RangeError(`Unsupported product: ${product}. Valid: ${validProducts.join(', ')}`);
   }
   if (typeof exw !== 'number' || !Number.isFinite(exw) || exw <= 0) {
     throw new RangeError(`Invalid EXW value: ${exw}. Must be a positive number.`);
@@ -74,35 +75,41 @@ export function calculateLandedCost({ from, to, product = 'module', exw }) {
     throw new RangeError(`Unsupported route: ${from}→${to}. Valid routes: ${valid}`);
   }
 
-  const c = route.costs;
+  // Product-specific tariff data
+  const productData = route.products?.[product];
+  if (!productData) {
+    throw new RangeError(`Product '${product}' not configured for route ${from}→${to}`);
+  }
+
+  // Shared logistics costs + product-specific duties
+  const sc = route.sharedCosts || route.costs;
 
   // 1. EXW (factory gate)
   const exwCost = exw;
 
   // 2. FOB = EXW + inland freight + port handling
-  const inlandFreight = c.inlandFreightPerWp;
-  const portHandling = c.portHandlingPerWp;
+  const inlandFreight = sc.inlandFreightPerWp;
+  const portHandling = sc.portHandlingPerWp;
   const fob = round5(exwCost + inlandFreight + portHandling);
 
   // 3. Ocean freight
-  const oceanFreight = c.oceanFreightPerWp;
+  const oceanFreight = sc.oceanFreightPerWp;
 
   // 4. Insurance = (FOB + ocean freight) * insurance rate
-  // Insurance is calculated on FOB + freight value (approximation of CIF base)
   const insuranceBase = fob + oceanFreight;
-  const insurance = round5(insuranceBase * (c.insuranceRatePct / 100));
+  const insurance = round5(insuranceBase * (sc.insuranceRatePct / 100));
 
   // 5. CIF = FOB + ocean freight + insurance
   const cif = round5(fob + oceanFreight + insurance);
 
-  // 6. Duties on CIF value
-  const customsDuty = round5(cif * (c.customsDutyPct / 100));
-  const antiDumping = round5(cif * (c.antiDumpingPct / 100));
-  const countervailing = round5(cif * (c.countervailingPct / 100));
+  // 6. Duties on CIF value (product-specific rates)
+  const customsDuty = round5(cif * (productData.customsDutyPct / 100));
+  const antiDumping = round5(cif * (productData.antiDumpingPct / 100));
+  const countervailing = round5(cif * (productData.countervailingPct / 100));
 
   // 7. Clearance and delivery
-  const customsClearance = c.customsClearancePerWp;
-  const inlandDelivery = c.inlandDeliveryPerWp;
+  const customsClearance = sc.customsClearancePerWp;
+  const inlandDelivery = sc.inlandDeliveryPerWp;
 
   // 8. DDP = CIF + all duties + clearance + delivery
   const ddp = round5(cif + customsDuty + antiDumping + countervailing + customsClearance + inlandDelivery);
@@ -137,10 +144,10 @@ export function calculateLandedCost({ from, to, product = 'module', exw }) {
     model: {
       version: MODEL_VERSION,
       asOf: route.asOf,
-      hsCode: tradeData.hsCode,
+      hsCode: productData.hsCode || tradeData.productHsCodes?.[product] || 'unknown',
       source: route.source,
       confidence: route.confidence,
-      notes: route.notes,
+      notes: productData.notes || '',
       transitDays: route.transitDays,
     },
     breakdown: {
@@ -199,8 +206,8 @@ export function calculateAllRoutes(exw, product = 'module') {
 export function getLandedCostMeta() {
   return {
     version: MODEL_VERSION,
-    product: tradeData.product,
-    hsCode: tradeData.hsCode,
+    supportedProducts: tradeData.supportedProducts,
+    productHsCodes: tradeData.productHsCodes,
     asOf: tradeData.asOf,
     routeCount: tradeData.routes.length,
     provenanceNote: tradeData.provenanceNote,

@@ -7,8 +7,45 @@ import { calculateSolarForecast } from '../services/forecast-service.js';
 import { calculateWindCost } from '../services/wind-cost-engine.js';
 import { computeBrief } from '../services/brief-service.js';
 import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes } from '../services/landed-cost-engine.js';
+import { calculateSolarImportComparison } from '../services/solar-import-simulator.js';
 
 export function registerPageDataRoutes(app) {
+  // GET /api/page/solar-import?dest=VN&source=CN&tech=topcon&year=2025
+  app.get('/api/page/solar-import', async (request, reply) => {
+    const dest = (request.query.dest || 'VN').toUpperCase();
+    const source = (request.query.source || 'CN').toUpperCase();
+    const tech = (request.query.tech || 'topcon').toLowerCase();
+    const year = parseInt(request.query.year || '2025', 10);
+
+    const VALID_COUNTRIES = ['CN', 'VN', 'IN', 'DE', 'US', 'AU'];
+    const VALID_TECHS = ['topcon', 'mono'];
+
+    if (!VALID_COUNTRIES.includes(dest) || !VALID_COUNTRIES.includes(source)) {
+      reply.code(400);
+      return { error: 'Invalid dest or source country' };
+    }
+    if (!VALID_TECHS.includes(tech) || year < 2025 || year > 2030) {
+      reply.code(400);
+      return { error: 'Invalid tech or year' };
+    }
+    if (dest === source) {
+      reply.code(400);
+      return { error: 'Source and destination must be different countries' };
+    }
+
+    try {
+      return calculateSolarImportComparison({ dest, source, tech, year });
+    } catch (err) {
+      if (err instanceof RangeError) {
+        reply.code(400);
+        return { error: err.message };
+      }
+      request.log.error({ err, dest, source, tech, year }, 'Page solar-import error');
+      reply.code(500);
+      return { error: 'Calculation error' };
+    }
+  });
+
   // GET /api/page/landed-cost?from=CN&to=VN&product=module&exw=0.179
   app.get('/api/page/landed-cost', async (request, reply) => {
     const from = (request.query.from || '').toUpperCase();
@@ -17,9 +54,10 @@ export function registerPageDataRoutes(app) {
     const exw = parseFloat(request.query.exw || '0.179');
 
     // Validate inputs before comparison mode (which swallows errors)
-    if (product !== 'module') {
+    const VALID_PRODUCTS = ['module', 'cell', 'wafer'];
+    if (!VALID_PRODUCTS.includes(product)) {
       reply.code(400);
-      return { error: `Unsupported product: ${product}. Only 'module' is supported.` };
+      return { error: `Unsupported product: ${product}. Valid: ${VALID_PRODUCTS.join(', ')}` };
     }
     if (!Number.isFinite(exw) || exw <= 0 || exw > 5) {
       reply.code(400);
