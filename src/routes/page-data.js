@@ -16,6 +16,16 @@ export function registerPageDataRoutes(app) {
     const product = (request.query.product || 'module').toLowerCase();
     const exw = parseFloat(request.query.exw || '0.179');
 
+    // Validate inputs before comparison mode (which swallows errors)
+    if (product !== 'module') {
+      reply.code(400);
+      return { error: `Unsupported product: ${product}. Only 'module' is supported.` };
+    }
+    if (!Number.isFinite(exw) || exw <= 0 || exw > 5) {
+      reply.code(400);
+      return { error: `Invalid EXW value: ${request.query.exw}. Must be a positive number up to 5.` };
+    }
+
     try {
       const comparison = calculateAllRoutes(exw, product);
 

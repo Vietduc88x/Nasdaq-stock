@@ -331,4 +331,30 @@ describe('GET /api/page/landed-cost — route integration', () => {
     const body = res.json();
     expect(body.comparison.length).toBeGreaterThanOrEqual(6);
   });
+
+  it('returns 400 for non-numeric exw without from/to', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost?exw=abc',
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toMatch(/Invalid EXW/i);
+  });
+
+  it('returns 400 for invalid product without from/to', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost?product=inverter&exw=0.179',
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.json().error).toMatch(/product/i);
+  });
+
+  it('returns 400 for negative exw without from/to', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost?exw=-1',
+    });
+    expect(res.statusCode).toBe(400);
+  });
 });

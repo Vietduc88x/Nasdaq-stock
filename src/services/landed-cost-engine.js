@@ -185,8 +185,8 @@ export function calculateAllRoutes(exw, product = 'module') {
         premiumPct: result.summary.ddpPremiumPct,
         transitDays: route.transitDays,
       });
-    } catch {
-      // Skip invalid routes silently in comparison mode
+    } catch (err) {
+      console.warn(`[landed-cost] Skipping route ${route.from}→${route.to}: ${err.message}`);
     }
   }
   results.sort((a, b) => a.ddp - b.ddp);

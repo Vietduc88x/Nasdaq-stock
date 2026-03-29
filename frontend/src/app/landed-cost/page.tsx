@@ -25,7 +25,7 @@ export default async function LandedCostPage({
       <div className="pt-2">
         <h1 className="text-[22px] font-semibold tracking-tight">Landed Cost Simulator</h1>
         <p className="text-[13px] mt-1" style={{ color: 'var(--text-tertiary)' }}>
-          What does a Chinese solar module cost delivered to your market? EXW → FOB → CIF → DDP.
+          What does a solar module cost delivered to your market? Compare trade routes, tariffs, and logistics. EXW → FOB → CIF → DDP.
         </p>
       </div>
 
