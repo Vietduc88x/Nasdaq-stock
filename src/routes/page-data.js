@@ -3,6 +3,7 @@ import { calculateBessCost } from '../services/bess-cost-engine.js';
 import { getSystemMaterials, getAllMaterials } from '../services/impact-service.js';
 import { getAllPrices, getPrice } from '../services/market-data-service.js';
 import { buildProvenance } from '../services/provenance-service.js';
+import { calculateSolarForecast } from '../services/forecast-service.js';
 
 export function registerPageDataRoutes(app) {
   // GET /api/page/home - Dashboard page payload
@@ -98,6 +99,14 @@ export function registerPageDataRoutes(app) {
         })
       );
 
+      // Forecast: run in parallel, never block the page if it fails
+      let forecast = null;
+      try {
+        forecast = await calculateSolarForecast(country, tech, year);
+      } catch (forecastErr) {
+        request.log.warn({ err: forecastErr }, 'Forecast calculation failed, returning null');
+      }
+
       return {
         params: { country, tech, year },
         model: {
@@ -107,6 +116,7 @@ export function registerPageDataRoutes(app) {
         },
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
+        forecast,
         meta: buildProvenance('solar', { liveCoverage, referenceCoverage, fallbacksUsed })
       };
     } catch (err) {

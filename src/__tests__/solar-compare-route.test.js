@@ -150,3 +150,66 @@ describe('GET /api/page/solar-compare — route-level', () => {
     });
   });
 });
+
+describe('GET /api/page/solar — forecast integration', () => {
+  it('includes forecast object in solar page response', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar?country=VN&tech=topcon&year=2025',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+
+    expect(body).toHaveProperty('forecast');
+    expect(body.forecast).not.toBeNull();
+  });
+
+  it('forecast has correct shape', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar?country=VN&tech=topcon&year=2025',
+    });
+    const { forecast } = res.json();
+
+    expect(forecast.currentModeledCost).toBeGreaterThan(0);
+    expect(forecast.nowcastCost).toBeGreaterThan(0);
+    expect(forecast.forward30dCost).toBeGreaterThan(0);
+
+    expect(forecast.leadIndicator).toHaveProperty('label');
+    expect(forecast.leadIndicator).toHaveProperty('score');
+    expect(forecast.leadIndicator).toHaveProperty('confidence');
+    expect(forecast.leadIndicator).toHaveProperty('expectedLag');
+    expect(['Falling', 'Stable', 'Rising', 'Strongly Rising']).toContain(forecast.leadIndicator.label);
+    expect(['High', 'Medium', 'Low']).toContain(forecast.leadIndicator.confidence);
+
+    expect(forecast.topDrivers).toBeInstanceOf(Array);
+    expect(forecast.topDrivers.length).toBeLessThanOrEqual(3);
+    expect(forecast.topDrivers.length).toBeGreaterThan(0);
+  });
+
+  it('forecast topDrivers have correct fields', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar?country=CN&tech=topcon&year=2025',
+    });
+    const { forecast } = res.json();
+
+    for (const driver of forecast.topDrivers) {
+      expect(driver).toHaveProperty('material');
+      expect(driver).toHaveProperty('changePct');
+      expect(driver).toHaveProperty('weightPct');
+      expect(driver).toHaveProperty('passThrough');
+      expect(driver).toHaveProperty('lagLabel');
+      expect(driver).toHaveProperty('signalContribution');
+    }
+  });
+
+  it('forecast modeled cost matches model totalCostPerWp', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/solar?country=VN&tech=topcon&year=2025',
+    });
+    const body = res.json();
+    expect(body.forecast.currentModeledCost).toBe(body.model.totalCostPerWp);
+  });
+});

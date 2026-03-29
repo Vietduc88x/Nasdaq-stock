@@ -1,0 +1,62 @@
+{
+  "_doc": "Pass-through rates and lag estimates for solar material price propagation. passThrough = fraction of raw material price change that reaches module cost. lagDaysMin/Max = typical time for price changes to propagate through supply chain.",
+  "version": "solar-lag-v2026.03",
+  "materials": {
+    "silver": {
+      "passThrough": 0.80,
+      "lagDaysMin": 14,
+      "lagDaysMax": 30,
+      "priority": 1,
+      "note": "High pass-through: paste is a direct input, short supply chain"
+    },
+    "aluminum": {
+      "passThrough": 0.70,
+      "lagDaysMin": 30,
+      "lagDaysMax": 60,
+      "priority": 2,
+      "note": "Frame extrusion contracts often have quarterly price adjustments"
+    },
+    "copper": {
+      "passThrough": 0.75,
+      "lagDaysMin": 14,
+      "lagDaysMax": 45,
+      "priority": 3,
+      "note": "Interconnects and wiring — moderate pass-through"
+    },
+    "glass": {
+      "passThrough": 0.60,
+      "lagDaysMin": 30,
+      "lagDaysMax": 90,
+      "priority": 4,
+      "note": "Solar glass has concentrated suppliers, longer-term contracts"
+    },
+    "eva": {
+      "passThrough": 0.50,
+      "lagDaysMin": 30,
+      "lagDaysMax": 90,
+      "priority": 5,
+      "note": "Petrochemical derivative, buffered by inventory"
+    },
+    "silicon": {
+      "passThrough": 0.85,
+      "lagDaysMin": 30,
+      "lagDaysMax": 60,
+      "priority": 6,
+      "note": "Polysilicon is the core feedstock but contract prices lag spot"
+    },
+    "steel": {
+      "passThrough": 0.65,
+      "lagDaysMin": 30,
+      "lagDaysMax": 90,
+      "priority": 7,
+      "note": "Racking/mounting — often ordered in bulk with price locks"
+    },
+    "tin": {
+      "passThrough": 0.70,
+      "lagDaysMin": 14,
+      "lagDaysMax": 30,
+      "priority": 8,
+      "note": "Solder — small absolute cost but responsive to spot"
+    }
+  }
+}

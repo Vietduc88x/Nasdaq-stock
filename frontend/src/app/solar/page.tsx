@@ -5,6 +5,7 @@ import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
 import SolarControls from '@/components/SolarControls';
 import CountryComparisonPanel from '@/components/CountryComparisonPanel';
+import ForecastOutlookCard from '@/components/ForecastOutlookCard';
 
 export const revalidate = 60;
 
@@ -73,6 +74,9 @@ export default async function SolarPage({
         currentTech={data.params.tech}
         currentYear={data.params.year}
       />
+
+      {/* Forecast Outlook */}
+      {data.forecast && <ForecastOutlookCard forecast={data.forecast} />}
 
       {/* Freshness */}
       <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--text-faint)' }}>

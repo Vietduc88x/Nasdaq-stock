@@ -48,11 +48,34 @@ export interface MaterialImpact {
   costUnit?: string;
 }
 
+export interface ForecastDriver {
+  material: string;
+  changePct: number | null;
+  weightPct: number;
+  passThrough: number;
+  lagLabel: string;
+  signalContribution: number;
+}
+
+export interface ForecastData {
+  currentModeledCost: number;
+  nowcastCost: number;
+  forward30dCost: number;
+  leadIndicator: {
+    label: 'Falling' | 'Stable' | 'Rising' | 'Strongly Rising';
+    score: number;
+    confidence: 'High' | 'Medium' | 'Low';
+    expectedLag: string;
+  };
+  topDrivers: ForecastDriver[];
+}
+
 export interface SolarPageData {
   params: { country: string; tech: string; year: number };
   model: { version: string; asOf: string; totalCostPerWp: number };
   stageBreakdown: StageBreakdown[];
   materialImpacts: MaterialImpact[];
+  forecast: ForecastData | null;
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }
 
