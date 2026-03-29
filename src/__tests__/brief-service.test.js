@@ -77,6 +77,75 @@ describe('writeSnapshot', () => {
   });
 });
 
+describe('Trust model — reference baseline rejection + degraded state', () => {
+  const YESTERDAY = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const YESTERDAY_FILE = join(SNAPSHOTS_DIR, `${YESTERDAY}.json`);
+  let originalExists = false;
+  let originalContent = null;
+
+  beforeAll(() => {
+    // Back up any real yesterday snapshot
+    if (existsSync(YESTERDAY_FILE)) {
+      originalExists = true;
+      originalContent = readFileSync(YESTERDAY_FILE, 'utf-8');
+    }
+  });
+
+  afterAll(() => {
+    // Restore original snapshot
+    if (originalExists && originalContent) {
+      writeFileSync(YESTERDAY_FILE, originalContent);
+    } else {
+      try { unlinkSync(YESTERDAY_FILE); } catch { /* ignore */ }
+    }
+  });
+
+  it('rejects reference-only baselines — no movers emitted against fallback prices', async () => {
+    // Write a fake yesterday snapshot where ALL prices are reference/fallback
+    const fakeSnapshot = {
+      date: YESTERDAY,
+      writtenAt: new Date().toISOString(),
+      prices: [
+        { slug: 'silver', value: 30.0, unit: 'USD/oz', source: 'reference', coverageTier: 'fallback_reference', change24hPct: null },
+        { slug: 'copper', value: 4.0, unit: 'USD/lb', source: 'reference', coverageTier: 'fallback_reference', change24hPct: null },
+        { slug: 'aluminum', value: 1.1, unit: 'USD/lb', source: 'reference', coverageTier: 'fallback_reference', change24hPct: null },
+      ],
+    };
+    mkdirSync(SNAPSHOTS_DIR, { recursive: true });
+    writeFileSync(YESTERDAY_FILE, JSON.stringify(fakeSnapshot));
+
+    const { computeBrief } = await import('../services/brief-service.js');
+    const brief = await computeBrief();
+
+    // Even if today has live prices, no movers should appear because
+    // yesterday's baselines were all reference — comparing live vs reference is fake
+    expect(brief.noData).toBe(false);
+    expect(brief.movers).toHaveLength(0);
+  });
+
+  it('sets degraded=true when live prices exist today but no live comparisons are possible', async () => {
+    // Same setup: reference-only yesterday snapshot
+    const fakeSnapshot = {
+      date: YESTERDAY,
+      writtenAt: new Date().toISOString(),
+      prices: [
+        { slug: 'silver', value: 30.0, unit: 'USD/oz', source: 'reference', coverageTier: 'fallback_reference', change24hPct: null },
+        { slug: 'copper', value: 4.0, unit: 'USD/lb', source: 'reference', coverageTier: 'modeled_reference', change24hPct: null },
+      ],
+    };
+    writeFileSync(YESTERDAY_FILE, JSON.stringify(fakeSnapshot));
+
+    const { computeBrief } = await import('../services/brief-service.js');
+    const brief = await computeBrief();
+
+    // If today has any live materials but zero live-vs-live pairs, degraded should be true
+    if (brief.meta.liveMaterials > 0) {
+      expect(brief.degraded).toBe(true);
+      expect(brief.meta.liveComparisons).toBe(0);
+    }
+  });
+});
+
 describe('computeBrief (integration)', () => {
   let computeBrief;
 
