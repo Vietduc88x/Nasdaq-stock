@@ -132,13 +132,14 @@ export async function computeBrief() {
   }
 
   // Build lookup: slug → yesterday's price value
+  // Only include live prices from yesterday — reference/fallback baselines produce fake deltas
   const yesterdayMap = new Map(
     yesterdaySnapshot.prices
-      .filter(p => p.value !== null)
+      .filter(p => p.value !== null && p.source !== 'reference' && p.coverageTier !== 'fallback_reference')
       .map(p => [p.slug, p])
   );
 
-  // Compute deltas for live materials
+  // Compute deltas — both today AND yesterday must be live for a valid comparison
   const movers = [];
   for (const tp of todayPrices) {
     const todayPrice = tp.price;
@@ -185,14 +186,19 @@ export async function computeBrief() {
   movers.sort((a, b) => Math.abs(b.topImpact.delta) - Math.abs(a.topImpact.delta));
 
   const liveMaterials = todayPrices.filter(p => p.price && !p.price.fallbackUsed && p.price.source !== 'reference').length;
+  const liveComparisons = yesterdayMap.size;
+  // Degraded: we have a snapshot but too few live-vs-live pairs for meaningful comparison
+  const degraded = liveMaterials > 0 && liveComparisons === 0;
 
   return {
     date: today,
     noData: false,
+    degraded,
     movers: movers.slice(0, 5),
     totalMovers: movers.length,
     meta: {
       liveMaterials,
+      liveComparisons,
       totalMaterials: todayPrices.length,
       snapshotDate: yesterday,
     },

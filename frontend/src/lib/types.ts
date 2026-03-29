@@ -130,10 +130,11 @@ export interface BriefMover {
 export interface BriefData {
   date: string;
   noData: boolean;
+  degraded?: boolean;
   reason?: string;
   movers: BriefMover[];
   totalMovers?: number;
-  meta: { liveMaterials: number; totalMaterials: number; snapshotDate?: string };
+  meta: { liveMaterials: number; liveComparisons?: number; totalMaterials: number; snapshotDate?: string };
 }
 
 export interface CrossSystemImpact {

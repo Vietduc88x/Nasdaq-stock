@@ -26,11 +26,14 @@ export default function MorningBriefCard({ brief }: Props) {
   }
 
   if (brief.movers.length === 0) {
+    const isDegraded = 'degraded' in brief && brief.degraded;
     return (
       <div className="card-surface p-4">
         <div className="section-label mb-2">Morning Brief</div>
         <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-          No significant material price moves today.
+          {isDegraded
+            ? 'Comparison data unavailable — insufficient live pricing for reliable movers.'
+            : 'No significant material price moves today.'}
         </p>
       </div>
     );
