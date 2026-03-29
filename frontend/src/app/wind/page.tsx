@@ -1,4 +1,5 @@
 import { fetchWindPage } from '@/lib/api';
+import Link from 'next/link';
 import WaterfallChart from '@/components/WaterfallChart';
 import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
@@ -52,6 +53,26 @@ export default async function WindPage({
           </div>
         ))}
       </div>
+
+      {/* Anatomy CTA */}
+      <Link href="/wind/anatomy" className="block group">
+        <div className="card-surface p-4 flex items-center justify-between group-hover:border-[var(--up)] transition-all" style={{ borderColor: 'rgba(52,199,89,0.2)', background: 'rgba(52,199,89,0.04)' }}>
+          <div className="flex items-center gap-4">
+            <span className="text-[32px]">💨</span>
+            <div>
+              <div className="text-[15px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+                What&apos;s Inside a Wind Turbine?
+              </div>
+              <div className="text-[12px] mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                Explore blades, nacelle, tower structure, rare earth magnets &amp; supply chain
+              </div>
+            </div>
+          </div>
+          <svg className="w-5 h-5 opacity-40 group-hover:opacity-80 group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--up)' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </Link>
 
       {/* Controls */}
       <WindControls currentYear={data.params.year} />
