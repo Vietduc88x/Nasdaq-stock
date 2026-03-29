@@ -1,10 +1,7 @@
 import { fetchHomePage, fetchBrief } from '@/lib/api';
-import { formatUsd, systemIcon } from '@/lib/formatters';
 import Link from 'next/link';
-import MaterialRow from '@/components/MaterialRow';
-import MaterialIcon from '@/components/MaterialIcon';
-import MaterialFilters from '@/components/MaterialFilters';
 import MorningBriefCard from '@/components/MorningBriefCard';
+import MaterialList from '@/components/MaterialList';
 
 export const revalidate = 60;
 
@@ -46,52 +43,8 @@ export default async function HomePage() {
       {/* Morning Brief */}
       <MorningBriefCard brief={brief} />
 
-      {/* Filters */}
-      <MaterialFilters />
-
-      {/* Desktop Table */}
-      <div className="hidden sm:block">
-        <div className="grid grid-cols-[2.5fr_1fr_0.8fr_0.6fr_100px] gap-4 px-4 py-2 text-[11px] font-medium uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>
-          <span>Material</span>
-          <span className="text-right">Price</span>
-          <span className="text-right">24h</span>
-          <span className="text-right">Source</span>
-          <span className="text-right">5D</span>
-        </div>
-
-        {data.materials.map((m, i) => (
-          <MaterialRow key={m.slug} material={m} index={i} />
-        ))}
-      </div>
-
-      {/* Mobile Cards */}
-      <div className="sm:hidden space-y-0">
-        {data.materials.map((m, i) => {
-          return (
-            <Link key={m.slug} href={`/material/${m.slug}`}>
-              <div className="flex items-center gap-3 py-3 row-border animate-cascade" style={{ animationDelay: `${Math.min(i * 20, 200)}ms` }}>
-                <MaterialIcon slug={m.slug} symbol={m.icon} size={28} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-[15px] font-medium">{m.name}</div>
-                  <div className="flex gap-1 mt-0.5">
-                    {m.systems.map(s => (
-                      <span key={s} className="text-[10px]" style={{ color: 'var(--text-faint)' }}>{systemIcon(s)} {s}</span>
-                    ))}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="font-price text-[16px] font-semibold">
-                    {m.currentPrice ? formatUsd(m.currentPrice.value) : '—'}
-                  </div>
-                  <div className="text-[10px]" style={{ color: 'var(--text-faint)' }}>
-                    {m.currentPrice?.unit || ''}
-                  </div>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+      {/* Filterable Material List */}
+      <MaterialList materials={data.materials} />
     </div>
   );
 }
