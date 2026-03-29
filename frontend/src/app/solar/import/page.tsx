@@ -72,7 +72,7 @@ export default async function SolarImportPage({
       </div>
 
       {/* Scenario comparison table */}
-      <SourcingScenarioTable scenarios={data.scenarios} baselineCost={data.baseline.totalCostPerWp} />
+      <SourcingScenarioTable scenarios={data.scenarios} />
 
       {/* Waterfall for each scenario */}
       {data.scenarios.filter(s => s.scenario !== 'domestic').map(s => (

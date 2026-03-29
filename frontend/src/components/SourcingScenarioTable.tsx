@@ -4,10 +4,9 @@ import type { SolarImportScenario } from '@/lib/types';
 
 interface Props {
   scenarios: SolarImportScenario[];
-  baselineCost: number;
 }
 
-export default function SourcingScenarioTable({ scenarios, baselineCost }: Props) {
+export default function SourcingScenarioTable({ scenarios }: Props) {
   const cheapest = Math.min(...scenarios.map(s => s.totalCostPerWp));
 
   return (

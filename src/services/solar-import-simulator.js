@@ -21,7 +21,7 @@
  */
 
 import { calculateSolarCost } from './solar-model-service.js';
-import { calculateLandedCost } from './landed-cost-engine.js';
+import { calculateLandedCost, getLandedCostMeta } from './landed-cost-engine.js';
 
 const VALID_SCENARIOS = ['domestic', 'wafer_import', 'cell_import', 'module_import'];
 const SCENARIO_LABELS = {
@@ -195,7 +195,6 @@ export function calculateSolarImportComparison({ dest, source, tech, year }) {
   );
 
   // Best-driver analysis for each import scenario
-  const sourceStages = getSolarStageMap(sourceCost);
   const destStages = getSolarStageMap(destCost);
 
   for (const s of scenarios) {
@@ -234,7 +233,7 @@ export function calculateSolarImportComparison({ dest, source, tech, year }) {
     scenarios,
     model: {
       solarModelVersion: destCost.model.version,
-      tradeModelVersion: 'landed-cost-v2026.03',
+      tradeModelVersion: getLandedCostMeta().version,
     },
   };
 }
