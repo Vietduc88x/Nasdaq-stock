@@ -33,15 +33,23 @@ This is not just another market dashboard. It is a decision-support product for 
 |------|-------|---------|
 | Markets Overview | `/markets` | Trading-oriented overview of futures-linked materials, leaders/laggards, and sector context |
 
-### Phase 2
+### Phase 2 (shipped)
 
 | Page | Route | Purpose |
 |------|-------|---------|
-| BESS Cost Model | `/bess` | Battery pack model with chemistry-specific assumptions |
-| Wind Cost Model | `/wind` | Onshore/offshore turbine model with material impact views |
-| Scenario Studio | `/scenario` | Multi-material what-if simulation across systems |
+| BESS Cost Model | `/bess` | Battery pack model (LFP/NMC811), Argonne BatPaC v5.0 |
+| Wind Cost Model | `/wind` | Onshore turbine model (IRENA + NREL 2024), 5-stage |
+| Solar Country Comparison | `/solar` | Side-by-side 6-country cost comparison |
+| Solar Forecast | `/solar` | Nowcast + 30-day estimate + lead indicator |
+| Morning Brief | `/` | Daily top material movers with cross-system cost impact |
+| BESS Anatomy | `/bess/anatomy` | Interactive battery component explorer |
+| Wind Anatomy | `/wind/anatomy` | Interactive turbine component explorer |
 
-**Deliberate phase cut:** ship Solar first as the flagship modeling workflow, then expand into trading features and additional systems after the data contract, provenance layer, and UX patterns are proven.
+### Phase 3 (not started)
+
+| Page | Route | Purpose |
+|------|-------|---------|
+| Scenario Studio | `/scenario` | Multi-material what-if simulation across systems |
 
 ### User modes
 
@@ -250,34 +258,34 @@ material_impact_map
 |   |
 |   |-- services/
 |   |   |-- market-data-service.js
-|   |   |-- material-catalog-service.js
 |   |   |-- solar-model-service.js
+|   |   |-- bess-cost-engine.js
+|   |   |-- wind-cost-engine.js
+|   |   |-- forecast-service.js
+|   |   |-- brief-service.js
 |   |   |-- impact-service.js
 |   |   |-- provenance-service.js
-|   |   |-- cache-service.js
 |   |
 |   |-- data/
 |   |   |-- materials/
-|   |   |   |-- catalog.json
-|   |   |   |-- source-map.json
-|   |   |   |-- reference-prices.json
+|   |   |   |-- catalog.json             // 21 materials, 4 coverage tiers
 |   |   |-- models/
 |   |   |   |-- solar-irena-v2026.03.json
-|   |   |   |-- solar-impact-v2026.03.json
-|   |   |-- schemas/
-|   |       |-- material.schema.json
-|   |       |-- model.schema.json
-|   |
-|   |-- utils/
-|   |   |-- validators.js
-|   |   |-- units.js
-|   |   |-- logger.js
+|   |   |   |-- bess-argonne-v2024.json
+|   |   |   |-- wind-irena-v2026.json
+|   |   |-- forecast/
+|   |   |   |-- solar-lag-model.json
+|   |   |-- snapshots/                   // daily price snapshots (Morning Brief)
 |   |
 |   |-- __tests__/
 |       |-- solar-model.test.js
-|       |-- market-data-service.test.js
+|       |-- solar-compare.test.js
+|       |-- solar-compare-route.test.js
+|       |-- bess-cost-engine.test.js
+|       |-- wind-cost-engine.test.js
+|       |-- forecast-service.test.js
+|       |-- brief-service.test.js
 |       |-- impact-service.test.js
-|       |-- page-data.test.js
 |
 |-- ecosystem.config.js
 |-- package.json
@@ -332,9 +340,13 @@ Prefer a hybrid API:
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | GET | `/api/page/home` | Dashboard payload with top materials, freshness summary, and featured solar impacts |
-| GET | `/api/page/solar` | Full solar page payload for selected params |
+| GET | `/api/page/solar` | Full solar page payload with forecast for selected params |
+| GET | `/api/page/solar-compare` | Multi-country solar cost comparison (2-6 countries) |
+| GET | `/api/page/bess` | BESS cost model payload (LFP/NMC811) |
+| GET | `/api/page/wind` | Wind cost model payload (onshore) |
+| GET | `/api/page/brief` | Morning Brief: top material movers with cost impact |
 | GET | `/api/page/material/:slug` | Material detail payload with cross-system impact summary |
-| GET | `/api/page/markets` | Trading-oriented market overview with futures-linked materials and sector signals (Phase 1.5) |
+| GET | `/api/page/markets` | Trading-oriented market overview (Phase 3) |
 
 ### 8.2 Supporting Endpoints
 
@@ -730,35 +742,39 @@ Avoid `git checkout HEAD~1` as the primary rollback plan. Prefer tagged releases
 
 ## 17. Roadmap
 
-### Phase 1
+### Phase 1 (shipped)
 
-- Solar model
-- Materials dashboard
+- Solar PV cost model (IRENA, 6 countries, 2 technologies)
+- Materials dashboard (21 materials, 4 coverage tiers, filterable)
 - Provenance/freshness system
 - Page-shaped API
-- trader and investor context on material detail pages
+- Material detail pages with cross-system impact
 
-### Phase 2
+### Phase 2 (shipped)
 
-- BESS model
-- Wind model
-- Cross-system material detail page
-- markets overview page
-- tradable instrument mapping for major covered materials
+- BESS cost model (BatPaC, LFP/NMC811)
+- Wind cost model (IRENA + NREL, onshore)
+- Solar country comparison (6 countries)
+- Solar cost forecast (nowcast, 30-day, lead indicator)
+- Morning Brief (daily movers, trust-aware)
+- Anatomy pages (solar, BESS, wind)
+- 206 backend tests
 
-### Phase 3
+### Phase 3 (next)
 
+- Tariff/landed cost simulator
+- Price alerts (email/Telegram)
+- Historical cost tracker (daily snapshots foundation exists)
+- Markets overview page
 - Scenario studio
-- Shareable URLs
-- historical trend overlays
-- cross-asset correlation views
-- sector watchlists for traders and investors
 
 ### Phase 4
 
-- custom BOM overrides
-- export/report generation
-- authenticated saved scenarios
+- Technology comparison (TOPCon vs Mono vs HJT crossover)
+- Supply chain risk map
+- API access for developers
+- Export/report generation
+- Authenticated saved scenarios
 
 ---
 
@@ -778,6 +794,6 @@ If the product answers those five questions clearly, it will feel credible to op
 
 ---
 
-*Document revised: 2026-03-28*
-*Architecture version: 2.0*
-*Status: Revised after architecture review*
+*Document revised: 2026-03-29*
+*Architecture version: 2.1*
+*Status: Updated after Sprint 2 (Wind + Morning Brief shipped)*
