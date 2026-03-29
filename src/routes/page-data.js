@@ -6,8 +6,46 @@ import { buildProvenance } from '../services/provenance-service.js';
 import { calculateSolarForecast } from '../services/forecast-service.js';
 import { calculateWindCost } from '../services/wind-cost-engine.js';
 import { computeBrief } from '../services/brief-service.js';
+import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes } from '../services/landed-cost-engine.js';
 
 export function registerPageDataRoutes(app) {
+  // GET /api/page/landed-cost?from=CN&to=VN&product=module&exw=0.179
+  app.get('/api/page/landed-cost', async (request, reply) => {
+    const from = (request.query.from || '').toUpperCase();
+    const to = (request.query.to || '').toUpperCase();
+    const product = (request.query.product || 'module').toLowerCase();
+    const exw = parseFloat(request.query.exw || '0.179');
+
+    try {
+      const comparison = calculateAllRoutes(exw, product);
+
+      // If from/to provided, return selected route + comparison
+      if (from && to) {
+        const selectedRoute = calculateLandedCost({ from, to, product, exw });
+        return {
+          selectedRoute,
+          comparison,
+          routes: getAvailableRoutes(),
+        };
+      }
+
+      // No route selected — return comparison only
+      return {
+        selectedRoute: null,
+        comparison,
+        routes: getAvailableRoutes(),
+      };
+    } catch (err) {
+      if (err instanceof RangeError) {
+        reply.code(400);
+        return { error: err.message };
+      }
+      request.log.error({ err, from, to, product, exw }, 'Page landed-cost error');
+      reply.code(500);
+      return { error: 'Calculation error' };
+    }
+  });
+
   // GET /api/page/brief - Morning Brief: top material movers + cost impact
   app.get('/api/page/brief', async (request) => {
     try {

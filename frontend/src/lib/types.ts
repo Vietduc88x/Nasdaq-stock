@@ -137,6 +137,40 @@ export interface BriefData {
   meta: { liveMaterials: number; liveComparisons?: number; totalMaterials: number; snapshotDate?: string };
 }
 
+export interface LandedCostStage {
+  stage: string;
+  costPerWp: number;
+}
+
+export interface LandedCostRouteResult {
+  params: { from: string; to: string; product: string; exw: number };
+  model: {
+    version: string; asOf: string; hsCode: string;
+    source: string; confidence: string; notes: string;
+    transitDays: { min: number; max: number };
+  };
+  breakdown: {
+    exw: number; inlandFreight: number; portHandling: number; fob: number;
+    oceanFreight: number; insurance: number; cif: number;
+    customsDuty: number; antiDumping: number; countervailing: number;
+    customsClearance: number; inlandDelivery: number; ddp: number;
+  };
+  waterfall: LandedCostStage[];
+  summary: { totalAddersPerWp: number; ddpPremiumPct: number };
+}
+
+export interface LandedCostComparison {
+  from: string; to: string; label: string; confidence: string;
+  fob: number; cif: number; ddp: number; premiumPct: number;
+  transitDays: { min: number; max: number };
+}
+
+export interface LandedCostPageData {
+  selectedRoute: LandedCostRouteResult | null;
+  comparison: LandedCostComparison[];
+  routes: { from: string; to: string; label: string; confidence: string }[];
+}
+
 export interface CrossSystemImpact {
   system: string;
   component: string;

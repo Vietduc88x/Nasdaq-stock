@@ -1,0 +1,137 @@
+{
+  "version": "landed-cost-v2026.03",
+  "product": "module",
+  "hsCode": "8541.43",
+  "unit": "$/Wp",
+  "asOf": "2026-03-29",
+  "provenanceNote": "Indicative trade-cost model based on published tariff schedules, freight indices, and customs fee references. Not legal or customs advice. Rates reflect cooperating-firm scenarios where AD/CVD applies.",
+
+  "routes": [
+    {
+      "from": "CN",
+      "to": "VN",
+      "label": "China → Vietnam",
+      "asOf": "2026-03-29",
+      "source": "ACFTA tariff schedule, Freightos/Sino-Shipping freight index",
+      "confidence": "high",
+      "notes": "ACFTA preferential rate assumes valid certificate of origin. VAT (10%) excluded — reclaimable for businesses.",
+      "transitDays": { "min": 5, "max": 8 },
+      "costs": {
+        "inlandFreightPerWp": 0.0015,
+        "portHandlingPerWp": 0.0008,
+        "oceanFreightPerWp": 0.0025,
+        "insuranceRatePct": 0.3,
+        "customsDutyPct": 0,
+        "antiDumpingPct": 0,
+        "countervailingPct": 0,
+        "customsClearancePerWp": 0.0006,
+        "inlandDeliveryPerWp": 0.0012
+      }
+    },
+    {
+      "from": "CN",
+      "to": "IN",
+      "label": "China → India",
+      "asOf": "2026-03-29",
+      "source": "India Union Budget 2025, Taiyang News, Mercom India",
+      "confidence": "high",
+      "notes": "BCD 20% + AIDC 20% on modules = 40% effective duty on CIF value. ALMM restrictions may further limit usage in government projects.",
+      "transitDays": { "min": 12, "max": 18 },
+      "costs": {
+        "inlandFreightPerWp": 0.0015,
+        "portHandlingPerWp": 0.0010,
+        "oceanFreightPerWp": 0.0060,
+        "insuranceRatePct": 0.3,
+        "customsDutyPct": 40,
+        "antiDumpingPct": 0,
+        "countervailingPct": 0,
+        "customsClearancePerWp": 0.0010,
+        "inlandDeliveryPerWp": 0.0020
+      }
+    },
+    {
+      "from": "CN",
+      "to": "US",
+      "label": "China → United States",
+      "asOf": "2026-03-29",
+      "source": "USTR Section 301 list, CBP user fee schedule, Norton Rose Fulbright April 2025",
+      "confidence": "medium",
+      "notes": "Section 301 tariff (50%) + reciprocal tariff (10%) on CIF value. Section 201 expired Feb 2026. AD/CVD not applicable for direct CN origin (covered by 301). MPF 0.3464% capped at $651.50.",
+      "transitDays": { "min": 14, "max": 25 },
+      "costs": {
+        "inlandFreightPerWp": 0.0020,
+        "portHandlingPerWp": 0.0012,
+        "oceanFreightPerWp": 0.0100,
+        "insuranceRatePct": 0.3,
+        "customsDutyPct": 60,
+        "antiDumpingPct": 0,
+        "countervailingPct": 0,
+        "customsClearancePerWp": 0.0015,
+        "inlandDeliveryPerWp": 0.0025
+      }
+    },
+    {
+      "from": "CN",
+      "to": "DE",
+      "label": "China → Germany (EU)",
+      "asOf": "2026-03-29",
+      "source": "EU TARIC database, European Commission trade policy",
+      "confidence": "high",
+      "notes": "EU MFN duty 0% on HS 8541.43. No active AD/CVD on solar modules (removed 2018). VAT (19%) excluded — reclaimable for businesses.",
+      "transitDays": { "min": 25, "max": 40 },
+      "costs": {
+        "inlandFreightPerWp": 0.0020,
+        "portHandlingPerWp": 0.0012,
+        "oceanFreightPerWp": 0.0090,
+        "insuranceRatePct": 0.3,
+        "customsDutyPct": 0,
+        "antiDumpingPct": 0,
+        "countervailingPct": 0,
+        "customsClearancePerWp": 0.0010,
+        "inlandDeliveryPerWp": 0.0020
+      }
+    },
+    {
+      "from": "CN",
+      "to": "AU",
+      "label": "China → Australia",
+      "asOf": "2026-03-29",
+      "source": "ChAFTA tariff schedule, Australian Border Force",
+      "confidence": "high",
+      "notes": "ChAFTA preferential rate 0% on HS 8541.43. GST (10%) excluded — reclaimable for businesses. Customs processing fee AUD 50-200.",
+      "transitDays": { "min": 15, "max": 25 },
+      "costs": {
+        "inlandFreightPerWp": 0.0018,
+        "portHandlingPerWp": 0.0010,
+        "oceanFreightPerWp": 0.0070,
+        "insuranceRatePct": 0.3,
+        "customsDutyPct": 0,
+        "antiDumpingPct": 0,
+        "countervailingPct": 0,
+        "customsClearancePerWp": 0.0008,
+        "inlandDeliveryPerWp": 0.0018
+      }
+    },
+    {
+      "from": "VN",
+      "to": "US",
+      "label": "Vietnam → United States",
+      "asOf": "2026-03-29",
+      "source": "US Commerce Dept final AD/CVD determinations April 2025, USTR reciprocal tariff schedule",
+      "confidence": "low",
+      "notes": "Reciprocal tariff 46% + AD/CVD rates vary widely by exporter (50-271% AD, up to 543% CVD). This model uses cooperating-firm estimates (~65% combined AD+CVD). Actual rates are company-specific. Extreme uncertainty.",
+      "transitDays": { "min": 18, "max": 30 },
+      "costs": {
+        "inlandFreightPerWp": 0.0018,
+        "portHandlingPerWp": 0.0010,
+        "oceanFreightPerWp": 0.0110,
+        "insuranceRatePct": 0.3,
+        "customsDutyPct": 46,
+        "antiDumpingPct": 40,
+        "countervailingPct": 25,
+        "customsClearancePerWp": 0.0015,
+        "inlandDeliveryPerWp": 0.0025
+      }
+    }
+  ]
+}

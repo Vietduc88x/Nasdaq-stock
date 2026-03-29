@@ -279,3 +279,56 @@ describe('GET /api/page/brief — route integration', () => {
     expect(body.meta).toHaveProperty('totalMaterials');
   });
 });
+
+describe('GET /api/page/landed-cost — route integration', () => {
+  it('returns comparison for all routes when no from/to', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost?exw=0.179',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.selectedRoute).toBeNull();
+    expect(body.comparison.length).toBeGreaterThanOrEqual(6);
+    expect(body.routes.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('returns selected route + comparison when from/to provided', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost?from=CN&to=VN&exw=0.179',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.selectedRoute).not.toBeNull();
+    expect(body.selectedRoute.breakdown.ddp).toBeGreaterThan(0.179);
+    expect(body.selectedRoute.model.hsCode).toBe('8541.43');
+    expect(body.comparison.length).toBeGreaterThanOrEqual(6);
+  });
+
+  it('returns 400 for invalid route', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost?from=CN&to=BR&exw=0.179',
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('returns 400 for invalid product', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost?from=CN&to=VN&product=inverter&exw=0.179',
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('uses default EXW 0.179 when not provided', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/landed-cost',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.comparison.length).toBeGreaterThanOrEqual(6);
+  });
+});

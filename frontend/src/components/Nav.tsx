@@ -9,6 +9,7 @@ const links = [
   { href: '/solar', label: 'Solar PV' },
   { href: '/bess', label: 'BESS' },
   { href: '/wind', label: 'Wind' },
+  { href: '/landed-cost', label: 'Trade' },
 ];
 
 export default function Nav() {

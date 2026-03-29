@@ -1,4 +1,4 @@
-import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, MaterialDetailData } from './types';
+import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, LandedCostPageData, MaterialDetailData } from './types';
 
 // Server-side (build/SSR) needs absolute URL; client-side uses relative (rewrite handles it)
 const BASE = typeof window === 'undefined'
@@ -52,6 +52,20 @@ export async function fetchWindPage(
     { next: { revalidate: 60 } }
   );
   if (!res.ok) throw new Error(`Wind page fetch failed: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchLandedCostPage(
+  from?: string,
+  to?: string,
+  exw = 0.179,
+  product = 'module'
+): Promise<LandedCostPageData> {
+  const params = new URLSearchParams({ exw: String(exw), product });
+  if (from) params.set('from', from);
+  if (to) params.set('to', to);
+  const res = await fetch(`${BASE}/api/page/landed-cost?${params}`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`Landed cost fetch failed: ${res.status}`);
   return res.json();
 }
 
