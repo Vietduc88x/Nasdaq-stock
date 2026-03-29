@@ -21,3 +21,5 @@ tmpclaude-*
 
 # Old vanilla (archived)
 old-vanilla/
+src/data/snapshots/*.json
+!src/data/snapshots/.gitkeep

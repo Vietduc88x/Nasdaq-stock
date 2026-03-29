@@ -1,0 +1,73 @@
+{
+  "version": "wind-irena-v2026",
+  "source": "IRENA Renewable Power Generation Costs 2023 + NREL 2024 Cost of Wind Energy Review",
+  "provenanceNote": "Bottom-up onshore wind turbine cost model. Costs in $/kW (installed capacity). Based on 3MW reference turbine. Outputs reflect equipment + installation costs, not project finance or grid connection.",
+  "validYears": [2025, 2026, 2027, 2028, 2029, 2030],
+  "turbineTypes": ["onshore"],
+  "unit": "$/kW",
+  "referenceCapacityMW": 3,
+
+  "stages": {
+    "blade": {
+      "description": "Rotor blades — fiberglass shell, carbon fiber spar caps, epoxy resin",
+      "components": {
+        "fiberglass_shell": { "baselineCostPerKw": 60, "note": "15 kg/kW × $4/kg" },
+        "carbon_fiber_spar": { "baselineCostPerKw": 75, "note": "5 kg/kW × $15/kg" },
+        "resin_adhesive": { "baselineCostPerKw": 18, "note": "Epoxy resin + structural adhesive" },
+        "blade_mold_labor": { "baselineCostPerKw": 25, "note": "Layup labor + mold amortization" },
+        "blade_transport": { "baselineCostPerKw": 12, "note": "Specialized transport for 60m+ blades" }
+      }
+    },
+    "nacelle": {
+      "description": "Nacelle assembly — gearbox/drivetrain, generator, power electronics, housing",
+      "components": {
+        "generator_copper": { "baselineCostPerKw": 48, "note": "3.2 kg/kW copper windings" },
+        "permanent_magnets": { "baselineCostPerKw": 62.5, "note": "Nd 500g/kW + Dy 50g/kW (direct-drive)" },
+        "gearbox_bearings": { "baselineCostPerKw": 55, "note": "Planetary gearbox + main bearings" },
+        "power_electronics": { "baselineCostPerKw": 35, "note": "Converter, transformer, switchgear" },
+        "nacelle_housing": { "baselineCostPerKw": 28, "note": "2.5 kg/kW aluminum + fiberglass cover" },
+        "yaw_pitch_systems": { "baselineCostPerKw": 20, "note": "Yaw drives, pitch bearings, hydraulics" }
+      }
+    },
+    "tower": {
+      "description": "Steel tubular tower — dominant material cost",
+      "components": {
+        "tower_steel": { "baselineCostPerKw": 680, "note": "85 kg/kW × $8/kg structural steel" },
+        "tower_galvanizing": { "baselineCostPerKw": 4.5, "note": "0.8 kg/kW zinc coating" },
+        "tower_fabrication": { "baselineCostPerKw": 45, "note": "Rolling, welding, surface treatment" },
+        "tower_transport": { "baselineCostPerKw": 30, "note": "Heavy-haul transport to site" }
+      }
+    },
+    "electrical": {
+      "description": "Electrical balance of plant — cabling, switchgear, SCADA",
+      "components": {
+        "internal_cabling": { "baselineCostPerKw": 22, "note": "In-tower + nacelle wiring" },
+        "substation_share": { "baselineCostPerKw": 18, "note": "Pro-rata substation equipment" },
+        "scada_controls": { "baselineCostPerKw": 8, "note": "Supervisory control and data acquisition" }
+      }
+    },
+    "installation": {
+      "description": "Site work, foundation, crane, commissioning",
+      "components": {
+        "foundation": { "baselineCostPerKw": 65, "note": "Reinforced concrete foundation" },
+        "crane_erection": { "baselineCostPerKw": 45, "note": "Mobile crane rental + crew" },
+        "civil_works": { "baselineCostPerKw": 30, "note": "Access roads, hardstanding, drainage" },
+        "commissioning": { "baselineCostPerKw": 15, "note": "Testing, grid sync, handover" }
+      }
+    }
+  },
+
+  "technologyRoadmap": {
+    "2025": { "bladeLengthM": 65, "hubHeightM": 100, "capacityFactorPct": 35, "costReductionPct": 0 },
+    "2026": { "bladeLengthM": 68, "hubHeightM": 105, "capacityFactorPct": 36, "costReductionPct": 2 },
+    "2027": { "bladeLengthM": 70, "hubHeightM": 108, "capacityFactorPct": 36.5, "costReductionPct": 4 },
+    "2028": { "bladeLengthM": 73, "hubHeightM": 110, "capacityFactorPct": 37, "costReductionPct": 6 },
+    "2029": { "bladeLengthM": 75, "hubHeightM": 112, "capacityFactorPct": 37.5, "costReductionPct": 8 },
+    "2030": { "bladeLengthM": 78, "hubHeightM": 115, "capacityFactorPct": 38, "costReductionPct": 10 }
+  },
+
+  "benchmarks": {
+    "onshore_2025": { "totalPerKw": 1400, "note": "Bottom-up component total. IRENA global weighted average $1200/kW excludes installation/BOP; our model includes full installed cost." },
+    "onshore_2030": { "totalPerKw": 1260, "note": "10% reduction from technology roadmap improvements" }
+  }
+}

@@ -213,3 +213,69 @@ describe('GET /api/page/solar — forecast integration', () => {
     expect(body.forecast.currentModeledCost).toBe(body.model.totalCostPerWp);
   });
 });
+
+describe('GET /api/page/wind — route integration', () => {
+  it('returns 200 with valid wind data', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/wind?turbineType=onshore&year=2025',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.model.totalCostPerKw).toBeGreaterThan(1000);
+    expect(body.stageBreakdown).toHaveLength(5);
+    expect(body.materialImpacts.length).toBeGreaterThan(0);
+    expect(body.meta).toHaveProperty('freshness');
+  });
+
+  it('uses defaults when no params provided', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/wind',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.params.turbineType).toBe('onshore');
+    expect(body.params.year).toBe(2025);
+  });
+
+  it('rejects invalid turbine type', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/wind?turbineType=offshore',
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('rejects year out of range', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/wind?year=2040',
+    });
+    expect(res.statusCode).toBe(400);
+  });
+});
+
+describe('GET /api/page/brief — route integration', () => {
+  it('returns 200 with brief data', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/brief',
+    });
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body).toHaveProperty('date');
+    expect(body).toHaveProperty('movers');
+    expect(Array.isArray(body.movers)).toBe(true);
+  });
+
+  it('brief has meta with liveMaterials count', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/brief',
+    });
+    const body = res.json();
+    expect(body.meta).toHaveProperty('liveMaterials');
+    expect(body.meta).toHaveProperty('totalMaterials');
+  });
+});

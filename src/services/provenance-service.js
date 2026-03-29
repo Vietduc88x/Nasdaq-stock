@@ -1,6 +1,7 @@
 const MODEL_VERSIONS = {
   solar: 'solar-irena-v2026.03',
-  bess: 'bess-argonne-v2024'
+  bess: 'bess-argonne-v2024',
+  wind: 'wind-irena-v2026'
 };
 
 /**

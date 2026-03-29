@@ -1,9 +1,15 @@
-import type { HomePageData, SolarPageData, SolarCompareData, MaterialDetailData } from './types';
+import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, MaterialDetailData } from './types';
 
 // Server-side (build/SSR) needs absolute URL; client-side uses relative (rewrite handles it)
 const BASE = typeof window === 'undefined'
   ? (process.env.NEXT_PUBLIC_API_URL || 'https://market-api.techmadeeasy.info')
   : '';
+
+export async function fetchBrief(): Promise<BriefData> {
+  const res = await fetch(`${BASE}/api/page/brief`, { next: { revalidate: 60 } });
+  if (!res.ok) throw new Error(`Brief fetch failed: ${res.status}`);
+  return res.json();
+}
 
 export async function fetchHomePage(): Promise<HomePageData> {
   const res = await fetch(`${BASE}/api/page/home`, { next: { revalidate: 60 } });
@@ -34,6 +40,18 @@ export async function fetchSolarCompare(
     { next: { revalidate: 60 } }
   );
   if (!res.ok) throw new Error(`Solar compare fetch failed: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchWindPage(
+  turbineType = 'onshore',
+  year = 2025
+): Promise<WindPageData> {
+  const res = await fetch(
+    `${BASE}/api/page/wind?turbineType=${turbineType}&year=${year}`,
+    { next: { revalidate: 60 } }
+  );
+  if (!res.ok) throw new Error(`Wind page fetch failed: ${res.status}`);
   return res.json();
 }
 

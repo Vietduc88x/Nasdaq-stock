@@ -8,6 +8,7 @@ const links = [
   { href: '/', label: 'Materials' },
   { href: '/solar', label: 'Solar PV' },
   { href: '/bess', label: 'BESS' },
+  { href: '/wind', label: 'Wind' },
 ];
 
 export default function Nav() {

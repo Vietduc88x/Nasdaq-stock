@@ -27,6 +27,7 @@ export interface StageBreakdown {
   stage: string;
   costPerWp?: number;    // Solar: $/Wp
   costPerKwh?: number;   // BESS: $/kWh
+  costPerKw?: number;    // Wind: $/kW
   components: Record<string, number>;
 }
 
@@ -100,6 +101,39 @@ export interface HomePageData {
   materials: MaterialSummary[];
   featuredSolar: { country: string; tech: string; year: number; totalCostPerWp: number };
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
+}
+
+export interface WindPageData {
+  params: { turbineType: string; year: number };
+  model: {
+    version: string; asOf: string; totalCostPerKw: number;
+    referenceCapacityMW: number; bladeLengthM: number;
+    hubHeightM: number; capacityFactorPct: number;
+  };
+  stageBreakdown: StageBreakdown[];
+  materialImpacts: MaterialImpact[];
+  meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
+}
+
+export interface BriefMover {
+  material: string;
+  name: string;
+  priceDeltaPct: number;
+  priceToday: number;
+  priceYesterday: number;
+  priceUnit: string;
+  topImpact: { system: string; component: string; delta: number; costUnit: string; baselineCost: number };
+  allImpacts: { system: string; component: string; delta: number; costUnit: string; baselineCost: number }[];
+  coverageTier: string;
+}
+
+export interface BriefData {
+  date: string;
+  noData: boolean;
+  reason?: string;
+  movers: BriefMover[];
+  totalMovers?: number;
+  meta: { liveMaterials: number; totalMaterials: number; snapshotDate?: string };
 }
 
 export interface CrossSystemImpact {

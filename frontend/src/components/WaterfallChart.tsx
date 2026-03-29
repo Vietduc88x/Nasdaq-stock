@@ -21,8 +21,9 @@ interface Props {
 
 export default function WaterfallChart({ stages, totalCost, costUnit = '$/Wp' }: Props) {
   const isKwh = costUnit === '$/kWh';
-  const decimals = isKwh ? 1 : 4;
-  const getStageCost = (s: StageBreakdown) => s.costPerWp ?? s.costPerKwh ?? 0;
+  const isKw = costUnit === '$/kW';
+  const decimals = isKw ? 0 : isKwh ? 1 : 4;
+  const getStageCost = (s: StageBreakdown) => s.costPerWp ?? s.costPerKwh ?? s.costPerKw ?? 0;
   let cumulative = 0;
   const labels = [...stages.map(s => {
     const name = s.stage.replace(/([A-Z])/g, ' $1').trim();
@@ -105,7 +106,7 @@ export default function WaterfallChart({ stages, totalCost, costUnit = '$/Wp' }:
                 ticks: {
                   color: 'rgba(255,255,255,0.25)',
                   font: { size: 11, family: 'SF Mono, monospace' },
-                  callback: (v) => `$${(v as number).toFixed(isKwh ? 0 : 3)}`,
+                  callback: (v) => `$${(v as number).toFixed(isKw ? 0 : isKwh ? 0 : 3)}`,
                 },
                 border: { display: false },
                 min: 0,

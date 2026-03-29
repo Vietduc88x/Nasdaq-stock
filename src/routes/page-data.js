@@ -4,8 +4,20 @@ import { getSystemMaterials, getAllMaterials } from '../services/impact-service.
 import { getAllPrices, getPrice } from '../services/market-data-service.js';
 import { buildProvenance } from '../services/provenance-service.js';
 import { calculateSolarForecast } from '../services/forecast-service.js';
+import { calculateWindCost } from '../services/wind-cost-engine.js';
+import { computeBrief } from '../services/brief-service.js';
 
 export function registerPageDataRoutes(app) {
+  // GET /api/page/brief - Morning Brief: top material movers + cost impact
+  app.get('/api/page/brief', async (request) => {
+    try {
+      return await computeBrief();
+    } catch (err) {
+      request.log.error({ err }, 'Page brief error');
+      return { date: new Date().toISOString().slice(0, 10), noData: true, reason: 'error', movers: [], meta: {} };
+    }
+  });
+
   // GET /api/page/home - Dashboard page payload
   app.get('/api/page/home', async () => {
     const materials = getAllMaterials();
@@ -276,6 +288,72 @@ export function registerPageDataRoutes(app) {
       };
     } catch (err) {
       request.log.error({ err, chemistry, year }, 'Page BESS error');
+      reply.code(500);
+      return { error: 'Calculation error' };
+    }
+  });
+
+  // GET /api/page/wind?turbineType=onshore&year=2025
+  app.get('/api/page/wind', async (request, reply) => {
+    const turbineType = (request.query.turbineType || 'onshore').toLowerCase();
+    const year = parseInt(request.query.year || '2025', 10);
+
+    const VALID_TYPES = ['onshore'];
+    if (!VALID_TYPES.includes(turbineType) || year < 2025 || year > 2030) {
+      reply.code(400);
+      return { error: 'Invalid parameters. turbineType: onshore, year: 2025-2030' };
+    }
+
+    try {
+      const cost = calculateWindCost(turbineType, year);
+      const windMaterials = getSystemMaterials('wind');
+
+      let liveCoverage = 0;
+      let referenceCoverage = 0;
+      const fallbacksUsed = [];
+
+      const materialImpacts = await Promise.all(
+        windMaterials.map(async (m) => {
+          const price = await getPrice(m.slug);
+          if (price?.coverageTier === 'live_exchange' && !price?.fallbackUsed) {
+            liveCoverage++;
+          } else {
+            referenceCoverage++;
+            if (price?.fallbackUsed) fallbacksUsed.push(m.slug);
+          }
+
+          return {
+            material: m.slug,
+            name: m.name,
+            icon: m.icon,
+            coverageTier: price?.coverageTier || m.coverageTier,
+            priceSource: price?.source || 'reference',
+            asOf: price?.asOf || null,
+            currentPrice: price ? { value: price.value, unit: price.unit } : null,
+            baselineCost: m.baselineCost,
+            costUnit: m.costUnit,
+            component: m.component,
+          };
+        })
+      );
+
+      return {
+        params: { turbineType, year },
+        model: {
+          version: cost.model.version,
+          asOf: new Date().toISOString(),
+          totalCostPerKw: cost.totalCostPerKw,
+          referenceCapacityMW: cost.model.referenceCapacityMW,
+          bladeLengthM: cost.model.bladeLengthM,
+          hubHeightM: cost.model.hubHeightM,
+          capacityFactorPct: cost.model.capacityFactorPct,
+        },
+        stageBreakdown: cost.stageBreakdown,
+        materialImpacts,
+        meta: buildProvenance('wind', { liveCoverage, referenceCoverage, fallbacksUsed }),
+      };
+    } catch (err) {
+      request.log.error({ err, turbineType, year }, 'Page wind error');
       reply.code(500);
       return { error: 'Calculation error' };
     }

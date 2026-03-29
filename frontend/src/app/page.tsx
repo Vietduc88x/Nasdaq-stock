@@ -1,14 +1,15 @@
-import { fetchHomePage } from '@/lib/api';
+import { fetchHomePage, fetchBrief } from '@/lib/api';
 import { formatUsd, systemIcon } from '@/lib/formatters';
 import Link from 'next/link';
 import MaterialRow from '@/components/MaterialRow';
 import MaterialIcon from '@/components/MaterialIcon';
 import MaterialFilters from '@/components/MaterialFilters';
+import MorningBriefCard from '@/components/MorningBriefCard';
 
 export const revalidate = 60;
 
 export default async function HomePage() {
-  const data = await fetchHomePage();
+  const [data, brief] = await Promise.all([fetchHomePage(), fetchBrief()]);
   const livePct = data.meta.liveCoveragePct;
   const totalMaterials = data.materials.length;
 
@@ -41,6 +42,9 @@ export default async function HomePage() {
           </div>
         </Link>
       </div>
+
+      {/* Morning Brief */}
+      <MorningBriefCard brief={brief} />
 
       {/* Filters */}
       <MaterialFilters />

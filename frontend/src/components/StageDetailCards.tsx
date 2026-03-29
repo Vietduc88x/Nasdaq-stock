@@ -7,6 +7,8 @@ const DEFAULT_COLORS: Record<string, string> = {
   polysilicon: '#34C759', wafer: '#3B82F6', cell: '#FBBF24', module: '#A855F7',
   // BESS
   cathode: '#ef4444', anode: '#f59e0b', cellComponents: '#3b82f6', cellAssembly: '#8b5cf6', pack: '#22c55e',
+  // Wind
+  blade: '#34C759', nacelle: '#3B82F6', tower: '#FBBF24', electrical: '#A855F7', installation: '#ec4899',
 };
 
 interface Props {
@@ -16,7 +18,7 @@ interface Props {
 }
 
 function getStageCost(stage: StageBreakdown): number {
-  return stage.costPerWp ?? stage.costPerKwh ?? 0;
+  return stage.costPerWp ?? stage.costPerKwh ?? stage.costPerKw ?? 0;
 }
 
 export default function StageDetailCards({ stages, totalCost, costUnit = '$/Wp' }: Props) {
@@ -36,7 +38,7 @@ export default function StageDetailCards({ stages, totalCost, costUnit = '$/Wp' 
               </span>
             </div>
             <div className="font-price text-[17px] font-bold mb-3">
-              ${cost.toFixed(costUnit === '$/kWh' ? 1 : 4)}
+              ${cost.toFixed(costUnit === '$/Wp' ? 4 : 1)}
             </div>
             <div className="space-y-1.5">
               {Object.entries(stage.components)
@@ -49,7 +51,7 @@ export default function StageDetailCards({ stages, totalCost, costUnit = '$/Wp' 
                     <div key={name}>
                       <div className="flex justify-between text-[10px] mb-0.5">
                         <span style={{ color: 'var(--text-muted)' }} className="capitalize">{name.replace(/([A-Z])/g, ' $1').trim()}</span>
-                        <span className="font-price" style={{ color: 'var(--text-tertiary)' }}>${value.toFixed(costUnit === '$/kWh' ? 1 : 4)}</span>
+                        <span className="font-price" style={{ color: 'var(--text-tertiary)' }}>${value.toFixed(costUnit === '$/Wp' ? 4 : 1)}</span>
                       </div>
                       <div className="w-full h-1 rounded-full" style={{ background: 'rgba(255,255,255,0.04)' }}>
                         <div className="h-1 rounded-full" style={{ width: `${Math.min(barPct, 100)}%`, background: `${color}60` }} />
