@@ -48,6 +48,20 @@ Each model provides:
 - Stacked horizontal bars showing stage breakdown per country
 - Delta vs cheapest (absolute and percentage)
 
+### Landed Cost Simulator
+
+- EXW → FOB → CIF → DDP calculation across 6 trade routes
+- Real tariff rates: Section 301 (US), BCD+AIDC (India), ACFTA (Vietnam), ChAFTA (Australia), EU MFN
+- Product-specific HS codes and duties for modules (8541.43), cells (8541.42), wafers (8541.49)
+- Route comparison table sorted by DDP, with confidence indicators and transit times
+
+### Solar Import Stage Simulator
+
+- Compare 4 sourcing strategies: full domestic, import wafers, import cells, import modules
+- Combines IRENA manufacturing costs with landed-cost trade adders
+- Best-driver analysis: manufacturing advantage vs tariff/freight burden
+- Stage breakdown waterfalls per scenario with trade adder decomposition
+
 ### Anatomy Pages
 
 Interactive educational pages for each technology:
@@ -64,7 +78,7 @@ Interactive educational pages for each technology:
 | Hosting | Vercel (frontend), DigitalOcean droplet (API) |
 | Process Manager | PM2 |
 | Reverse Proxy | nginx with SSL (Certbot) |
-| Testing | Vitest (206 tests) |
+| Testing | Vitest (294 tests) |
 
 ## Architecture
 
@@ -77,6 +91,8 @@ Browser --> Next.js (Vercel) <-- rewrites --> Fastify API (Droplet)
                                           |-- wind-cost-engine
                                           |-- forecast-service
                                           |-- brief-service
+                                          |-- landed-cost-engine
+                                          |-- solar-import-simulator
                                           |-- impact-service
                                           |-- market-data-service
                                           |-- provenance-service
@@ -87,6 +103,7 @@ Browser --> Next.js (Vercel) <-- rewrites --> Fastify API (Droplet)
                                           |-- models/bess-argonne-v2024.json
                                           |-- models/wind-irena-v2026.json
                                           |-- forecast/solar-lag-model.json
+                                          |-- trade/landed-cost-v2026.json
                                           |-- snapshots/ (daily price snapshots)
 ```
 
@@ -102,6 +119,8 @@ Page-shaped API design: one fetch per page, backend owns aggregation. See [ARCHI
 | GET | `/api/page/bess` | BESS cost model |
 | GET | `/api/page/wind` | Wind cost model |
 | GET | `/api/page/brief` | Morning Brief with top movers |
+| GET | `/api/page/landed-cost` | Landed cost simulator (EXW → DDP) |
+| GET | `/api/page/solar-import` | Solar import stage simulator |
 | GET | `/api/page/material/:slug` | Material detail with cross-system impact |
 
 ## Development
@@ -110,7 +129,7 @@ Page-shaped API design: one fetch per page, backend owns aggregation. See [ARCHI
 # Backend
 cd C:\Market_Techmade
 npm install
-npx vitest run          # 206 tests
+npx vitest run          # 294 tests
 
 # Frontend
 cd frontend

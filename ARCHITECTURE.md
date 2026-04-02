@@ -263,6 +263,8 @@ material_impact_map
 |   |   |-- wind-cost-engine.js
 |   |   |-- forecast-service.js
 |   |   |-- brief-service.js
+|   |   |-- landed-cost-engine.js
+|   |   |-- solar-import-simulator.js
 |   |   |-- impact-service.js
 |   |   |-- provenance-service.js
 |   |
@@ -275,6 +277,8 @@ material_impact_map
 |   |   |   |-- wind-irena-v2026.json
 |   |   |-- forecast/
 |   |   |   |-- solar-lag-model.json
+|   |   |-- trade/
+|   |   |   |-- landed-cost-v2026.json   // 6 routes, 3 products (module/cell/wafer)
 |   |   |-- snapshots/                   // daily price snapshots (Morning Brief)
 |   |
 |   |-- __tests__/
@@ -285,6 +289,8 @@ material_impact_map
 |       |-- wind-cost-engine.test.js
 |       |-- forecast-service.test.js
 |       |-- brief-service.test.js
+|       |-- landed-cost-engine.test.js
+|       |-- solar-import-simulator.test.js
 |       |-- impact-service.test.js
 |
 |-- ecosystem.config.js
@@ -345,6 +351,8 @@ Prefer a hybrid API:
 | GET | `/api/page/bess` | BESS cost model payload (LFP/NMC811) |
 | GET | `/api/page/wind` | Wind cost model payload (onshore) |
 | GET | `/api/page/brief` | Morning Brief: top material movers with cost impact |
+| GET | `/api/page/landed-cost` | Landed cost simulator: EXW → FOB → CIF → DDP across 6 routes |
+| GET | `/api/page/solar-import` | Solar import stage simulator: 4 sourcing strategies |
 | GET | `/api/page/material/:slug` | Material detail payload with cross-system impact summary |
 | GET | `/api/page/markets` | Trading-oriented market overview (Phase 3) |
 
@@ -758,11 +766,12 @@ Avoid `git checkout HEAD~1` as the primary rollback plan. Prefer tagged releases
 - Solar cost forecast (nowcast, 30-day, lead indicator)
 - Morning Brief (daily movers, trust-aware)
 - Anatomy pages (solar, BESS, wind)
-- 206 backend tests
+- Landed cost simulator (6 routes, EXW→DDP, multi-product)
+- Solar import stage simulator (4 sourcing strategies, CN→VN)
+- 294 backend tests
 
 ### Phase 3 (next)
 
-- Tariff/landed cost simulator
 - Price alerts (email/Telegram)
 - Historical cost tracker (daily snapshots foundation exists)
 - Markets overview page
@@ -794,6 +803,6 @@ If the product answers those five questions clearly, it will feel credible to op
 
 ---
 
-*Document revised: 2026-03-29*
-*Architecture version: 2.1*
-*Status: Updated after Sprint 2 (Wind + Morning Brief shipped)*
+*Document revised: 2026-04-02*
+*Architecture version: 2.2*
+*Status: Updated after Landed Cost Simulator + Solar Import Stage Simulator shipped*
