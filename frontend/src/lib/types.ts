@@ -207,6 +207,8 @@ export interface SolarImportPageData {
   scenarios: SolarImportScenario[];
   ranking: { cheapestScenario: string; previousCheapestScenario: string; rankingChanged: boolean };
   model: { solarModelVersion: string; tradeModelVersion: string };
+  regime: PolicyRegime;
+  regimes: PolicyRegime[];
 }
 
 export interface CrossSystemImpact {

@@ -14,11 +14,10 @@ const SCENARIO_LABELS: Record<string, string> = {
   module_import: 'Import Modules',
 };
 
-const REGIMES = [
-  { id: 'current', label: 'Current Policy', description: 'Published rates as of March 2026' },
-  { id: 'us_relief_case', label: 'US Tariff Relief', description: 'Hypothetical tariff reduction' },
-  { id: 'escalation_case', label: 'Trade Escalation', description: 'Hypothetical tariff increase' },
-];
+const COUNTRY_LABELS: Record<string, string> = {
+  CN: 'China', VN: 'Vietnam', US: 'United States',
+  IN: 'India', DE: 'Germany', AU: 'Australia',
+};
 
 export default async function SolarImportPage({
   searchParams,
@@ -33,10 +32,13 @@ export default async function SolarImportPage({
 
   const data = await fetchSolarImportPage(dest, source, tech, year, regime);
 
-  // Find the cheapest import scenario
   const cheapest = data.scenarios.reduce((min, s) =>
     s.totalCostPerWp < min.totalCostPerWp ? s : min
   );
+
+  const sourceName = COUNTRY_LABELS[source] || source;
+  const destName = COUNTRY_LABELS[dest] || dest;
+  const routeLabel = `${source}→${dest}`;
 
   return (
     <div className="space-y-6">
@@ -50,7 +52,7 @@ export default async function SolarImportPage({
         </Link>
         <h1 className="text-[22px] font-semibold tracking-tight">Solar Import Stage Simulator</h1>
         <p className="text-[13px] mt-1 max-w-2xl" style={{ color: 'var(--text-tertiary)' }}>
-          Compare sourcing strategies: full domestic manufacturing vs importing wafers, cells, or finished modules from China to Vietnam.
+          Compare sourcing strategies: full domestic manufacturing in {destName} vs importing wafers, cells, or finished modules from {sourceName}.
           Based on IRENA cost model + real tariff/freight data.
         </p>
       </div>
@@ -61,20 +63,20 @@ export default async function SolarImportPage({
         borderLeft: '3px solid #fbbf24',
         color: 'var(--text-muted)'
       }}>
-        Indicative model combining IRENA manufacturing costs with published tariff schedules.
-        Not legal or customs advice. Trade adders based on ACFTA preferential rates (CN→VN).
+        Indicative model combining IRENA manufacturing costs with published tariff schedules for {routeLabel}.
+        Not legal or customs advice. Regime: {data.regime?.label || 'Current Policy'}.
       </div>
 
       {/* Controls */}
       <SolarImportControls currentTech={tech} currentYear={year} />
 
-      {/* Policy regime */}
+      {/* Route presets + Policy regime */}
       <PolicyRegimeControls
-        regimes={REGIMES}
+        regimes={data.regimes || []}
         currentRegime={regime}
         currentFrom={source}
         currentTo={dest}
-        showRoutePresets={false}
+        showRoutePresets={true}
         routeParamNames={{ from: 'source', to: 'dest' }}
       />
 
@@ -84,14 +86,14 @@ export default async function SolarImportPage({
           background: 'rgba(96,165,250,0.08)',
           border: '1px solid rgba(96,165,250,0.15)',
         }}>
-          <span className="text-[16px]">⚠️</span>
+          <span className="text-[16px]">&#9888;&#65039;</span>
           <div>
             <div className="text-[13px] font-medium" style={{ color: 'var(--text-primary)' }}>
               Best strategy changed under this policy scenario
             </div>
             <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
               From <strong>{SCENARIO_LABELS[data.ranking.previousCheapestScenario] || data.ranking.previousCheapestScenario}</strong>
-              {' → '}
+              {' \u2192 '}
               <strong style={{ color: 'var(--up)' }}>{SCENARIO_LABELS[data.ranking.cheapestScenario] || data.ranking.cheapestScenario}</strong>
             </div>
           </div>
@@ -155,13 +157,14 @@ export default async function SolarImportPage({
           <div>
             <div className="font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Manufacturing Model</div>
             <div>Source: {data.model.solarModelVersion}</div>
-            <div>Destination: Vietnam ({tech.toUpperCase()}, {year})</div>
-            <div>Source country: China</div>
+            <div>Destination: {destName} ({tech.toUpperCase()}, {year})</div>
+            <div>Source country: {sourceName}</div>
           </div>
           <div>
             <div className="font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Trade Model</div>
             <div>Source: {data.model.tradeModelVersion}</div>
-            <div>Route: CN → VN (ACFTA, 0% duty)</div>
+            <div>Route: {routeLabel}</div>
+            <div>Regime: {data.regime?.label || 'Current Policy'}</div>
             <div>HS Codes: 8541.43 (module), 8541.42 (cell), 8541.49 (wafer)</div>
           </div>
         </div>

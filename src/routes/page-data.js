@@ -35,7 +35,10 @@ export function registerPageDataRoutes(app) {
     }
 
     try {
-      return calculateSolarImportComparison({ dest, source, tech, year, regime });
+      const result = calculateSolarImportComparison({ dest, source, tech, year, regime });
+      const regimes = getAvailableRegimes();
+      const activeRegime = regimes.find(r => r.id === regime) || regimes[0];
+      return { ...result, regime: activeRegime, regimes };
     } catch (err) {
       if (err instanceof RangeError) {
         reply.code(400);
