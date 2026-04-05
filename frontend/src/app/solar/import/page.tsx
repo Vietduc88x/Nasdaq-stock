@@ -2,19 +2,36 @@ import { fetchSolarImportPage } from '@/lib/api';
 import Link from 'next/link';
 import SolarImportControls from '@/components/SolarImportControls';
 import SourcingScenarioTable from '@/components/SourcingScenarioTable';
+import PolicyRegimeControls from '@/components/PolicyRegimeControls';
 import WaterfallChart from '@/components/WaterfallChart';
 
 export const revalidate = 60;
 
+const SCENARIO_LABELS: Record<string, string> = {
+  domestic: 'Full Domestic',
+  wafer_import: 'Import Wafers',
+  cell_import: 'Import Cells',
+  module_import: 'Import Modules',
+};
+
+const REGIMES = [
+  { id: 'current', label: 'Current Policy', description: 'Published rates as of March 2026' },
+  { id: 'us_relief_case', label: 'US Tariff Relief', description: 'Hypothetical tariff reduction' },
+  { id: 'escalation_case', label: 'Trade Escalation', description: 'Hypothetical tariff increase' },
+];
+
 export default async function SolarImportPage({
   searchParams,
 }: {
-  searchParams: { tech?: string; year?: string };
+  searchParams: { tech?: string; year?: string; regime?: string; source?: string; dest?: string };
 }) {
   const tech = searchParams.tech?.toLowerCase() || 'topcon';
   const year = parseInt(searchParams.year || '2025', 10);
+  const regime = searchParams.regime || 'current';
+  const source = searchParams.source?.toUpperCase() || 'CN';
+  const dest = searchParams.dest?.toUpperCase() || 'VN';
 
-  const data = await fetchSolarImportPage('VN', 'CN', tech, year);
+  const data = await fetchSolarImportPage(dest, source, tech, year, regime);
 
   // Find the cheapest import scenario
   const cheapest = data.scenarios.reduce((min, s) =>
@@ -50,6 +67,36 @@ export default async function SolarImportPage({
 
       {/* Controls */}
       <SolarImportControls currentTech={tech} currentYear={year} />
+
+      {/* Policy regime */}
+      <PolicyRegimeControls
+        regimes={REGIMES}
+        currentRegime={regime}
+        currentFrom={source}
+        currentTo={dest}
+        showRoutePresets={false}
+        routeParamNames={{ from: 'source', to: 'dest' }}
+      />
+
+      {/* Ranking change notice */}
+      {data.ranking?.rankingChanged && (
+        <div className="p-3 rounded-lg flex items-center gap-3" style={{
+          background: 'rgba(96,165,250,0.08)',
+          border: '1px solid rgba(96,165,250,0.15)',
+        }}>
+          <span className="text-[16px]">⚠️</span>
+          <div>
+            <div className="text-[13px] font-medium" style={{ color: 'var(--text-primary)' }}>
+              Best strategy changed under this policy scenario
+            </div>
+            <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+              From <strong>{SCENARIO_LABELS[data.ranking.previousCheapestScenario] || data.ranking.previousCheapestScenario}</strong>
+              {' → '}
+              <strong style={{ color: 'var(--up)' }}>{SCENARIO_LABELS[data.ranking.cheapestScenario] || data.ranking.cheapestScenario}</strong>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Headline result */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">

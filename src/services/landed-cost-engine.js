@@ -27,10 +27,38 @@ const tradeData = JSON.parse(
   readFileSync(join(__dirname, '../data/trade/landed-cost-v2026.json'), 'utf-8')
 );
 
+const policyData = JSON.parse(
+  readFileSync(join(__dirname, '../data/trade/policy-scenarios-v2026.json'), 'utf-8')
+);
+
 const MODEL_VERSION = tradeData.version;
 
 function round5(n) { return Math.round(n * 100000) / 100000; }
 function round4(n) { return Math.round(n * 10000) / 10000; }
+
+/**
+ * Get available policy regimes.
+ */
+export function getAvailableRegimes() {
+  return policyData.regimes.map(r => ({ id: r.id, label: r.label, description: r.description }));
+}
+
+/**
+ * Apply regime overrides to a product's tariff data.
+ * Returns a new object with overridden duty rates merged over the base.
+ */
+function applyRegimeOverrides(productData, from, to, product, regimeId) {
+  if (!regimeId || regimeId === 'current') return productData;
+
+  const regime = policyData.regimes.find(r => r.id === regimeId);
+  if (!regime) throw new RangeError(`Unknown regime: ${regimeId}. Valid: ${policyData.regimes.map(r => r.id).join(', ')}`);
+
+  const routeKey = `${from}->${to}`;
+  const routeOverrides = regime.overrides[routeKey];
+  if (!routeOverrides || !routeOverrides[product]) return productData;
+
+  return { ...productData, ...routeOverrides[product] };
+}
 
 /**
  * Get all available routes.
@@ -57,7 +85,7 @@ function findRoute(from, to) {
  * @param {{ from: string, to: string, product?: string, exw: number }} params
  * @returns {object} Full breakdown with FOB, CIF, DDP stages
  */
-export function calculateLandedCost({ from, to, product = 'module', exw }) {
+export function calculateLandedCost({ from, to, product = 'module', exw, regime = 'current' }) {
   const validProducts = tradeData.supportedProducts || ['module'];
   if (!validProducts.includes(product)) {
     throw new RangeError(`Unsupported product: ${product}. Valid: ${validProducts.join(', ')}`);
@@ -75,11 +103,12 @@ export function calculateLandedCost({ from, to, product = 'module', exw }) {
     throw new RangeError(`Unsupported route: ${from}→${to}. Valid routes: ${valid}`);
   }
 
-  // Product-specific tariff data
-  const productData = route.products?.[product];
-  if (!productData) {
+  // Product-specific tariff data with regime overrides
+  const baseProductData = route.products?.[product];
+  if (!baseProductData) {
     throw new RangeError(`Product '${product}' not configured for route ${from}→${to}`);
   }
+  const productData = applyRegimeOverrides(baseProductData, from, to, product, regime);
 
   // Shared logistics costs + product-specific duties
   const sc = route.sharedCosts || route.costs;
@@ -140,7 +169,7 @@ export function calculateLandedCost({ from, to, product = 'module', exw }) {
   ].filter(s => s.costPerWp > 0);
 
   return {
-    params: { from, to, product, exw },
+    params: { from, to, product, exw, regime },
     model: {
       version: MODEL_VERSION,
       asOf: route.asOf,
@@ -176,11 +205,11 @@ export function calculateLandedCost({ from, to, product = 'module', exw }) {
 /**
  * Calculate landed cost for all routes (comparison mode).
  */
-export function calculateAllRoutes(exw, product = 'module') {
+export function calculateAllRoutes(exw, product = 'module', regime = 'current') {
   const results = [];
   for (const route of tradeData.routes) {
     try {
-      const result = calculateLandedCost({ from: route.from, to: route.to, product, exw });
+      const result = calculateLandedCost({ from: route.from, to: route.to, product, exw, regime });
       results.push({
         from: route.from,
         to: route.to,
@@ -211,5 +240,6 @@ export function getLandedCostMeta() {
     asOf: tradeData.asOf,
     routeCount: tradeData.routes.length,
     provenanceNote: tradeData.provenanceNote,
+    regimes: getAvailableRegimes(),
   };
 }

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getLandedCostMeta } from '../services/landed-cost-engine.js';
+import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getAvailableRegimes, getLandedCostMeta } from '../services/landed-cost-engine.js';
 
 describe('Landed Cost Engine', () => {
   describe('Model metadata', () => {
@@ -174,6 +174,65 @@ describe('Landed Cost Engine', () => {
         expect(r).toHaveProperty('premiumPct');
         expect(r).toHaveProperty('transitDays');
       }
+    });
+  });
+
+  describe('Policy regime support', () => {
+    it('lists available regimes', () => {
+      const regimes = getAvailableRegimes();
+      expect(regimes.length).toBeGreaterThanOrEqual(3);
+      expect(regimes.find(r => r.id === 'current')).toBeDefined();
+      expect(regimes.find(r => r.id === 'us_relief_case')).toBeDefined();
+      expect(regimes.find(r => r.id === 'escalation_case')).toBeDefined();
+    });
+
+    it('current regime matches default (no regime) exactly', () => {
+      const withoutRegime = calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179 });
+      const withRegime = calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179, regime: 'current' });
+      expect(withoutRegime.breakdown.ddp).toBe(withRegime.breakdown.ddp);
+    });
+
+    it('us_relief_case lowers CN→US DDP vs current', () => {
+      const current = calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179, regime: 'current' });
+      const relief = calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179, regime: 'us_relief_case' });
+      expect(relief.breakdown.ddp).toBeLessThan(current.breakdown.ddp);
+    });
+
+    it('escalation_case raises CN→US DDP vs current', () => {
+      const current = calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179, regime: 'current' });
+      const escalation = calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179, regime: 'escalation_case' });
+      expect(escalation.breakdown.ddp).toBeGreaterThan(current.breakdown.ddp);
+    });
+
+    it('unaffected routes unchanged under route-specific override', () => {
+      const currentVN = calculateLandedCost({ from: 'CN', to: 'VN', exw: 0.179, regime: 'current' });
+      const reliefVN = calculateLandedCost({ from: 'CN', to: 'VN', exw: 0.179, regime: 'us_relief_case' });
+      // us_relief_case only overrides CN→US and VN→US, not CN→VN
+      expect(currentVN.breakdown.ddp).toBe(reliefVN.breakdown.ddp);
+    });
+
+    it('regime is included in params', () => {
+      const result = calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179, regime: 'escalation_case' });
+      expect(result.params.regime).toBe('escalation_case');
+    });
+
+    it('rejects invalid regime', () => {
+      expect(() => calculateLandedCost({ from: 'CN', to: 'US', exw: 0.179, regime: 'fantasy' })).toThrow(RangeError);
+    });
+
+    it('comparison mode works with regime', () => {
+      const current = calculateAllRoutes(0.179, 'module', 'current');
+      const escalation = calculateAllRoutes(0.179, 'module', 'escalation_case');
+      // CN→US should be more expensive under escalation
+      const currentUS = current.find(r => r.from === 'CN' && r.to === 'US');
+      const escalationUS = escalation.find(r => r.from === 'CN' && r.to === 'US');
+      expect(escalationUS.ddp).toBeGreaterThan(currentUS.ddp);
+    });
+
+    it('meta includes regimes', () => {
+      const meta = getLandedCostMeta();
+      expect(meta.regimes).toBeDefined();
+      expect(meta.regimes.length).toBeGreaterThanOrEqual(3);
     });
   });
 });

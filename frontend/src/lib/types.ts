@@ -165,10 +165,19 @@ export interface LandedCostComparison {
   transitDays: { min: number; max: number };
 }
 
+export interface PolicyRegime {
+  id: string;
+  label: string;
+  description: string;
+}
+
 export interface LandedCostPageData {
   selectedRoute: LandedCostRouteResult | null;
   comparison: LandedCostComparison[];
   routes: { from: string; to: string; label: string; confidence: string }[];
+  regime: PolicyRegime;
+  regimes: PolicyRegime[];
+  deltaVsBaseline: { ddpAbs: number; ddpPct: number } | null;
 }
 
 export interface SolarImportTradeAdders {
@@ -193,9 +202,10 @@ export interface SolarImportScenario {
 }
 
 export interface SolarImportPageData {
-  params: { dest: string; source: string; tech: string; year: number };
+  params: { dest: string; source: string; tech: string; year: number; regime: string };
   baseline: { scenario: string; totalCostPerWp: number };
   scenarios: SolarImportScenario[];
+  ranking: { cheapestScenario: string; previousCheapestScenario: string; rankingChanged: boolean };
   model: { solarModelVersion: string; tradeModelVersion: string };
 }
 

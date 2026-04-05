@@ -184,4 +184,43 @@ describe('Solar Import Simulator', () => {
       expect(result.stageBreakdown).toHaveLength(1);
     });
   });
+
+  describe('Policy regime support', () => {
+    it('current regime matches default exactly', () => {
+      const withoutRegime = calculateSolarImportComparison({ dest: DEST, source: SOURCE, tech: TECH, year: YEAR });
+      const withRegime = calculateSolarImportComparison({ dest: DEST, source: SOURCE, tech: TECH, year: YEAR, regime: 'current' });
+      for (let i = 0; i < withoutRegime.scenarios.length; i++) {
+        expect(withoutRegime.scenarios[i].totalCostPerWp).toBe(withRegime.scenarios[i].totalCostPerWp);
+      }
+    });
+
+    it('params include regime', () => {
+      const result = calculateSolarImportComparison({ dest: DEST, source: SOURCE, tech: TECH, year: YEAR, regime: 'escalation_case' });
+      expect(result.params.regime).toBe('escalation_case');
+    });
+
+    it('ranking includes cheapestScenario and rankingChanged', () => {
+      const result = calculateSolarImportComparison({ dest: DEST, source: SOURCE, tech: TECH, year: YEAR, regime: 'current' });
+      expect(result.ranking).toHaveProperty('cheapestScenario');
+      expect(result.ranking).toHaveProperty('previousCheapestScenario');
+      expect(result.ranking).toHaveProperty('rankingChanged');
+      expect(result.ranking.rankingChanged).toBe(false);
+    });
+
+    it('domestic scenario unaffected by regime (no trade component)', () => {
+      const current = calculateSolarImportScenario({ dest: DEST, source: SOURCE, tech: TECH, year: YEAR, scenario: 'domestic', regime: 'current' });
+      const escalation = calculateSolarImportScenario({ dest: DEST, source: SOURCE, tech: TECH, year: YEAR, scenario: 'domestic', regime: 'escalation_case' });
+      expect(current.totalCostPerWp).toBe(escalation.totalCostPerWp);
+    });
+
+    it('CN→US route: escalation raises import scenario costs', () => {
+      // Use US as dest to test tariff impact on import scenarios
+      const current = calculateSolarImportComparison({ dest: 'US', source: 'CN', tech: TECH, year: YEAR, regime: 'current' });
+      const escalation = calculateSolarImportComparison({ dest: 'US', source: 'CN', tech: TECH, year: YEAR, regime: 'escalation_case' });
+
+      const currentModule = current.scenarios.find(s => s.scenario === 'module_import');
+      const escalationModule = escalation.scenarios.find(s => s.scenario === 'module_import');
+      expect(escalationModule.totalCostPerWp).toBeGreaterThan(currentModule.totalCostPerWp);
+    });
+  });
 });

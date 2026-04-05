@@ -59,10 +59,11 @@ export async function fetchSolarImportPage(
   dest = 'VN',
   source = 'CN',
   tech = 'topcon',
-  year = 2025
+  year = 2025,
+  regime = 'current'
 ): Promise<SolarImportPageData> {
   const res = await fetch(
-    `${BASE}/api/page/solar-import?dest=${dest}&source=${source}&tech=${tech}&year=${year}`,
+    `${BASE}/api/page/solar-import?dest=${dest}&source=${source}&tech=${tech}&year=${year}&regime=${regime}`,
     { next: { revalidate: 60 } }
   );
   if (!res.ok) throw new Error(`Solar import fetch failed: ${res.status}`);
@@ -73,9 +74,10 @@ export async function fetchLandedCostPage(
   from?: string,
   to?: string,
   exw = 0.179,
-  product = 'module'
+  product = 'module',
+  regime = 'current'
 ): Promise<LandedCostPageData> {
-  const params = new URLSearchParams({ exw: String(exw), product });
+  const params = new URLSearchParams({ exw: String(exw), product, regime });
   if (from) params.set('from', from);
   if (to) params.set('to', to);
   const res = await fetch(`${BASE}/api/page/landed-cost?${params}`, { next: { revalidate: 60 } });

@@ -1,0 +1,53 @@
+{
+  "version": "policy-scenarios-v2026.04",
+  "asOf": "2026-04-05",
+  "provenanceNote": "Hypothetical policy scenarios for what-if analysis. Not predictions. Current regime reflects published rates as of March 2026.",
+
+  "regimes": [
+    {
+      "id": "current",
+      "label": "Current Policy (2026)",
+      "description": "Published tariff schedules as of March 2026. Section 301 + reciprocal tariffs active.",
+      "overrides": {}
+    },
+    {
+      "id": "us_relief_case",
+      "label": "US Tariff Relief",
+      "description": "Hypothetical scenario: Section 301 reduced to 25%, reciprocal tariffs halved, AD/CVD reduced for cooperating firms.",
+      "overrides": {
+        "CN->US": {
+          "module": { "customsDutyPct": 35 },
+          "cell": { "customsDutyPct": 35 },
+          "wafer": { "customsDutyPct": 25 }
+        },
+        "VN->US": {
+          "module": { "customsDutyPct": 23, "antiDumpingPct": 20, "countervailingPct": 10 },
+          "cell": { "customsDutyPct": 23, "antiDumpingPct": 20, "countervailingPct": 10 },
+          "wafer": { "customsDutyPct": 23 }
+        }
+      }
+    },
+    {
+      "id": "escalation_case",
+      "label": "Trade Escalation",
+      "description": "Hypothetical scenario: US raises all China tariffs to 100%, reciprocal tariffs doubled, India raises module duty to 60%.",
+      "overrides": {
+        "CN->US": {
+          "module": { "customsDutyPct": 100 },
+          "cell": { "customsDutyPct": 100 },
+          "wafer": { "customsDutyPct": 80 }
+        },
+        "VN->US": {
+          "module": { "customsDutyPct": 92, "antiDumpingPct": 60, "countervailingPct": 40 },
+          "cell": { "customsDutyPct": 92, "antiDumpingPct": 60, "countervailingPct": 40 },
+          "wafer": { "customsDutyPct": 92 }
+        },
+        "CN->IN": {
+          "module": { "customsDutyPct": 60 },
+          "cell": { "customsDutyPct": 45 },
+          "wafer": { "customsDutyPct": 15 }
+        }
+      }
+    }
+  ]
+}

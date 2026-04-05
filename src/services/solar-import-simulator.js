@@ -79,7 +79,7 @@ function buildScenarioResult({ scenario, label, totalCostPerWp, domestic, stageB
 /**
  * Calculate a single import scenario.
  */
-export function calculateSolarImportScenario({ dest, source, tech, year, scenario }) {
+export function calculateSolarImportScenario({ dest, source, tech, year, scenario, regime = 'current' }) {
   if (!VALID_SCENARIOS.includes(scenario)) {
     throw new RangeError(`Invalid scenario: ${scenario}. Valid: ${VALID_SCENARIOS.join(', ')}`);
   }
@@ -110,7 +110,7 @@ export function calculateSolarImportScenario({ dest, source, tech, year, scenari
 
   if (scenario === 'wafer_import') {
     const waferExportExw = getCumulativeExportExw(sourceStages, 'wafer');
-    const landed = calculateLandedCost({ from: source, to: dest, product: 'wafer', exw: round5(waferExportExw) });
+    const landed = calculateLandedCost({ from: source, to: dest, product: 'wafer', exw: round5(waferExportExw), regime });
     const total = round5(landed.breakdown.ddp + destStages.cell + destStages.module);
 
     return buildScenarioResult({
@@ -136,7 +136,7 @@ export function calculateSolarImportScenario({ dest, source, tech, year, scenari
 
   if (scenario === 'cell_import') {
     const cellExportExw = getCumulativeExportExw(sourceStages, 'cell');
-    const landed = calculateLandedCost({ from: source, to: dest, product: 'cell', exw: round5(cellExportExw) });
+    const landed = calculateLandedCost({ from: source, to: dest, product: 'cell', exw: round5(cellExportExw), regime });
     const total = round5(landed.breakdown.ddp + destStages.module);
 
     return buildScenarioResult({
@@ -161,7 +161,7 @@ export function calculateSolarImportScenario({ dest, source, tech, year, scenari
 
   if (scenario === 'module_import') {
     const moduleExportExw = getCumulativeExportExw(sourceStages, 'module');
-    const landed = calculateLandedCost({ from: source, to: dest, product: 'module', exw: round5(moduleExportExw) });
+    const landed = calculateLandedCost({ from: source, to: dest, product: 'module', exw: round5(moduleExportExw), regime });
 
     return buildScenarioResult({
       scenario: 'module_import',
@@ -186,12 +186,11 @@ export function calculateSolarImportScenario({ dest, source, tech, year, scenari
 /**
  * Calculate all import scenarios for comparison.
  */
-export function calculateSolarImportComparison({ dest, source, tech, year }) {
+export function calculateSolarImportComparison({ dest, source, tech, year, regime = 'current' }) {
   const destCost = calculateSolarCost(dest, tech, year);
-  const sourceCost = calculateSolarCost(source, tech, year);
 
   const scenarios = VALID_SCENARIOS.map(scenario =>
-    calculateSolarImportScenario({ dest, source, tech, year, scenario })
+    calculateSolarImportScenario({ dest, source, tech, year, scenario, regime })
   );
 
   // Best-driver analysis for each import scenario
@@ -203,7 +202,6 @@ export function calculateSolarImportComparison({ dest, source, tech, year }) {
       continue;
     }
 
-    // Manufacturing delta = how much cheaper is the imported product at EXW vs local equivalent
     let equivalentLocalUpstream;
     switch (s.tradeAdders.product) {
       case 'wafer': equivalentLocalUpstream = destStages.polysilicon + destStages.wafer; break;
@@ -224,13 +222,37 @@ export function calculateSolarImportComparison({ dest, source, tech, year }) {
     };
   }
 
+  // Ranking: find cheapest scenario under this regime
+  const cheapest = scenarios.reduce((min, s) => s.totalCostPerWp < min.totalCostPerWp ? s : min);
+
+  // Compare with current regime ranking to detect flips
+  let ranking;
+  if (regime === 'current') {
+    ranking = {
+      cheapestScenario: cheapest.scenario,
+      previousCheapestScenario: cheapest.scenario,
+      rankingChanged: false,
+    };
+  } else {
+    const currentScenarios = VALID_SCENARIOS.map(scenario =>
+      calculateSolarImportScenario({ dest, source, tech, year, scenario, regime: 'current' })
+    );
+    const currentCheapest = currentScenarios.reduce((min, s) => s.totalCostPerWp < min.totalCostPerWp ? s : min);
+    ranking = {
+      cheapestScenario: cheapest.scenario,
+      previousCheapestScenario: currentCheapest.scenario,
+      rankingChanged: cheapest.scenario !== currentCheapest.scenario,
+    };
+  }
+
   return {
-    params: { dest, source, tech, year },
+    params: { dest, source, tech, year, regime },
     baseline: {
       scenario: 'domestic',
       totalCostPerWp: destCost.totalCostPerWp,
     },
     scenarios,
+    ranking,
     model: {
       solarModelVersion: destCost.model.version,
       tradeModelVersion: getLandedCostMeta().version,

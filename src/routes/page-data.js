@@ -6,7 +6,7 @@ import { buildProvenance } from '../services/provenance-service.js';
 import { calculateSolarForecast } from '../services/forecast-service.js';
 import { calculateWindCost } from '../services/wind-cost-engine.js';
 import { computeBrief } from '../services/brief-service.js';
-import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes } from '../services/landed-cost-engine.js';
+import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getAvailableRegimes } from '../services/landed-cost-engine.js';
 import { calculateSolarImportComparison } from '../services/solar-import-simulator.js';
 
 export function registerPageDataRoutes(app) {
@@ -16,6 +16,7 @@ export function registerPageDataRoutes(app) {
     const source = (request.query.source || 'CN').toUpperCase();
     const tech = (request.query.tech || 'topcon').toLowerCase();
     const year = parseInt(request.query.year || '2025', 10);
+    const regime = (request.query.regime || 'current').toLowerCase();
 
     const VALID_COUNTRIES = ['CN', 'VN', 'IN', 'DE', 'US', 'AU'];
     const VALID_TECHS = ['topcon', 'mono'];
@@ -34,7 +35,7 @@ export function registerPageDataRoutes(app) {
     }
 
     try {
-      return calculateSolarImportComparison({ dest, source, tech, year });
+      return calculateSolarImportComparison({ dest, source, tech, year, regime });
     } catch (err) {
       if (err instanceof RangeError) {
         reply.code(400);
@@ -52,6 +53,7 @@ export function registerPageDataRoutes(app) {
     const to = (request.query.to || '').toUpperCase();
     const product = (request.query.product || 'module').toLowerCase();
     const exw = parseFloat(request.query.exw || '0.179');
+    const regime = (request.query.regime || 'current').toLowerCase();
 
     // Validate inputs before comparison mode (which swallows errors)
     const VALID_PRODUCTS = ['module', 'cell', 'wafer'];
@@ -65,15 +67,30 @@ export function registerPageDataRoutes(app) {
     }
 
     try {
-      const comparison = calculateAllRoutes(exw, product);
+      const comparison = calculateAllRoutes(exw, product, regime);
+      const regimes = getAvailableRegimes();
+      const activeRegime = regimes.find(r => r.id === regime) || regimes[0];
+
+      // Compute delta vs baseline (current regime) if regime is not current
+      let deltaVsBaseline = null;
+      if (regime !== 'current' && from && to) {
+        const baselineResult = calculateLandedCost({ from, to, product, exw, regime: 'current' });
+        const shockedResult = calculateLandedCost({ from, to, product, exw, regime });
+        const ddpAbs = Math.round((shockedResult.breakdown.ddp - baselineResult.breakdown.ddp) * 100000) / 100000;
+        const ddpPct = Math.round((ddpAbs / baselineResult.breakdown.ddp) * 10000) / 100;
+        deltaVsBaseline = { ddpAbs, ddpPct };
+      }
 
       // If from/to provided, return selected route + comparison
       if (from && to) {
-        const selectedRoute = calculateLandedCost({ from, to, product, exw });
+        const selectedRoute = calculateLandedCost({ from, to, product, exw, regime });
         return {
           selectedRoute,
           comparison,
           routes: getAvailableRoutes(),
+          regime: activeRegime,
+          regimes,
+          deltaVsBaseline,
         };
       }
 
@@ -82,6 +99,9 @@ export function registerPageDataRoutes(app) {
         selectedRoute: null,
         comparison,
         routes: getAvailableRoutes(),
+        regime: activeRegime,
+        regimes,
+        deltaVsBaseline: null,
       };
     } catch (err) {
       if (err instanceof RangeError) {

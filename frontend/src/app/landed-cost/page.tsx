@@ -2,6 +2,7 @@ import { fetchLandedCostPage } from '@/lib/api';
 import LandedCostControls from '@/components/LandedCostControls';
 import LandedCostSummaryCard from '@/components/LandedCostSummaryCard';
 import RouteComparisonTable from '@/components/RouteComparisonTable';
+import PolicyRegimeControls from '@/components/PolicyRegimeControls';
 import WaterfallChart from '@/components/WaterfallChart';
 
 export const revalidate = 60;
@@ -9,14 +10,15 @@ export const revalidate = 60;
 export default async function LandedCostPage({
   searchParams,
 }: {
-  searchParams: { from?: string; to?: string; exw?: string; product?: string };
+  searchParams: { from?: string; to?: string; exw?: string; product?: string; regime?: string };
 }) {
   const from = searchParams.from?.toUpperCase();
   const to = searchParams.to?.toUpperCase();
   const exw = parseFloat(searchParams.exw || '0.179');
   const product = searchParams.product || 'module';
+  const regime = searchParams.regime || 'current';
 
-  const data = await fetchLandedCostPage(from, to, exw, product);
+  const data = await fetchLandedCostPage(from, to, exw, product, regime);
   const selected = data.selectedRoute;
 
   return (
@@ -40,7 +42,35 @@ export default async function LandedCostPage({
         HS Code: 8541.43 (PV modules).
       </div>
 
-      {/* Controls */}
+      {/* Route presets + Policy regime */}
+      <PolicyRegimeControls
+        regimes={data.regimes}
+        currentRegime={regime}
+        currentFrom={from}
+        currentTo={to}
+      />
+
+      {/* Policy delta badge */}
+      {data.deltaVsBaseline && regime !== 'current' && (
+        <div className="flex items-center gap-3 p-3 rounded-lg" style={{
+          background: data.deltaVsBaseline.ddpAbs > 0 ? 'rgba(255,59,48,0.08)' : 'rgba(52,199,89,0.08)',
+          border: `1px solid ${data.deltaVsBaseline.ddpAbs > 0 ? 'rgba(255,59,48,0.15)' : 'rgba(52,199,89,0.15)'}`,
+        }}>
+          <span className="text-[13px] font-medium" style={{ color: 'var(--text-primary)' }}>
+            Policy Impact:
+          </span>
+          <span className="font-price text-[14px] font-semibold" style={{
+            color: data.deltaVsBaseline.ddpAbs > 0 ? 'var(--down, #ef4444)' : 'var(--up)'
+          }}>
+            {data.deltaVsBaseline.ddpAbs > 0 ? '+' : ''}{data.deltaVsBaseline.ddpPct.toFixed(1)}%
+          </span>
+          <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>
+            ({data.deltaVsBaseline.ddpAbs > 0 ? '+' : ''}${data.deltaVsBaseline.ddpAbs.toFixed(4)}/Wp vs current policy)
+          </span>
+        </div>
+      )}
+
+      {/* EXW Controls */}
       <LandedCostControls
         routes={data.routes}
         currentFrom={from}
