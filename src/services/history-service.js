@@ -13,9 +13,9 @@ const __dirname = dirname(__filename);
 const SNAPSHOTS_DIR = join(__dirname, '../data/snapshots');
 
 const TRACKED_MATERIALS = ['silver', 'copper', 'aluminum', 'gold', 'steel', 'zinc'];
-const SOLAR_YEARS = [2025, 2026, 2028, 2030];
+const SOLAR_YEARS = [2025, 2026, 2027, 2028, 2029, 2030];
 const BESS_YEARS = [2025, 2026, 2028, 2030, 2035];
-const WIND_YEARS = [2025, 2026, 2028, 2030];
+const WIND_YEARS = [2025, 2026, 2027, 2028, 2029, 2030];
 
 function round4(n) {
   return Math.round(n * 10000) / 10000;

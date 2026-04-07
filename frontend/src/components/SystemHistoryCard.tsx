@@ -2,7 +2,7 @@ import type { HistorySeries } from '@/lib/types';
 import TrendLineChart from '@/components/TrendLineChart';
 
 function formatValue(value: number, unit: string) {
-  const digits = unit === '$/kW' ? 0 : 3;
+  const digits = unit === '$/kW' ? 0 : unit === '$/kWh' ? 0 : 3;
   return `${value.toFixed(digits)} ${unit}`;
 }
 
@@ -43,12 +43,8 @@ export default function SystemHistoryCard({
       </div>
 
       <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <TrendLineChart points={data.points} height={96} stroke="var(--accent-blue, #60a5fa)" />
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-[10px]" style={{ color: 'var(--text-faint)' }}>
-          <div className="flex items-center gap-4">
-            <span>{data.points[0]?.date}</span>
-            <span>{data.points[data.points.length - 1]?.date}</span>
-          </div>
+        <TrendLineChart points={data.points} height={180} stroke="var(--accent-blue, #60a5fa)" unit={data.unit} />
+        <div className="mt-3 flex flex-wrap items-center justify-end gap-3 text-[10px]" style={{ color: 'var(--text-faint)' }}>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <span className="inline-block w-4 h-[2px]" style={{ background: 'var(--accent-blue, #60a5fa)' }} />

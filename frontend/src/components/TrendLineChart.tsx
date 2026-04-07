@@ -9,28 +9,39 @@ interface Props {
   width?: number;
   height?: number;
   stroke?: string;
+  unit?: string;
+}
+
+function formatYAxisValue(value: number, unit?: string) {
+  if (!unit) return String(Math.round(value));
+  const digits = unit === '$/kW' ? 0 : unit === '$/kWh' ? 0 : 3;
+  return `${value.toFixed(digits)} ${unit}`;
 }
 
 export default function TrendLineChart({
   points,
   width = 220,
-  height = 72,
+  height = 144,
   stroke = 'var(--accent-green)',
+  unit,
 }: Props) {
   if (!points.length) return null;
 
   const values = points.map(point => point.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
-  const range = max - min || 1;
-  const padding = 6;
-  const innerWidth = width - padding * 2;
-  const innerHeight = height - padding * 2;
+  const range = max - min || Math.max(max * 0.05, 1);
+  const domainMin = Math.max(0, min - range * 0.1);
+  const domainMax = max + range * 0.1;
+  const domainRange = domainMax - domainMin || 1;
+  const padding = { top: 10, right: 12, bottom: 28, left: 56 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
 
   const coords = points
     .map((point, index) => {
-      const x = padding + (innerWidth * index) / Math.max(points.length - 1, 1);
-      const y = padding + innerHeight - ((point.value - min) / range) * innerHeight;
+      const x = padding.left + (innerWidth * index) / Math.max(points.length - 1, 1);
+      const y = padding.top + innerHeight - ((point.value - domainMin) / domainRange) * innerHeight;
       return { x, y, projected: point.projected };
     });
 
@@ -43,9 +54,52 @@ export default function TrendLineChart({
     : coords.slice(firstProjectedIndex - 1);
 
   const toPolyline = (series: typeof coords) => series.map(point => `${point.x},${point.y}`).join(' ');
+  const yTicks = 4;
+  const xTicks = points.map((point, index) => ({ label: point.date, x: coords[index]?.x ?? padding.left }));
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
+      {Array.from({ length: yTicks + 1 }).map((_, index) => {
+        const y = padding.top + (innerHeight * index) / yTicks;
+        const value = domainMax - (domainRange * index) / yTicks;
+        return (
+          <g key={`y-${index}`}>
+            <line
+              x1={padding.left}
+              y1={y}
+              x2={width - padding.right}
+              y2={y}
+              stroke="rgba(255,255,255,0.05)"
+              strokeDasharray="2 4"
+            />
+            <text
+              x={padding.left - 6}
+              y={y + 3}
+              textAnchor="end"
+              fontSize="9"
+              fill="var(--text-faint)"
+            >
+              {formatYAxisValue(value, unit)}
+            </text>
+          </g>
+        );
+      })}
+
+      <line
+        x1={padding.left}
+        y1={padding.top}
+        x2={padding.left}
+        y2={height - padding.bottom}
+        stroke="rgba(255,255,255,0.08)"
+      />
+      <line
+        x1={padding.left}
+        y1={height - padding.bottom}
+        x2={width - padding.right}
+        y2={height - padding.bottom}
+        stroke="rgba(255,255,255,0.08)"
+      />
+
       {solidCoords.length > 1 && (
         <polyline
           fill="none"
@@ -68,6 +122,39 @@ export default function TrendLineChart({
           points={toPolyline(dashedCoords)}
         />
       )}
+
+      {coords.map((point, index) => (
+        <circle
+          key={`point-${points[index].date}`}
+          cx={point.x}
+          cy={point.y}
+          r={3}
+          fill={point.projected ? stroke : '#0b1220'}
+          stroke={stroke}
+          strokeWidth="1.5"
+        />
+      ))}
+
+      {xTicks.map(tick => (
+        <g key={`x-${tick.label}`}>
+          <line
+            x1={tick.x}
+            y1={height - padding.bottom}
+            x2={tick.x}
+            y2={height - padding.bottom + 4}
+            stroke="rgba(255,255,255,0.08)"
+          />
+          <text
+            x={tick.x}
+            y={height - 8}
+            textAnchor="middle"
+            fontSize="9"
+            fill="var(--text-faint)"
+          >
+            {tick.label}
+          </text>
+        </g>
+      ))}
     </svg>
   );
 }
