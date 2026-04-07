@@ -1,4 +1,4 @@
-import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, LandedCostPageData, SolarImportPageData, MaterialDetailData, HistoryPageData } from './types';
+import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, LandedCostPageData, SolarImportPageData, MaterialDetailData, HistoryPageData, MaterialHistoryData } from './types';
 
 // Server-side (build/SSR) needs absolute URL; client-side uses relative (rewrite handles it)
 const BASE = typeof window === 'undefined'
@@ -94,5 +94,11 @@ export async function fetchLandedCostPage(
 export async function fetchMaterialDetail(slug: string): Promise<MaterialDetailData> {
   const res = await fetch(`${BASE}/api/page/material/${slug}`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Material detail fetch failed: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchMaterialHistory(slug: string, range = '5d'): Promise<MaterialHistoryData> {
+  const res = await fetch(`${BASE}/api/materials/${slug}/history?range=${range}`, { next: { revalidate: 300 } });
+  if (!res.ok) throw new Error(`Material history fetch failed: ${res.status}`);
   return res.json();
 }

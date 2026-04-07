@@ -45,11 +45,11 @@ export default async function MaterialDetailPage({ params }: { params: { slug: s
       {/* Price Chart — real data for live materials, message for reference */}
       <div className="card-surface p-5">
         <PriceChart
+          slug={data.material.slug}
           yahooSymbol={data.material.yahooSymbol}
           name={data.material.slug}
           currentPrice={data.currentPrice?.value}
           unit={data.currentPrice?.unit}
-          sparkline5d={data.currentPrice?.sparkline5d}
         />
       </div>
 

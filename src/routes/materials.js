@@ -1,5 +1,6 @@
 import { getAllMaterials, getMaterial, calculateImpact, getSystemMaterials } from '../services/impact-service.js';
 import { getPrice } from '../services/market-data-service.js';
+import { getMaterialHistory, getValidHistoryRanges } from '../services/material-history-service.js';
 
 export function registerMaterialRoutes(app) {
   // GET /api/materials - full catalog with optional filter
@@ -60,5 +61,28 @@ export function registerMaterialRoutes(app) {
     }
 
     return impact;
+  });
+
+  // GET /api/materials/:slug/history?range=1mo
+  app.get('/api/materials/:slug/history', async (request, reply) => {
+    const range = (request.query.range || '5d').toLowerCase();
+
+    try {
+      const history = await getMaterialHistory(request.params.slug, range);
+      return {
+        ...history,
+        availableRanges: getValidHistoryRanges(),
+      };
+    } catch (err) {
+      if (err instanceof RangeError) {
+        const isMissingMaterial = err.message.includes('Material not found');
+        reply.code(isMissingMaterial ? 404 : 400);
+        return { error: err.message };
+      }
+
+      request.log.error({ err, slug: request.params.slug, range }, 'Material history error');
+      reply.code(500);
+      return { error: 'History fetch failed' };
+    }
   });
 }

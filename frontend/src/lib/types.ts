@@ -259,3 +259,19 @@ export interface MaterialDetailData {
   crossSystemImpact: CrossSystemImpact[];
   meta: { asOf: string };
 }
+
+export interface MaterialHistoryPoint {
+  date: string;
+  value: number;
+}
+
+export interface MaterialHistoryData {
+  slug: string;
+  name: string;
+  range: string;
+  unit: string;
+  sourceKind: 'yahoo' | 'snapshot' | 'snapshot_fallback' | 'unavailable';
+  points: MaterialHistoryPoint[];
+  note: string;
+  availableRanges: string[];
+}

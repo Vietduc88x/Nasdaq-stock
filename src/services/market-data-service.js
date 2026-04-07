@@ -62,6 +62,54 @@ async function fetchYahooData(yahooSymbol) {
 }
 
 /**
+ * Fetch historical series from Yahoo Finance.
+ * Returns [{ date, value }] in the material's native unit after conversion.
+ */
+export async function fetchYahooHistory(yahooSymbol, range = '5d') {
+  const rangeConfig = {
+    '5d': { range: '5d', interval: '1d' },
+    '1mo': { range: '1mo', interval: '1d' },
+    '3mo': { range: '3mo', interval: '1d' },
+    '1y': { range: '1y', interval: '1wk' },
+    'max': { range: 'max', interval: '1mo' },
+  };
+
+  const config = rangeConfig[range];
+  if (!config) {
+    throw new RangeError(`Unsupported Yahoo range: ${range}`);
+  }
+
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=${config.interval}&range=${config.range}`;
+  const resp = await fetch(url, { signal: AbortSignal.timeout(8000) });
+
+  if (!resp.ok) {
+    throw new Error(`Yahoo returned ${resp.status} for ${yahooSymbol}`);
+  }
+
+  const data = await resp.json();
+  const result = data?.chart?.result?.[0];
+  const timestamps = result?.timestamp || [];
+  const closes = result?.indicators?.quote?.[0]?.close || [];
+
+  if (!timestamps.length || !closes.length) {
+    throw new Error('No history in Yahoo response');
+  }
+
+  const conv = YAHOO_CONVERSIONS[yahooSymbol];
+  return timestamps
+    .map((timestamp, index) => {
+      const close = closes[index];
+      if (close === null || close === undefined) return null;
+      const value = conv ? close / conv.divisor : close;
+      return {
+        date: new Date(timestamp * 1000).toISOString().slice(0, 10),
+        value: Math.round(value * 10000) / 10000,
+      };
+    })
+    .filter(Boolean);
+}
+
+/**
  * Get current price for a material slug.
  */
 export async function getPrice(slug) {
