@@ -43,6 +43,30 @@ describe('GET /api/materials/:slug/history', () => {
     expect(body.points.length).toBeGreaterThan(0);
   });
 
+  it('treats zinc as reference-backed history, not a live Yahoo chart', async () => {
+    const detailRes = await app.inject({
+      method: 'GET',
+      url: '/api/materials/zinc',
+    });
+
+    expect(detailRes.statusCode).toBe(200);
+    const detail = detailRes.json();
+    expect(detail.coverageTier).toBe('indexed_reference');
+    expect(detail.yahooSymbol).toBeNull();
+    expect(detail.currentPrice.coverageTier).toBe('indexed_reference');
+    expect(detail.currentPrice.source).toBe('reference');
+
+    const historyRes = await app.inject({
+      method: 'GET',
+      url: '/api/materials/zinc/history?range=max',
+    });
+
+    expect(historyRes.statusCode).toBe(200);
+    const history = historyRes.json();
+    expect(history.slug).toBe('zinc');
+    expect(history.sourceKind).toBe('snapshot');
+  });
+
   it('rejects invalid ranges', async () => {
     const res = await app.inject({
       method: 'GET',

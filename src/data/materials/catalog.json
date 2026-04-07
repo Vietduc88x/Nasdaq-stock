@@ -1,5 +1,5 @@
 {
-  "version": "materials-v2026.03",
+  "version": "materials-v2026.04",
   "materials": [
     {
       "slug": "silver",
@@ -93,8 +93,8 @@
       "normalizedUnit": "USD/g",
       "conversionFactor": 0.00220462,
       "fallbackPrice": 1.28,
-      "coverageTier": "live_exchange",
-      "yahooSymbol": "ZN=F",
+      "coverageTier": "indexed_reference",
+      "yahooSymbol": null,
       "category": "structural",
       "systems": [
         { "system": "wind", "component": "Galvanizing / anti-corrosion coating", "usage_gPerKW": 800, "baselineCost_usdPerKW": 4.5 }
