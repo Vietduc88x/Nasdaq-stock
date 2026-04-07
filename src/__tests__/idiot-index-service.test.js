@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { buildBessIdiotIndex, buildSystemIdiotIndex, buildTradeUpliftIndex, buildWindIdiotIndex } from '../services/idiot-index-service.js';
-import { calculateBessCost } from '../services/bess-cost-engine.js';
-import { calculateWindCost } from '../services/wind-cost-engine.js';
+import { calculateBessCost, getBessBaseBasket } from '../services/bess-cost-engine.js';
+import { calculateWindCost, getWindBaseBasket } from '../services/wind-cost-engine.js';
 
 describe('idiot-index-service', () => {
   it('builds a system idiot index from material contributions', () => {
@@ -9,9 +9,9 @@ describe('idiot-index-service', () => {
       totalCost: 0.179,
       unit: '$/Wp',
       materials: [
-        { name: 'Silver', component: 'Paste', baselineContributionPerWp: 0.0085 },
-        { name: 'Glass', component: 'Front cover', baselineContributionPerWp: 0.0120 },
-        { name: 'Aluminum', component: 'Frame', baselineContributionPerWp: 0.0095 },
+        { name: 'Silver', component: 'Paste', baselineContributionPerWp: 0.0085, usagePerUnit: 0.11, usageUnit: 'g/Wp' },
+        { name: 'Glass', component: 'Front cover', baselineContributionPerWp: 0.0120, usagePerUnit: 5.6, usageUnit: 'g/Wp' },
+        { name: 'Aluminum', component: 'Frame', baselineContributionPerWp: 0.0095, usagePerUnit: 1.5, usageUnit: 'g/Wp' },
       ],
       baselineKey: 'baselineContributionPerWp',
     });
@@ -22,6 +22,7 @@ describe('idiot-index-service', () => {
     expect(index.conversionCost).toBe(0.149);
     expect(index.topDriver?.label).toBe('Glass');
     expect(index.contributors?.[0]?.label).toBe('Glass');
+    expect(index.contributors?.[0]?.formula).toContain('g/Wp');
   });
 
   it('builds a trade uplift index from EXW to DDP', () => {
@@ -56,23 +57,24 @@ describe('idiot-index-service', () => {
     const cost = calculateBessCost('lfp', 2025);
     const index = buildBessIdiotIndex({
       totalCost: cost.totalCostPerKwh,
-      stageBreakdown: cost.stageBreakdown,
+      contributors: getBessBaseBasket('lfp', 2025),
     });
 
     expect(index.rawMaterialCost).toBeGreaterThan(40);
     expect(index.rawMaterialCost).toBeLessThan(cost.totalCostPerKwh);
     expect(index.multiplier).toBeGreaterThan(1);
     expect(index.multiplier).toBeLessThan(2);
-    expect(index.topDriver?.label).toBe('Cathode Active Material');
-    expect(index.contributors?.some(item => item.label === 'Cathode Active Material')).toBe(true);
+    expect(index.topDriver?.label).toBe('Cathode Active Material (LFP)');
+    expect(index.contributors?.some(item => item.label === 'Cathode Active Material (LFP)')).toBe(true);
     expect(index.contributors?.some(item => item.label === 'Formation Cycling')).toBe(false);
+    expect(index.contributors?.find(item => item.label === 'Cathode Active Material (LFP)')?.formula).toContain('kg/kWh');
   });
 
   it('builds a wind idiot index from bottom-up stage components', () => {
     const cost = calculateWindCost('onshore', 2025);
     const index = buildWindIdiotIndex({
       totalCost: cost.totalCostPerKw,
-      stageBreakdown: cost.stageBreakdown,
+      contributors: getWindBaseBasket(2025),
     });
 
     expect(index.rawMaterialCost).toBeGreaterThan(1000);
@@ -81,5 +83,6 @@ describe('idiot-index-service', () => {
     expect(index.multiplier).toBeLessThan(1.5);
     expect(index.topDriver?.label).toBe('Tower Steel');
     expect(index.contributors?.some(item => item.label === 'Crane Erection')).toBe(false);
+    expect(index.contributors?.find(item => item.label === 'Tower Steel')?.formula).toContain('kg/kW');
   });
 });

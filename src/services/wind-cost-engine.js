@@ -58,6 +58,8 @@ function calculateStageCost(stageName, roadmap) {
   return { total: round1(total), components };
 }
 
+function round4(n) { return Math.round(n * 10000) / 10000; }
+
 /**
  * Calculate wind turbine cost — main entry point.
  * @param {string} turbineType - 'onshore' (offshore deferred)
@@ -117,6 +119,52 @@ export function calculateWindCost(turbineType, year) {
 export function getWindBenchmark(turbineType, year) {
   const key = `${turbineType}_${year}`;
   return modelData.benchmarks[key] || null;
+}
+
+export function getWindBaseBasket(year) {
+  const roadmap = getRoadmap(year);
+  const reductionFactor = 1 - (roadmap.costReductionPct / 100);
+  const excludedComponents = new Set([
+    'blade_mold_labor',
+    'blade_transport',
+    'tower_fabrication',
+    'tower_transport',
+    'crane_erection',
+    'civil_works',
+    'commissioning',
+  ]);
+
+  const labelMap = {
+    fiberglass_shell: 'Fiberglass Shell',
+    carbon_fiber_spar: 'Carbon Fiber Spar',
+    resin_adhesive: 'Resin & Adhesive',
+    generator_copper: 'Generator Copper',
+    permanent_magnets: 'Permanent Magnets',
+    gearbox_bearings: 'Gearbox & Bearings',
+    power_electronics: 'Power Electronics',
+    nacelle_housing: 'Nacelle Housing',
+    yaw_pitch_systems: 'Yaw & Pitch Systems',
+    tower_steel: 'Tower Steel',
+    tower_galvanizing: 'Tower Galvanizing',
+    internal_cabling: 'Internal Cabling',
+    substation_share: 'Substation Equipment',
+    scada_controls: 'SCADA & Controls',
+    foundation: 'Foundation Materials',
+  };
+
+  return Object.entries(modelData.stages)
+    .flatMap(([stageName, stage]) =>
+      Object.entries(stage.components)
+        .filter(([componentName]) => !excludedComponents.has(componentName))
+        .map(([componentName, component]) => ({
+          label: labelMap[componentName] || componentName,
+          component: stageName.charAt(0).toUpperCase() + stageName.slice(1),
+          value: round4(component.baselineCostPerKw * reductionFactor),
+          formula: component.note || `Baseline component × ${(reductionFactor * 100).toFixed(0)}% roadmap factor`,
+          note: component.note || null,
+        }))
+    )
+    .sort((a, b) => b.value - a.value);
 }
 
 /**

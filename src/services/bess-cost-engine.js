@@ -47,6 +47,8 @@ function getRoadmap(year) {
   return modelData.technologyRoadmap[y] || modelData.technologyRoadmap['2025'];
 }
 
+function round4(n) { return Math.round(n * 10000) / 10000; }
+
 /**
  * Calculate BESS cost — main entry point.
  * @param {string} chemistry - 'lfp' or 'nmc811'
@@ -149,6 +151,151 @@ export function calculateBessCost(chemistry, year) {
 export function getBessBenchmark(chemistry, year) {
   const key = `${chemistry}_${year}`;
   return modelData.benchmarks[key] || null;
+}
+
+export function getBessBaseBasket(chemistry, year) {
+  const prices = getMaterialPrices(year);
+  const intensity = modelData.materialIntensity[chemistry];
+  const pack = modelData.pack;
+
+  if (!intensity) {
+    throw new Error(`Unknown chemistry: ${chemistry}`);
+  }
+
+  const cathodeRate = chemistry === 'lfp'
+    ? prices.lfp_cathode_usdPerKg
+    : prices.nmc811_cathode_usdPerKg;
+  const cathodeLabel = chemistry === 'lfp' ? 'Cathode Active Material (LFP)' : 'Cathode Active Material (NMC811)';
+
+  const anodeBlendRate =
+    prices.graphite_anode_usdPerKg * (1 - intensity.silicon_anode_fraction) +
+    prices.silicon_anode_usdPerKg * intensity.silicon_anode_fraction;
+
+  const contributors = [
+    {
+      label: cathodeLabel,
+      component: 'Cathode',
+      quantity: round4(intensity.cathode_kgPerKwh),
+      quantityUnit: 'kg/kWh',
+      rate: round4(cathodeRate),
+      rateUnit: '$/kg',
+      value: round4(cathodeRate * intensity.cathode_kgPerKwh),
+      formula: `${round4(intensity.cathode_kgPerKwh)} kg/kWh × $${round4(cathodeRate)}/kg`,
+      note: chemistry === 'lfp'
+        ? 'Cathode powder price from the Argonne 2025 LFP reference.'
+        : 'Cathode powder price from the Argonne 2025 NMC811 reference.',
+    },
+    {
+      label: 'Conductive Additive',
+      component: 'Cathode',
+      quantity: round4(intensity.carbon_additive_kgPerKwh),
+      quantityUnit: 'kg/kWh',
+      rate: round4(prices.carbon_additive_usdPerKg),
+      rateUnit: '$/kg',
+      value: round4(prices.carbon_additive_usdPerKg * intensity.carbon_additive_kgPerKwh),
+      formula: `${round4(intensity.carbon_additive_kgPerKwh)} kg/kWh × $${round4(prices.carbon_additive_usdPerKg)}/kg`,
+    },
+    {
+      label: 'Positive Binder',
+      component: 'Cathode',
+      quantity: round4(intensity.binder_positive_kgPerKwh),
+      quantityUnit: 'kg/kWh',
+      rate: round4(prices.binder_positive_usdPerKg),
+      rateUnit: '$/kg',
+      value: round4(prices.binder_positive_usdPerKg * intensity.binder_positive_kgPerKwh),
+      formula: `${round4(intensity.binder_positive_kgPerKwh)} kg/kWh × $${round4(prices.binder_positive_usdPerKg)}/kg`,
+    },
+    {
+      label: 'Anode Active Material',
+      component: 'Anode',
+      quantity: round4(intensity.graphite_kgPerKwh),
+      quantityUnit: 'kg/kWh',
+      rate: round4(anodeBlendRate),
+      rateUnit: '$/kg',
+      value: round4(anodeBlendRate * intensity.graphite_kgPerKwh),
+      formula: `${round4(intensity.graphite_kgPerKwh)} kg/kWh × $${round4(anodeBlendRate)}/kg`,
+      note: intensity.silicon_anode_fraction > 0
+        ? `Weighted anode blend: ${(1 - intensity.silicon_anode_fraction) * 100}% graphite, ${intensity.silicon_anode_fraction * 100}% silicon.`
+        : 'Pure graphite anode assumption.',
+    },
+    {
+      label: 'Negative Binder',
+      component: 'Anode',
+      quantity: round4(intensity.binder_negative_kgPerKwh),
+      quantityUnit: 'kg/kWh',
+      rate: round4(prices.binder_negative_usdPerKg),
+      rateUnit: '$/kg',
+      value: round4(prices.binder_negative_usdPerKg * intensity.binder_negative_kgPerKwh),
+      formula: `${round4(intensity.binder_negative_kgPerKwh)} kg/kWh × $${round4(prices.binder_negative_usdPerKg)}/kg`,
+    },
+    {
+      label: 'Copper Foil',
+      component: 'Anode',
+      quantity: round4(intensity.cu_foil_m2PerKwh),
+      quantityUnit: 'm²/kWh',
+      rate: round4(prices.cu_foil_usdPerM2),
+      rateUnit: '$/m²',
+      value: round4(prices.cu_foil_usdPerM2 * intensity.cu_foil_m2PerKwh),
+      formula: `${round4(intensity.cu_foil_m2PerKwh)} m²/kWh × $${round4(prices.cu_foil_usdPerM2)}/m²`,
+    },
+    {
+      label: 'Electrolyte',
+      component: 'Cell Components',
+      quantity: round4(intensity.electrolyte_LPerKwh),
+      quantityUnit: 'L/kWh',
+      rate: round4(prices.electrolyte_usdPerL),
+      rateUnit: '$/L',
+      value: round4(prices.electrolyte_usdPerL * intensity.electrolyte_LPerKwh),
+      formula: `${round4(intensity.electrolyte_LPerKwh)} L/kWh × $${round4(prices.electrolyte_usdPerL)}/L`,
+    },
+    {
+      label: 'Separator',
+      component: 'Cell Components',
+      quantity: round4(intensity.separator_m2PerKwh),
+      quantityUnit: 'm²/kWh',
+      rate: round4(prices.separator_usdPerM2),
+      rateUnit: '$/m²',
+      value: round4(prices.separator_usdPerM2 * intensity.separator_m2PerKwh),
+      formula: `${round4(intensity.separator_m2PerKwh)} m²/kWh × $${round4(prices.separator_usdPerM2)}/m²`,
+    },
+    {
+      label: 'Aluminum Foil',
+      component: 'Cell Components',
+      quantity: round4(intensity.al_foil_m2PerKwh),
+      quantityUnit: 'm²/kWh',
+      rate: round4(prices.al_foil_usdPerM2),
+      rateUnit: '$/m²',
+      value: round4(prices.al_foil_usdPerM2 * intensity.al_foil_m2PerKwh),
+      formula: `${round4(intensity.al_foil_m2PerKwh)} m²/kWh × $${round4(prices.al_foil_usdPerM2)}/m²`,
+    },
+    {
+      label: 'BMS Electronics',
+      component: 'Pack',
+      value: round4(pack.bms_usdPerKwh),
+      formula: `Fixed allowance = $${round4(pack.bms_usdPerKwh)}/kWh`,
+      note: 'Pack-level electronics allowance in the BatPaC reference model.',
+    },
+    {
+      label: 'Thermal Management Hardware',
+      component: 'Pack',
+      value: round4(pack.thermal_management_usdPerKwh),
+      formula: `Fixed allowance = $${round4(pack.thermal_management_usdPerKwh)}/kWh`,
+    },
+    {
+      label: 'Pack Housing',
+      component: 'Pack',
+      value: round4(pack.pack_housing_usdPerKwh),
+      formula: `Fixed allowance = $${round4(pack.pack_housing_usdPerKwh)}/kWh`,
+    },
+    {
+      label: 'Wiring & Connectors',
+      component: 'Pack',
+      value: round4(pack.wiring_connectors_usdPerKwh),
+      formula: `Fixed allowance = $${round4(pack.wiring_connectors_usdPerKwh)}/kWh`,
+    },
+  ];
+
+  return contributors.sort((a, b) => b.value - a.value);
 }
 
 /**

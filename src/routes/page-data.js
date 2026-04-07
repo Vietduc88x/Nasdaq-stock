@@ -1,10 +1,10 @@
 import { calculateSolarCost } from '../services/solar-model-service.js';
-import { calculateBessCost } from '../services/bess-cost-engine.js';
+import { calculateBessCost, getBessBaseBasket } from '../services/bess-cost-engine.js';
 import { getSystemMaterials, getAllMaterials } from '../services/impact-service.js';
 import { getAllPrices, getPrice } from '../services/market-data-service.js';
 import { buildProvenance } from '../services/provenance-service.js';
 import { calculateSolarForecast } from '../services/forecast-service.js';
-import { calculateWindCost } from '../services/wind-cost-engine.js';
+import { calculateWindCost, getWindBaseBasket } from '../services/wind-cost-engine.js';
 import { computeBrief } from '../services/brief-service.js';
 import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getAvailableRegimes } from '../services/landed-cost-engine.js';
 import { calculateSolarImportComparison } from '../services/solar-import-simulator.js';
@@ -230,7 +230,9 @@ export function registerPageDataRoutes(app) {
             baselineContributionPerWp: m.baselineCost,
             shareOfSystemPct: Math.round((m.baselineCost / cost.totalCostPerWp) * 1000) / 10,
             impactPer10Pct: Math.round(m.baselineCost * 0.1 * 100000) / 100000,
-            component: m.component
+            component: m.component,
+            usagePerUnit: m.usagePerUnit,
+            usageUnit: m.usageUnit,
           };
         })
       );
@@ -400,6 +402,8 @@ export function registerPageDataRoutes(app) {
             baselineCost: m.baselineCost,
             costUnit: m.costUnit,
             component: m.component,
+            usagePerUnit: m.usagePerUnit,
+            usageUnit: m.usageUnit,
           };
         })
       );
@@ -416,7 +420,7 @@ export function registerPageDataRoutes(app) {
         materialImpacts,
         idiotIndex: buildBessIdiotIndex({
           totalCost: cost.totalCostPerKwh,
-          stageBreakdown: cost.stageBreakdown,
+          contributors: getBessBaseBasket(chemistry, year),
         }),
         meta: buildProvenance('bess', { liveCoverage, referenceCoverage, fallbacksUsed }),
       };
@@ -467,6 +471,8 @@ export function registerPageDataRoutes(app) {
             baselineCost: m.baselineCost,
             costUnit: m.costUnit,
             component: m.component,
+            usagePerUnit: m.usagePerUnit,
+            usageUnit: m.usageUnit,
           };
         })
       );
@@ -486,7 +492,7 @@ export function registerPageDataRoutes(app) {
         materialImpacts,
         idiotIndex: buildWindIdiotIndex({
           totalCost: cost.totalCostPerKw,
-          stageBreakdown: cost.stageBreakdown,
+          contributors: getWindBaseBasket(year),
         }),
         meta: buildProvenance('wind', { liveCoverage, referenceCoverage, fallbacksUsed }),
       };

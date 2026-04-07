@@ -37,13 +37,32 @@ function buildBaseCostIndex({ title, kind, unit, baseCost, finishedCost, topDriv
   };
 }
 
-function buildContributors(materials, getBaseline) {
+function buildMaterialFormulaContributors(materials, getBaseline) {
   return materials
-    .map(material => ({
-      label: material.name,
-      component: material.component,
-      value: round4(getBaseline(material)),
-    }))
+    .map(material => {
+      const value = round4(getBaseline(material));
+      const quantity = Number(material.usagePerUnit) || null;
+      const quantityUnit = material.usageUnit || null;
+      const quantityBaseUnit = quantityUnit ? quantityUnit.split('/')[0] : null;
+      const rate = quantity && quantity > 0 ? round4(value / quantity) : null;
+      const rateUnit = quantityBaseUnit ? `$/${quantityBaseUnit}` : null;
+
+      return {
+        label: material.name,
+        component: material.component,
+        value,
+        quantity: quantity ? round4(quantity) : undefined,
+        quantityUnit: quantityUnit || undefined,
+        rate: rate || undefined,
+        rateUnit: rateUnit || undefined,
+        formula: quantity && quantityUnit && rate && rateUnit
+          ? `${round4(quantity)} ${quantityUnit} × $${rate.toFixed(4)}/${quantityBaseUnit}`
+          : undefined,
+        note: quantity
+          ? 'Baseline model contribution using the quantity-per-unit assumption in the material catalog.'
+          : undefined,
+      };
+    })
     .filter(item => Number.isFinite(item.value) && item.value > 0)
     .sort((a, b) => b.value - a.value);
 }
@@ -85,41 +104,6 @@ function buildTopTradeAdder(selectedRoute) {
   return entries ? { label: entries.label, value: round4(entries.value) } : null;
 }
 
-function toTitleCase(value) {
-  return value
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, char => char.toUpperCase());
-}
-
-function buildStageContributors(stageBreakdown, options = {}) {
-  const {
-    includeStage = () => true,
-    includeComponent = () => true,
-    labelForComponent = (stageName, componentName) => ({
-      label: toTitleCase(componentName),
-      component: toTitleCase(stageName),
-    }),
-  } = options;
-
-  return stageBreakdown
-    .filter(stage => includeStage(stage.stage))
-    .flatMap(stage =>
-      Object.entries(stage.components)
-        .filter(([, value]) => Number.isFinite(value) && value > 0)
-        .filter(([componentName]) => includeComponent(stage.stage, componentName))
-        .map(([componentName, value]) => {
-          const labels = labelForComponent(stage.stage, componentName);
-          return {
-            label: labels.label,
-            component: labels.component,
-            value: round4(value),
-          };
-        })
-    )
-    .sort((a, b) => b.value - a.value);
-}
-
 export function buildSystemIdiotIndex({ title = 'Idiot Index', totalCost, unit, materials, baselineKey = 'baselineCost' }) {
   const rawMaterialCost =
     materials.reduce((sum, material) => sum + (Number(material[baselineKey]) || 0), 0)
@@ -132,118 +116,58 @@ export function buildSystemIdiotIndex({ title = 'Idiot Index', totalCost, unit, 
     topDriver: buildTopMaterial(materials, material => Number(material[baselineKey]) || 0),
     explanation: 'Finished cost divided by the raw-material basket. Higher values imply more conversion cost, overhead, logistics, or margin layered on top of materials.',
   });
-  index.contributors = buildContributors(materials, material => Number(material[baselineKey]) || 0);
+  index.contributors = buildMaterialFormulaContributors(materials, material => Number(material[baselineKey]) || 0);
   return index;
 }
 
-export function buildBessIdiotIndex({ totalCost, stageBreakdown }) {
-  const labelMap = {
-    cathode: {
-      activeMaterial: 'Cathode Active Material',
-      additive: 'Conductive Additive',
-      binder: 'Positive Binder',
-    },
-    anode: {
-      activeMaterial: 'Anode Active Material',
-      binder: 'Negative Binder',
-      cuFoil: 'Copper Foil',
-    },
-    cellComponents: {
-      electrolyte: 'Electrolyte',
-      separator: 'Separator',
-      alFoil: 'Aluminum Foil',
-    },
-    pack: {
-      bms: 'BMS Electronics',
-      thermalManagement: 'Thermal Management Hardware',
-      housing: 'Pack Housing',
-      wiring: 'Wiring & Connectors',
-    },
-  };
-
-  const contributors = buildStageContributors(stageBreakdown, {
-    includeStage: stageName => stageName !== 'cellAssembly',
-    includeComponent: (stageName, componentName) =>
-      stageName !== 'pack' || !['moduleLabor', 'packLabor'].includes(componentName),
-    labelForComponent: (stageName, componentName) => ({
-      label: labelMap[stageName]?.[componentName] || toTitleCase(componentName),
-      component: toTitleCase(stageName),
-    }),
-  });
-
+export function buildDetailedSystemIdiotIndex({
+  title = 'Idiot Index',
+  unit,
+  totalCost,
+  contributors,
+  explanation,
+  baseLabel = 'Bottom-up material basket',
+  upliftLabel = 'Conversion layer',
+}) {
   const baseCost = contributors.reduce((sum, item) => sum + item.value, 0);
   const topDriver = contributors[0] ? { ...contributors[0] } : null;
 
   const index = buildBaseCostIndex({
-    title: 'Idiot Index',
+    title,
     kind: 'system',
+    unit,
+    baseCost,
+    finishedCost: totalCost,
+    topDriver,
+    explanation,
+  });
+
+  index.baseLabel = baseLabel;
+  index.upliftLabel = upliftLabel;
+  index.contributors = contributors;
+  return index;
+}
+
+export function buildBessIdiotIndex({ totalCost, contributors }) {
+  return buildDetailedSystemIdiotIndex({
     unit: '$/kWh',
-    baseCost,
-    finishedCost: totalCost,
-    topDriver,
+    totalCost,
+    contributors,
     explanation: 'Finished BESS pack cost divided by a bottom-up material and hardware basket derived from BatPaC stage components. The gap captures assembly labor, formation, testing, and the rest of the conversion layer.',
+    baseLabel: 'Bottom-up material basket',
+    upliftLabel: 'Assembly / conversion layer',
   });
-
-  index.baseLabel = 'Bottom-up material basket';
-  index.upliftLabel = 'Assembly / conversion layer';
-  index.contributors = contributors;
-  return index;
 }
 
-export function buildWindIdiotIndex({ totalCost, stageBreakdown }) {
-  const excludedComponents = new Set([
-    'blade_mold_labor',
-    'blade_transport',
-    'tower_fabrication',
-    'tower_transport',
-    'crane_erection',
-    'civil_works',
-    'commissioning',
-  ]);
-
-  const labelMap = {
-    fiberglass_shell: 'Fiberglass Shell',
-    carbon_fiber_spar: 'Carbon Fiber Spar',
-    resin_adhesive: 'Resin & Adhesive',
-    generator_copper: 'Generator Copper',
-    permanent_magnets: 'Permanent Magnets',
-    gearbox_bearings: 'Gearbox & Bearings',
-    power_electronics: 'Power Electronics',
-    nacelle_housing: 'Nacelle Housing',
-    yaw_pitch_systems: 'Yaw & Pitch Systems',
-    tower_steel: 'Tower Steel',
-    tower_galvanizing: 'Tower Galvanizing',
-    internal_cabling: 'Internal Cabling',
-    substation_share: 'Substation Equipment',
-    scada_controls: 'SCADA & Controls',
-    foundation: 'Foundation Materials',
-  };
-
-  const contributors = buildStageContributors(stageBreakdown, {
-    includeComponent: (_stageName, componentName) => !excludedComponents.has(componentName),
-    labelForComponent: (stageName, componentName) => ({
-      label: labelMap[componentName] || toTitleCase(componentName),
-      component: toTitleCase(stageName),
-    }),
-  });
-
-  const baseCost = contributors.reduce((sum, item) => sum + item.value, 0);
-  const topDriver = contributors[0] ? { ...contributors[0] } : null;
-
-  const index = buildBaseCostIndex({
-    title: 'Idiot Index',
-    kind: 'system',
+export function buildWindIdiotIndex({ totalCost, contributors }) {
+  return buildDetailedSystemIdiotIndex({
     unit: '$/kW',
-    baseCost,
-    finishedCost: totalCost,
-    topDriver,
+    totalCost,
+    contributors,
     explanation: 'Finished wind turbine cost divided by a bottom-up material and equipment basket from the wind model. The remainder reflects fabrication, transport, erection, and other conversion layers.',
+    baseLabel: 'Bottom-up material basket',
+    upliftLabel: 'Fabrication / install layer',
   });
-
-  index.baseLabel = 'Bottom-up material basket';
-  index.upliftLabel = 'Fabrication / install layer';
-  index.contributors = contributors;
-  return index;
 }
 
 export function buildTradeUpliftIndex(selectedRoute) {

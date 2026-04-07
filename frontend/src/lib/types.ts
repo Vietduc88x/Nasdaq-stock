@@ -40,6 +40,8 @@ export interface MaterialImpact {
   asOf: string | null;
   currentPrice: { value: number; unit: string } | null;
   component: string;
+  usagePerUnit?: number;
+  usageUnit?: string;
   // Solar-specific ($/Wp)
   baselineContributionPerWp?: number;
   shareOfSystemPct?: number;
@@ -83,7 +85,17 @@ export interface CostIndexData {
   baseLabel?: string;
   upliftLabel?: string;
   topDriver: { label: string; component?: string; value: number } | null;
-  contributors?: Array<{ label: string; component?: string; value: number }>;
+  contributors?: Array<{
+    label: string;
+    component?: string;
+    value: number;
+    quantity?: number;
+    quantityUnit?: string;
+    rate?: number;
+    rateUnit?: string;
+    formula?: string;
+    note?: string;
+  }>;
   explanation: string;
 }
 
