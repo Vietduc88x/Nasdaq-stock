@@ -242,7 +242,7 @@ export default function PriceChart({ slug, yahooSymbol, name, currentPrice, unit
         )}
       </div>
 
-      <div className="relative" style={{ height: '240px' }}>
+      <div className="relative" style={{ height: '208px' }}>
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center" style={{ color: 'var(--text-faint)' }}>
             Loading history...

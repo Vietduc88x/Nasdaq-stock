@@ -42,8 +42,8 @@ export default function SystemHistoryCard({
         </div>
       </div>
 
-      <div className="rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.02)' }}>
-        <TrendLineChart points={data.points} height={180} stroke="var(--accent-blue, #60a5fa)" unit={data.unit} />
+      <div className="rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.02)' }}>
+        <TrendLineChart points={data.points} height={132} stroke="var(--accent-blue, #60a5fa)" unit={data.unit} />
         <div className="mt-3 flex flex-wrap items-center justify-end gap-3 text-[10px]" style={{ color: 'var(--text-faint)' }}>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">

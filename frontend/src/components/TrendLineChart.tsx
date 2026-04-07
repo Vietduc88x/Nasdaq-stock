@@ -18,10 +18,20 @@ function formatYAxisValue(value: number, unit?: string) {
   return `${value.toFixed(digits)} ${unit}`;
 }
 
+function getXTicks(points: Point[], coords: Array<{ x: number }>) {
+  const wanted = Math.min(4, points.length);
+  const ticks = Array.from({ length: wanted }, (_, step) => {
+    const index = Math.round((step * (points.length - 1)) / Math.max(wanted - 1, 1));
+    return { label: points[index].date, x: coords[index]?.x ?? 0 };
+  });
+
+  return ticks.filter((tick, index, arr) => index === 0 || tick.label !== arr[index - 1].label);
+}
+
 export default function TrendLineChart({
   points,
   width = 220,
-  height = 144,
+  height = 118,
   stroke = 'var(--accent-green)',
   unit,
 }: Props) {
@@ -34,7 +44,7 @@ export default function TrendLineChart({
   const domainMin = Math.max(0, min - range * 0.1);
   const domainMax = max + range * 0.1;
   const domainRange = domainMax - domainMin || 1;
-  const padding = { top: 10, right: 12, bottom: 28, left: 56 };
+  const padding = { top: 8, right: 10, bottom: 22, left: 50 };
   const innerWidth = width - padding.left - padding.right;
   const innerHeight = height - padding.top - padding.bottom;
 
@@ -54,8 +64,8 @@ export default function TrendLineChart({
     : coords.slice(firstProjectedIndex - 1);
 
   const toPolyline = (series: typeof coords) => series.map(point => `${point.x},${point.y}`).join(' ');
-  const yTicks = 4;
-  const xTicks = points.map((point, index) => ({ label: point.date, x: coords[index]?.x ?? padding.left }));
+  const yTicks = 3;
+  const xTicks = getXTicks(points, coords);
 
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="w-full h-auto">
@@ -76,7 +86,7 @@ export default function TrendLineChart({
               x={padding.left - 6}
               y={y + 3}
               textAnchor="end"
-              fontSize="9"
+              fontSize="8"
               fill="var(--text-faint)"
             >
               {formatYAxisValue(value, unit)}
@@ -128,10 +138,10 @@ export default function TrendLineChart({
           key={`point-${points[index].date}`}
           cx={point.x}
           cy={point.y}
-          r={3}
+          r={2.5}
           fill={point.projected ? stroke : '#0b1220'}
           stroke={stroke}
-          strokeWidth="1.5"
+          strokeWidth="1.25"
         />
       ))}
 
@@ -146,9 +156,9 @@ export default function TrendLineChart({
           />
           <text
             x={tick.x}
-            y={height - 8}
+            y={height - 6}
             textAnchor="middle"
-            fontSize="9"
+            fontSize="8"
             fill="var(--text-faint)"
           >
             {tick.label}
