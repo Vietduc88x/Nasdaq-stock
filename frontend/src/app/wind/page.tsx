@@ -4,6 +4,7 @@ import WaterfallChart from '@/components/WaterfallChart';
 import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
 import WindControls from '@/components/WindControls';
+import CostIndexCard from '@/components/CostIndexCard';
 
 export const revalidate = 60;
 
@@ -76,6 +77,8 @@ export default async function WindPage({
 
       {/* Controls */}
       <WindControls currentYear={data.params.year} />
+
+      <CostIndexCard data={data.idiotIndex} />
 
       {/* Freshness */}
       <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--text-faint)' }}>

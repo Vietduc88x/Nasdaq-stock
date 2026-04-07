@@ -6,6 +6,7 @@ import StageDetailCards from '@/components/StageDetailCards';
 import SolarControls from '@/components/SolarControls';
 import CountryComparisonPanel from '@/components/CountryComparisonPanel';
 import ForecastOutlookCard from '@/components/ForecastOutlookCard';
+import CostIndexCard from '@/components/CostIndexCard';
 
 export const revalidate = 60;
 
@@ -97,6 +98,8 @@ export default async function SolarPage({
 
       {/* Forecast Outlook */}
       {data.forecast && <ForecastOutlookCard forecast={data.forecast} />}
+
+      <CostIndexCard data={data.idiotIndex} />
 
       {/* Freshness */}
       <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--text-faint)' }}>

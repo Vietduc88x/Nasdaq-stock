@@ -71,12 +71,26 @@ export interface ForecastData {
   topDrivers: ForecastDriver[];
 }
 
+export interface CostIndexData {
+  title: string;
+  kind: 'system' | 'trade';
+  unit: string;
+  rawMaterialCost: number;
+  finishedCost: number;
+  conversionCost: number;
+  multiplier: number | null;
+  rawSharePct: number | null;
+  topDriver: { label: string; component?: string; value: number } | null;
+  explanation: string;
+}
+
 export interface SolarPageData {
   params: { country: string; tech: string; year: number };
   model: { version: string; asOf: string; totalCostPerWp: number };
   stageBreakdown: StageBreakdown[];
   materialImpacts: MaterialImpact[];
   forecast: ForecastData | null;
+  idiotIndex: CostIndexData;
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }
 
@@ -112,6 +126,7 @@ export interface WindPageData {
   };
   stageBreakdown: StageBreakdown[];
   materialImpacts: MaterialImpact[];
+  idiotIndex: CostIndexData;
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }
 
@@ -178,6 +193,7 @@ export interface LandedCostPageData {
   regime: PolicyRegime;
   regimes: PolicyRegime[];
   deltaVsBaseline: { ddpAbs: number; ddpPct: number } | null;
+  idiotIndex: CostIndexData | null;
 }
 
 export interface SolarImportTradeAdders {

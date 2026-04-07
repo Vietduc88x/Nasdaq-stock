@@ -9,6 +9,7 @@ import { computeBrief } from '../services/brief-service.js';
 import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getAvailableRegimes } from '../services/landed-cost-engine.js';
 import { calculateSolarImportComparison } from '../services/solar-import-simulator.js';
 import { getHistoryPageData } from '../services/history-service.js';
+import { buildSystemIdiotIndex, buildTradeUpliftIndex } from '../services/idiot-index-service.js';
 
 export function registerPageDataRoutes(app) {
   // GET /api/page/history
@@ -106,6 +107,7 @@ export function registerPageDataRoutes(app) {
           regime: activeRegime,
           regimes,
           deltaVsBaseline,
+          idiotIndex: buildTradeUpliftIndex(selectedRoute),
         };
       }
 
@@ -117,6 +119,7 @@ export function registerPageDataRoutes(app) {
         regime: activeRegime,
         regimes,
         deltaVsBaseline: null,
+        idiotIndex: null,
       };
     } catch (err) {
       if (err instanceof RangeError) {
@@ -250,6 +253,12 @@ export function registerPageDataRoutes(app) {
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
         forecast,
+        idiotIndex: buildSystemIdiotIndex({
+          totalCost: cost.totalCostPerWp,
+          unit: '$/Wp',
+          materials: materialImpacts,
+          baselineKey: 'baselineContributionPerWp',
+        }),
         meta: buildProvenance('solar', { liveCoverage, referenceCoverage, fallbacksUsed })
       };
     } catch (err) {
@@ -405,6 +414,12 @@ export function registerPageDataRoutes(app) {
         },
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
+        idiotIndex: buildSystemIdiotIndex({
+          totalCost: cost.totalCostPerKwh,
+          unit: '$/kWh',
+          materials: materialImpacts,
+          baselineKey: 'baselineCost',
+        }),
         meta: buildProvenance('bess', { liveCoverage, referenceCoverage, fallbacksUsed }),
       };
     } catch (err) {
@@ -471,6 +486,12 @@ export function registerPageDataRoutes(app) {
         },
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
+        idiotIndex: buildSystemIdiotIndex({
+          totalCost: cost.totalCostPerKw,
+          unit: '$/kW',
+          materials: materialImpacts,
+          baselineKey: 'baselineCost',
+        }),
         meta: buildProvenance('wind', { liveCoverage, referenceCoverage, fallbacksUsed }),
       };
     } catch (err) {

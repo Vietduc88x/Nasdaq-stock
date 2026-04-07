@@ -4,6 +4,7 @@ import WaterfallChart from '@/components/WaterfallChart';
 import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
 import BessControls from '@/components/BessControls';
+import CostIndexCard from '@/components/CostIndexCard';
 
 export const revalidate = 60;
 
@@ -61,6 +62,8 @@ export default async function BessPage({
 
       {/* Controls */}
       <BessControls currentChemistry={data.params.chemistry} currentYear={data.params.year} />
+
+      <CostIndexCard data={data.idiotIndex} />
 
       {/* Freshness + provenance */}
       <div className="flex items-center gap-2 text-[11px]" style={{ color: 'var(--text-faint)' }}>

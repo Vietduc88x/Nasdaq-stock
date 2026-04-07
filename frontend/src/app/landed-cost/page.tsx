@@ -4,6 +4,7 @@ import LandedCostSummaryCard from '@/components/LandedCostSummaryCard';
 import RouteComparisonTable from '@/components/RouteComparisonTable';
 import PolicyRegimeControls from '@/components/PolicyRegimeControls';
 import WaterfallChart from '@/components/WaterfallChart';
+import CostIndexCard from '@/components/CostIndexCard';
 
 export const revalidate = 60;
 
@@ -88,15 +89,17 @@ export default async function LandedCostPage({
                 {selected.params.from} → {selected.params.to}
               </div>
             </div>
-            <div className="text-right">
-              <div className="font-price text-[32px] font-bold tracking-tight" style={{ color: 'var(--up)' }}>
-                ${selected.breakdown.ddp.toFixed(3)}
+          <div className="text-right">
+            <div className="font-price text-[32px] font-bold tracking-tight" style={{ color: 'var(--up)' }}>
+              ${selected.breakdown.ddp.toFixed(3)}
               </div>
               <div className="text-[12px]" style={{ color: 'var(--text-muted)' }}>
                 DDP $/Wp &middot; +{selected.summary.ddpPremiumPct.toFixed(1)}% over EXW
-              </div>
             </div>
           </div>
+        </div>
+
+          {data.idiotIndex && <CostIndexCard data={data.idiotIndex} />}
 
           {/* Summary card */}
           <LandedCostSummaryCard result={selected} />
