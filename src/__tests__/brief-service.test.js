@@ -197,4 +197,9 @@ describe('computeBrief (integration)', () => {
         .toBeGreaterThanOrEqual(Math.abs(brief.movers[i].topImpact.delta));
     }
   });
+
+  it('skips live materials with no downstream impact model', async () => {
+    const brief = await computeBrief();
+    expect(brief.movers.some(mover => mover.material === 'gold')).toBe(false);
+  });
 });

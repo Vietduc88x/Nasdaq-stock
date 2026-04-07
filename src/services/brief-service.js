@@ -141,6 +141,7 @@ export async function computeBrief() {
 
   // Compute deltas — both today AND yesterday must be live for a valid comparison
   const movers = [];
+  let validComparisons = 0;
   for (const tp of todayPrices) {
     const todayPrice = tp.price;
     if (!todayPrice || todayPrice.fallbackUsed || todayPrice.source === 'reference') continue;
@@ -164,6 +165,12 @@ export async function computeBrief() {
       baselineCost: i.baselineCost,
     }));
 
+    // Some live materials like gold are market anchors with no downstream system model.
+    // They belong on the dashboard, but not in the Morning Brief mover ranking.
+    if (systemImpacts.length === 0) continue;
+
+    validComparisons++;
+
     const maxImpact = systemImpacts.reduce((max, i) =>
       Math.abs(i.delta) > Math.abs(max.delta) ? i : max,
       systemImpacts[0]
@@ -186,7 +193,7 @@ export async function computeBrief() {
   movers.sort((a, b) => Math.abs(b.topImpact.delta) - Math.abs(a.topImpact.delta));
 
   const liveMaterials = todayPrices.filter(p => p.price && !p.price.fallbackUsed && p.price.source !== 'reference').length;
-  const liveComparisons = yesterdayMap.size;
+  const liveComparisons = validComparisons;
   // Degraded: we have a snapshot but too few live-vs-live pairs for meaningful comparison
   const degraded = liveMaterials > 0 && liveComparisons === 0;
 
