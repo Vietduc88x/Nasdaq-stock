@@ -9,7 +9,7 @@ import { computeBrief } from '../services/brief-service.js';
 import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getAvailableRegimes } from '../services/landed-cost-engine.js';
 import { calculateSolarImportComparison } from '../services/solar-import-simulator.js';
 import { getHistoryPageData } from '../services/history-service.js';
-import { buildSystemIdiotIndex, buildTradeUpliftIndex } from '../services/idiot-index-service.js';
+import { buildBessIdiotIndex, buildSystemIdiotIndex, buildTradeUpliftIndex, buildWindIdiotIndex } from '../services/idiot-index-service.js';
 
 export function registerPageDataRoutes(app) {
   // GET /api/page/history
@@ -414,11 +414,9 @@ export function registerPageDataRoutes(app) {
         },
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
-        idiotIndex: buildSystemIdiotIndex({
+        idiotIndex: buildBessIdiotIndex({
           totalCost: cost.totalCostPerKwh,
-          unit: '$/kWh',
-          materials: materialImpacts,
-          baselineKey: 'baselineCost',
+          stageBreakdown: cost.stageBreakdown,
         }),
         meta: buildProvenance('bess', { liveCoverage, referenceCoverage, fallbacksUsed }),
       };
@@ -486,11 +484,9 @@ export function registerPageDataRoutes(app) {
         },
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
-        idiotIndex: buildSystemIdiotIndex({
+        idiotIndex: buildWindIdiotIndex({
           totalCost: cost.totalCostPerKw,
-          unit: '$/kW',
-          materials: materialImpacts,
-          baselineKey: 'baselineCost',
+          stageBreakdown: cost.stageBreakdown,
         }),
         meta: buildProvenance('wind', { liveCoverage, referenceCoverage, fallbacksUsed }),
       };

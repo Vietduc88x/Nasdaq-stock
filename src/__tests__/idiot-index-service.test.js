@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { buildSystemIdiotIndex, buildTradeUpliftIndex } from '../services/idiot-index-service.js';
+import { buildBessIdiotIndex, buildSystemIdiotIndex, buildTradeUpliftIndex, buildWindIdiotIndex } from '../services/idiot-index-service.js';
+import { calculateBessCost } from '../services/bess-cost-engine.js';
+import { calculateWindCost } from '../services/wind-cost-engine.js';
 
 describe('idiot-index-service', () => {
   it('builds a system idiot index from material contributions', () => {
@@ -48,5 +50,36 @@ describe('idiot-index-service', () => {
 
   it('returns null for trade uplift without a selected route', () => {
     expect(buildTradeUpliftIndex(null)).toBeNull();
+  });
+
+  it('builds a BESS idiot index from BatPaC stage components', () => {
+    const cost = calculateBessCost('lfp', 2025);
+    const index = buildBessIdiotIndex({
+      totalCost: cost.totalCostPerKwh,
+      stageBreakdown: cost.stageBreakdown,
+    });
+
+    expect(index.rawMaterialCost).toBeGreaterThan(40);
+    expect(index.rawMaterialCost).toBeLessThan(cost.totalCostPerKwh);
+    expect(index.multiplier).toBeGreaterThan(1);
+    expect(index.multiplier).toBeLessThan(2);
+    expect(index.topDriver?.label).toBe('Cathode Active Material');
+    expect(index.contributors?.some(item => item.label === 'Cathode Active Material')).toBe(true);
+    expect(index.contributors?.some(item => item.label === 'Formation Cycling')).toBe(false);
+  });
+
+  it('builds a wind idiot index from bottom-up stage components', () => {
+    const cost = calculateWindCost('onshore', 2025);
+    const index = buildWindIdiotIndex({
+      totalCost: cost.totalCostPerKw,
+      stageBreakdown: cost.stageBreakdown,
+    });
+
+    expect(index.rawMaterialCost).toBeGreaterThan(1000);
+    expect(index.rawMaterialCost).toBeLessThan(cost.totalCostPerKw);
+    expect(index.multiplier).toBeGreaterThan(1);
+    expect(index.multiplier).toBeLessThan(1.5);
+    expect(index.topDriver?.label).toBe('Tower Steel');
+    expect(index.contributors?.some(item => item.label === 'Crane Erection')).toBe(false);
   });
 });
