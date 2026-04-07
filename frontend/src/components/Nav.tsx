@@ -10,6 +10,7 @@ const links = [
   { href: '/bess', label: 'BESS' },
   { href: '/wind', label: 'Wind' },
   { href: '/landed-cost', label: 'Trade' },
+  { href: '/history', label: 'History' },
 ];
 
 export default function Nav() {

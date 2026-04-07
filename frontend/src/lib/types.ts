@@ -211,6 +211,38 @@ export interface SolarImportPageData {
   regimes: PolicyRegime[];
 }
 
+export interface HistoryPoint {
+  date: string;
+  value: number;
+  unit?: string;
+  source?: string;
+  coverageTier?: string;
+}
+
+export interface HistorySeries {
+  slug?: string;
+  name?: string;
+  icon?: string;
+  label?: string;
+  unit: string;
+  points: HistoryPoint[];
+  latestValue: number;
+  latestDate: string;
+  changePctSinceStart: number;
+}
+
+export interface HistoryPageData {
+  observedMaterials: Array<HistorySeries & { slug: string; name: string; icon: string }>;
+  roadmapBenchmarks: Array<HistorySeries & { label: string }>;
+  meta: {
+    snapshotCount: number;
+    historyStartDate: string | null;
+    latestSnapshotDate: string | null;
+    trackedMaterialCount: number;
+    notes: { observed: string; roadmap: string };
+  };
+}
+
 export interface CrossSystemImpact {
   system: string;
   component: string;

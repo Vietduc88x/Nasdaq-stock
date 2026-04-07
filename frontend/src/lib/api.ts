@@ -1,4 +1,4 @@
-import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, LandedCostPageData, SolarImportPageData, MaterialDetailData } from './types';
+import type { HomePageData, SolarPageData, SolarCompareData, WindPageData, BriefData, LandedCostPageData, SolarImportPageData, MaterialDetailData, HistoryPageData } from './types';
 
 // Server-side (build/SSR) needs absolute URL; client-side uses relative (rewrite handles it)
 const BASE = typeof window === 'undefined'
@@ -14,6 +14,12 @@ export async function fetchBrief(): Promise<BriefData> {
 export async function fetchHomePage(): Promise<HomePageData> {
   const res = await fetch(`${BASE}/api/page/home`, { next: { revalidate: 60 } });
   if (!res.ok) throw new Error(`Home page fetch failed: ${res.status}`);
+  return res.json();
+}
+
+export async function fetchHistoryPage(): Promise<HistoryPageData> {
+  const res = await fetch(`${BASE}/api/page/history`, { next: { revalidate: 300 } });
+  if (!res.ok) throw new Error(`History page fetch failed: ${res.status}`);
   return res.json();
 }
 

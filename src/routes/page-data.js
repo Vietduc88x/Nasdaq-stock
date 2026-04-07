@@ -8,8 +8,20 @@ import { calculateWindCost } from '../services/wind-cost-engine.js';
 import { computeBrief } from '../services/brief-service.js';
 import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getAvailableRegimes } from '../services/landed-cost-engine.js';
 import { calculateSolarImportComparison } from '../services/solar-import-simulator.js';
+import { getHistoryPageData } from '../services/history-service.js';
 
 export function registerPageDataRoutes(app) {
+  // GET /api/page/history
+  app.get('/api/page/history', async (request, reply) => {
+    try {
+      return getHistoryPageData();
+    } catch (err) {
+      request.log.error({ err }, 'Page history error');
+      reply.code(500);
+      return { error: 'Calculation error' };
+    }
+  });
+
   // GET /api/page/solar-import?dest=VN&source=CN&tech=topcon&year=2025
   app.get('/api/page/solar-import', async (request, reply) => {
     const dest = (request.query.dest || 'VN').toUpperCase();

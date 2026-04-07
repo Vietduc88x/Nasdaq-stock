@@ -280,6 +280,34 @@ describe('GET /api/page/brief — route integration', () => {
   });
 });
 
+describe('GET /api/page/history — route integration', () => {
+  it('returns 200 with observed and roadmap history data', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/history',
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.observedMaterials.length).toBeGreaterThan(0);
+    expect(body.roadmapBenchmarks.length).toBeGreaterThan(0);
+    expect(body.meta.snapshotCount).toBeGreaterThan(0);
+  });
+
+  it('history response shape includes notes and latest snapshot metadata', async () => {
+    const res = await app.inject({
+      method: 'GET',
+      url: '/api/page/history',
+    });
+
+    const body = res.json();
+    expect(body.meta).toHaveProperty('historyStartDate');
+    expect(body.meta).toHaveProperty('latestSnapshotDate');
+    expect(body.meta.notes).toHaveProperty('observed');
+    expect(body.meta.notes).toHaveProperty('roadmap');
+  });
+});
+
 describe('GET /api/page/landed-cost — route integration', () => {
   it('returns comparison for all routes when no from/to', async () => {
     const res = await app.inject({
