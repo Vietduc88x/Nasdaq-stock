@@ -4,6 +4,7 @@ import SolarImportControls from '@/components/SolarImportControls';
 import SourcingScenarioTable from '@/components/SourcingScenarioTable';
 import PolicyRegimeControls from '@/components/PolicyRegimeControls';
 import WaterfallChart from '@/components/WaterfallChart';
+import CostIndexCard from '@/components/CostIndexCard';
 
 export const revalidate = 60;
 
@@ -119,6 +120,8 @@ export default async function SolarImportPage({
           </div>
         </div>
       </div>
+
+      {cheapest.scenarioIndex && <CostIndexCard data={cheapest.scenarioIndex} />}
 
       {/* Scenario comparison table */}
       <SourcingScenarioTable scenarios={data.scenarios} />

@@ -13,6 +13,27 @@ function safeRatio(numerator, denominator) {
   return numerator / denominator;
 }
 
+function buildBaseCostIndex({ title, kind, unit, baseCost, finishedCost, topDriver, explanation }) {
+  const normalizedBaseCost = round4(baseCost);
+  const normalizedFinishedCost = round4(finishedCost);
+  const upliftCost = round4(normalizedFinishedCost - normalizedBaseCost);
+  const multiplier = safeRatio(normalizedFinishedCost, normalizedBaseCost);
+  const baseShare = safeRatio(normalizedBaseCost, normalizedFinishedCost);
+
+  return {
+    title,
+    kind,
+    unit,
+    rawMaterialCost: normalizedBaseCost,
+    finishedCost: normalizedFinishedCost,
+    conversionCost: upliftCost,
+    multiplier: multiplier ? round2(multiplier) : null,
+    rawSharePct: baseShare ? round2(baseShare * 100) : null,
+    topDriver,
+    explanation,
+  };
+}
+
 function buildTopMaterial(materials, getBaseline) {
   const top = materials
     .map(material => ({
@@ -51,47 +72,40 @@ function buildTopTradeAdder(selectedRoute) {
 }
 
 export function buildSystemIdiotIndex({ title = 'Idiot Index', totalCost, unit, materials, baselineKey = 'baselineCost' }) {
-  const rawMaterialCost = round4(
+  const rawMaterialCost =
     materials.reduce((sum, material) => sum + (Number(material[baselineKey]) || 0), 0)
-  );
-  const finishedCost = round4(totalCost);
-  const conversionCost = round4(finishedCost - rawMaterialCost);
-  const multiplier = safeRatio(finishedCost, rawMaterialCost);
-  const rawShare = safeRatio(rawMaterialCost, finishedCost);
-
-  return {
+  return buildBaseCostIndex({
     title,
     kind: 'system',
     unit,
-    rawMaterialCost,
-    finishedCost,
-    conversionCost,
-    multiplier: multiplier ? round2(multiplier) : null,
-    rawSharePct: rawShare ? round2(rawShare * 100) : null,
+    baseCost: rawMaterialCost,
+    finishedCost: totalCost,
     topDriver: buildTopMaterial(materials, material => Number(material[baselineKey]) || 0),
     explanation: 'Finished cost divided by the raw-material basket. Higher values imply more conversion cost, overhead, logistics, or margin layered on top of materials.',
-  };
+  });
 }
 
 export function buildTradeUpliftIndex(selectedRoute) {
   if (!selectedRoute) return null;
-
-  const rawMaterialCost = round4(selectedRoute.breakdown.exw);
-  const finishedCost = round4(selectedRoute.breakdown.ddp);
-  const conversionCost = round4(finishedCost - rawMaterialCost);
-  const multiplier = safeRatio(finishedCost, rawMaterialCost);
-  const rawShare = safeRatio(rawMaterialCost, finishedCost);
-
-  return {
+  return buildBaseCostIndex({
     title: 'Trade Uplift Index',
     kind: 'trade',
     unit: '$/Wp',
-    rawMaterialCost,
-    finishedCost,
-    conversionCost,
-    multiplier: multiplier ? round2(multiplier) : null,
-    rawSharePct: rawShare ? round2(rawShare * 100) : null,
+    baseCost: selectedRoute.breakdown.exw,
+    finishedCost: selectedRoute.breakdown.ddp,
     topDriver: buildTopTradeAdder(selectedRoute),
     explanation: 'Delivered landed cost divided by factory EXW cost. Higher values mean tariffs, freight, insurance, and clearance are adding more friction to the route.',
-  };
+  });
+}
+
+export function buildScenarioUpliftIndex({ title = 'Scenario Index', unit, baseCost, finishedCost, topDriver }) {
+  return buildBaseCostIndex({
+    title,
+    kind: 'trade',
+    unit,
+    baseCost,
+    finishedCost,
+    topDriver,
+    explanation: 'Delivered scenario cost divided by the underlying factory-side scenario value. Higher values mean more trade friction or downstream cost layered on top of the source manufacturing value.',
+  });
 }

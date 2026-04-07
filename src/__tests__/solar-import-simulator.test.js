@@ -153,6 +153,15 @@ describe('Solar Import Simulator', () => {
         }
       }
     });
+
+    it('each scenario includes a scenarioIndex', () => {
+      const comparison = calculateSolarImportComparison({ dest: DEST, source: SOURCE, tech: TECH, year: YEAR });
+      for (const s of comparison.scenarios) {
+        expect(s.scenarioIndex).toBeTruthy();
+        expect(s.scenarioIndex.unit).toBe('$/Wp');
+        expect(s.scenarioIndex.multiplier).toBeGreaterThan(0);
+      }
+    });
   });
 
   describe('Validation', () => {

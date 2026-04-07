@@ -19,6 +19,7 @@ export default function SourcingScenarioTable({ scenarios }: Props) {
             <tr className="text-[10px] font-semibold uppercase tracking-wider" style={{ color: 'var(--text-faint)' }}>
               <th className="text-left pb-2 pr-3">Strategy</th>
               <th className="text-right pb-2 pr-3">Final Cost</th>
+              <th className="text-right pb-2 pr-3 hidden md:table-cell">Index</th>
               <th className="text-right pb-2 pr-3">vs Domestic</th>
               <th className="text-left pb-2 pr-3 hidden sm:table-cell">Main Driver</th>
             </tr>
@@ -56,6 +57,9 @@ export default function SourcingScenarioTable({ scenarios }: Props) {
                   </td>
                   <td className="text-right py-3 pr-3 font-price font-semibold" style={{ color: 'var(--text-primary)' }}>
                     ${s.totalCostPerWp.toFixed(3)}/Wp
+                  </td>
+                  <td className="text-right py-3 pr-3 font-price hidden md:table-cell" style={{ color: 'var(--accent-gold)' }}>
+                    {s.scenarioIndex?.multiplier ? `${s.scenarioIndex.multiplier.toFixed(1)}x` : '—'}
                   </td>
                   <td className="text-right py-3 pr-3 font-price" style={{
                     color: isDomestic ? 'var(--text-faint)' :

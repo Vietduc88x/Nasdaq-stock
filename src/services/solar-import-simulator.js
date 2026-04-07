@@ -22,6 +22,7 @@
 
 import { calculateSolarCost } from './solar-model-service.js';
 import { calculateLandedCost, getLandedCostMeta } from './landed-cost-engine.js';
+import { buildScenarioUpliftIndex } from './idiot-index-service.js';
 
 const VALID_SCENARIOS = ['domestic', 'wafer_import', 'cell_import', 'module_import'];
 const SCENARIO_LABELS = {
@@ -73,6 +74,7 @@ function buildScenarioResult({ scenario, label, totalCostPerWp, domestic, stageB
     deltaPct,
     stageBreakdown,
     tradeAdders,
+    scenarioIndex: null,
   };
 }
 
@@ -188,25 +190,44 @@ export function calculateSolarImportScenario({ dest, source, tech, year, scenari
  */
 export function calculateSolarImportComparison({ dest, source, tech, year, regime = 'current' }) {
   const destCost = calculateSolarCost(dest, tech, year);
+  const destStages = getSolarStageMap(destCost);
 
   const scenarios = VALID_SCENARIOS.map(scenario =>
     calculateSolarImportScenario({ dest, source, tech, year, scenario, regime })
   );
 
   // Best-driver analysis for each import scenario
-  const destStages = getSolarStageMap(destCost);
-
   for (const s of scenarios) {
-    if (s.scenario === 'domestic' || !s.tradeAdders) {
+    if (s.scenario === 'domestic') {
       s.mainDriver = null;
+      s.scenarioIndex = buildScenarioUpliftIndex({
+        title: 'Scenario Index',
+        unit: '$/Wp',
+        baseCost: destStages.polysilicon + destStages.wafer + destStages.cell + destStages.module,
+        finishedCost: s.totalCostPerWp,
+        topDriver: {
+          label: 'Local conversion stack',
+          value: round5(s.totalCostPerWp - (destStages.polysilicon + destStages.wafer + destStages.cell + destStages.module)),
+        },
+      });
       continue;
     }
 
     let equivalentLocalUpstream;
+    let scenarioFactoryValue;
     switch (s.tradeAdders.product) {
-      case 'wafer': equivalentLocalUpstream = destStages.polysilicon + destStages.wafer; break;
-      case 'cell': equivalentLocalUpstream = destStages.polysilicon + destStages.wafer + destStages.cell; break;
-      case 'module': equivalentLocalUpstream = destCost.totalCostPerWp; break;
+      case 'wafer':
+        equivalentLocalUpstream = destStages.polysilicon + destStages.wafer;
+        scenarioFactoryValue = s.tradeAdders.exportExw + destStages.cell + destStages.module;
+        break;
+      case 'cell':
+        equivalentLocalUpstream = destStages.polysilicon + destStages.wafer + destStages.cell;
+        scenarioFactoryValue = s.tradeAdders.exportExw + destStages.module;
+        break;
+      case 'module':
+        equivalentLocalUpstream = destCost.totalCostPerWp;
+        scenarioFactoryValue = s.tradeAdders.exportExw;
+        break;
     }
 
     const manufacturingDelta = round5(s.tradeAdders.exportExw - equivalentLocalUpstream);
@@ -220,6 +241,16 @@ export function calculateSolarImportComparison({ dest, source, tech, year, regim
       tradeBurden: round5(tradeBurden),
       netDelta: s.deltaVsDomestic,
     };
+    s.scenarioIndex = buildScenarioUpliftIndex({
+      title: 'Scenario Index',
+      unit: '$/Wp',
+      baseCost: scenarioFactoryValue,
+      finishedCost: s.totalCostPerWp,
+      topDriver: {
+        label: s.mainDriver === 'Tariff and freight burden' ? 'Trade burden' : 'Factory value gap',
+        value: Math.abs(s.mainDriver === 'Tariff and freight burden' ? tradeBurden : manufacturingDelta),
+      },
+    });
   }
 
   // Ranking: find cheapest scenario under this regime

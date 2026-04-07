@@ -215,6 +215,7 @@ export interface SolarImportScenario {
   tradeAdders: SolarImportTradeAdders | null;
   mainDriver: string | null;
   driverDetail?: { manufacturingDelta: number; tradeBurden: number; netDelta: number };
+  scenarioIndex: CostIndexData | null;
 }
 
 export interface SolarImportPageData {
