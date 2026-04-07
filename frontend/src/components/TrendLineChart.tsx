@@ -30,8 +30,8 @@ function getXTicks(points: Point[], coords: Array<{ x: number }>) {
 
 export default function TrendLineChart({
   points,
-  width = 220,
-  height = 118,
+  width = 720,
+  height = 168,
   stroke = 'var(--accent-green)',
   unit,
 }: Props) {
@@ -44,7 +44,7 @@ export default function TrendLineChart({
   const domainMin = Math.max(0, min - range * 0.1);
   const domainMax = max + range * 0.1;
   const domainRange = domainMax - domainMin || 1;
-  const padding = { top: 8, right: 10, bottom: 22, left: 50 };
+  const padding = { top: 10, right: 16, bottom: 32, left: 72 };
   const innerWidth = width - padding.left - padding.right;
   const innerHeight = height - padding.top - padding.bottom;
 
@@ -86,7 +86,7 @@ export default function TrendLineChart({
               x={padding.left - 6}
               y={y + 3}
               textAnchor="end"
-              fontSize="8"
+              fontSize="12"
               fill="var(--text-faint)"
             >
               {formatYAxisValue(value, unit)}
@@ -138,10 +138,10 @@ export default function TrendLineChart({
           key={`point-${points[index].date}`}
           cx={point.x}
           cy={point.y}
-          r={2.5}
+          r={4}
           fill={point.projected ? stroke : '#0b1220'}
           stroke={stroke}
-          strokeWidth="1.25"
+          strokeWidth="2"
         />
       ))}
 
@@ -156,9 +156,9 @@ export default function TrendLineChart({
           />
           <text
             x={tick.x}
-            y={height - 6}
+            y={height - 10}
             textAnchor="middle"
-            fontSize="8"
+            fontSize="12"
             fill="var(--text-faint)"
           >
             {tick.label}
