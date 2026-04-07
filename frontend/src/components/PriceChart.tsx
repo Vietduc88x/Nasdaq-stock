@@ -123,8 +123,8 @@ export default function PriceChart({ slug, yahooSymbol, name, currentPrice, unit
     const ySteps = 4;
     ctx.strokeStyle = 'rgba(255,255,255,0.04)';
     ctx.lineWidth = 1;
-    ctx.fillStyle = 'rgba(255,255,255,0.25)';
-    ctx.font = '10px SF Mono, monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.font = '11px SF Mono, monospace';
     ctx.textAlign = 'right';
 
     for (let i = 0; i <= ySteps; i++) {
@@ -180,8 +180,8 @@ export default function PriceChart({ slug, yahooSymbol, name, currentPrice, unit
     ctx.fillText(`$${last.toFixed(last >= 100 ? 0 : 2)}`, w - padding.right + 6, lastY + 3);
 
     const xTicks = getXAxisTicks(dates);
-    ctx.fillStyle = 'rgba(255,255,255,0.35)';
-    ctx.font = '10px SF Mono, monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.62)';
+    ctx.font = '11px SF Mono, monospace';
     ctx.textAlign = 'center';
 
     for (const tick of xTicks) {
@@ -266,17 +266,17 @@ export default function PriceChart({ slug, yahooSymbol, name, currentPrice, unit
       </div>
 
       {history && (
-        <div className="mt-3 flex items-center justify-between gap-3 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+        <div className="mt-3 flex items-center justify-between gap-3 text-[12px]" style={{ color: 'var(--text-secondary)' }}>
           <span>
             {history.points[0]?.date || 'n/a'} to {history.points[history.points.length - 1]?.date || 'n/a'}
           </span>
-          <span style={{ color: isSnapshotOnly ? 'var(--text-faint)' : 'var(--text-secondary)' }}>
+          <span style={{ color: isSnapshotOnly ? 'var(--text-muted)' : 'var(--text-primary)' }}>
             {history.sourceKind === 'yahoo' ? 'Live market history' : history.sourceKind === 'snapshot_fallback' ? 'Snapshot fallback' : history.sourceKind === 'snapshot' ? 'Persisted snapshots' : 'Unavailable'}
           </span>
         </div>
       )}
       {history?.note && (
-        <div className="mt-1 text-[11px]" style={{ color: 'var(--text-faint)' }}>
+        <div className="mt-1 text-[12px]" style={{ color: 'var(--text-muted)' }}>
           {history.note}
         </div>
       )}
