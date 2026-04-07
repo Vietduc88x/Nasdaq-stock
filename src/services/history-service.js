@@ -104,6 +104,60 @@ function buildRoadmapSeries(label, unit, years, calculator) {
   };
 }
 
+function buildSystemSeries(label, unit, years, selectedYear, calculator) {
+  const points = years.map(year => ({
+    date: String(year),
+    value: calculator(year),
+    projected: year > selectedYear,
+  }));
+
+  const currentPoint = points.find(point => point.date === String(selectedYear)) || points[0];
+  const first = points[0];
+  const changePct = first.value > 0
+    ? round2(((currentPoint.value - first.value) / first.value) * 100)
+    : 0;
+
+  return {
+    label,
+    unit,
+    points,
+    latestValue: currentPoint.value,
+    latestDate: currentPoint.date,
+    changePctSinceStart: changePct,
+    selectedYear,
+  };
+}
+
+export function getSolarHistorySeries(country = 'VN', tech = 'topcon', selectedYear = 2025) {
+  return buildSystemSeries(
+    `${country} ${tech.toUpperCase()} module benchmark`,
+    '$/Wp',
+    SOLAR_YEARS,
+    selectedYear,
+    year => calculateSolarCost(country, tech, year).totalCostPerWp
+  );
+}
+
+export function getBessHistorySeries(chemistry = 'lfp', selectedYear = 2025) {
+  return buildSystemSeries(
+    `${chemistry.toUpperCase()} pack benchmark`,
+    '$/kWh',
+    BESS_YEARS,
+    selectedYear,
+    year => calculateBessCost(chemistry, year).totalCostPerKwh
+  );
+}
+
+export function getWindHistorySeries(turbineType = 'onshore', selectedYear = 2025) {
+  return buildSystemSeries(
+    `${turbineType} wind benchmark`,
+    '$/kW',
+    WIND_YEARS,
+    selectedYear,
+    year => calculateWindCost(turbineType, year).totalCostPerKw
+  );
+}
+
 export function getHistoryPageData() {
   const snapshotDates = safeSnapshotDates();
   const materialMap = getMaterialCatalogMap();
@@ -113,16 +167,16 @@ export function getHistoryPageData() {
     .filter(Boolean);
 
   const roadmapBenchmarks = [
-    buildRoadmapSeries('Solar PV Module — Vietnam TOPCon', '$/Wp', SOLAR_YEARS, year => ({
+    buildRoadmapSeries('Solar PV Module - Vietnam TOPCon', '$/Wp', SOLAR_YEARS, year => ({
       value: calculateSolarCost('VN', 'topcon', year).totalCostPerWp,
     })),
-    buildRoadmapSeries('BESS Pack — LFP', '$/kWh', BESS_YEARS, year => ({
+    buildRoadmapSeries('BESS Pack - LFP', '$/kWh', BESS_YEARS, year => ({
       value: calculateBessCost('lfp', year).totalCostPerKwh,
     })),
     buildRoadmapSeries('Onshore Wind Turbine', '$/kW', WIND_YEARS, year => ({
       value: calculateWindCost('onshore', year).totalCostPerKw,
     })),
-    buildRoadmapSeries('CN→US Module DDP — Current Policy', '$/Wp', [2025, 2026], year => ({
+    buildRoadmapSeries('CN->US Module DDP - Current Policy', '$/Wp', [2025, 2026], year => ({
       value: calculateLandedCost({
         from: 'CN',
         to: 'US',

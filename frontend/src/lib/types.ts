@@ -105,6 +105,7 @@ export interface SolarPageData {
   stageBreakdown: StageBreakdown[];
   materialImpacts: MaterialImpact[];
   forecast: ForecastData | null;
+  history: HistorySeries;
   idiotIndex: CostIndexData;
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }
@@ -141,6 +142,7 @@ export interface WindPageData {
   };
   stageBreakdown: StageBreakdown[];
   materialImpacts: MaterialImpact[];
+  history: HistorySeries;
   idiotIndex: CostIndexData;
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }
@@ -249,6 +251,7 @@ export interface HistoryPoint {
   unit?: string;
   source?: string;
   coverageTier?: string;
+  projected?: boolean;
 }
 
 export interface HistorySeries {
@@ -261,6 +264,7 @@ export interface HistorySeries {
   latestValue: number;
   latestDate: string;
   changePctSinceStart: number;
+  selectedYear?: number;
 }
 
 export interface HistoryPageData {

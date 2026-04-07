@@ -5,6 +5,7 @@ import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
 import BessControls from '@/components/BessControls';
 import CostIndexCard from '@/components/CostIndexCard';
+import SystemHistoryCard from '@/components/SystemHistoryCard';
 
 export const revalidate = 60;
 
@@ -62,6 +63,12 @@ export default async function BessPage({
 
       {/* Controls */}
       <BessControls currentChemistry={data.params.chemistry} currentYear={data.params.year} />
+
+      <SystemHistoryCard
+        title="Cost History & Outlook"
+        subtitle="Modeled benchmark history for the selected chemistry. Future roadmap points are shown as a dashed line."
+        data={data.history}
+      />
 
       <CostIndexCard data={data.idiotIndex} />
 

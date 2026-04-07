@@ -8,7 +8,7 @@ import { calculateWindCost, getWindBaseBasket } from '../services/wind-cost-engi
 import { computeBrief } from '../services/brief-service.js';
 import { calculateLandedCost, calculateAllRoutes, getAvailableRoutes, getAvailableRegimes } from '../services/landed-cost-engine.js';
 import { calculateSolarImportComparison } from '../services/solar-import-simulator.js';
-import { getHistoryPageData } from '../services/history-service.js';
+import { getBessHistorySeries, getHistoryPageData, getSolarHistorySeries, getWindHistorySeries } from '../services/history-service.js';
 import { buildBessIdiotIndex, buildSystemIdiotIndex, buildTradeUpliftIndex, buildWindIdiotIndex } from '../services/idiot-index-service.js';
 
 export function registerPageDataRoutes(app) {
@@ -255,6 +255,7 @@ export function registerPageDataRoutes(app) {
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
         forecast,
+        history: getSolarHistorySeries(country, tech, year),
         idiotIndex: buildSystemIdiotIndex({
           totalCost: cost.totalCostPerWp,
           unit: '$/Wp',
@@ -418,6 +419,7 @@ export function registerPageDataRoutes(app) {
         },
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
+        history: getBessHistorySeries(chemistry, year),
         idiotIndex: buildBessIdiotIndex({
           totalCost: cost.totalCostPerKwh,
           contributors: getBessBaseBasket(chemistry, year),
@@ -490,6 +492,7 @@ export function registerPageDataRoutes(app) {
         },
         stageBreakdown: cost.stageBreakdown,
         materialImpacts,
+        history: getWindHistorySeries(turbineType, year),
         idiotIndex: buildWindIdiotIndex({
           totalCost: cost.totalCostPerKw,
           contributors: getWindBaseBasket(year),

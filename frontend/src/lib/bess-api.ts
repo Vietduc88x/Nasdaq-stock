@@ -1,10 +1,11 @@
-import type { MaterialImpact, CostIndexData } from './types';
+import type { MaterialImpact, CostIndexData, HistorySeries } from './types';
 
 export interface BessPageData {
   params: { chemistry: string; year: number };
   model: { version: string; costingMethod: string; asOf: string; totalCostPerKwh: number };
   stageBreakdown: { stage: string; costPerKwh: number; components: Record<string, number> }[];
   materialImpacts: MaterialImpact[];
+  history: HistorySeries;
   idiotIndex: CostIndexData;
   meta: { freshness: string; liveCoveragePct: number; referenceCoveragePct: number };
 }

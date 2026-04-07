@@ -7,6 +7,7 @@ import SolarControls from '@/components/SolarControls';
 import CountryComparisonPanel from '@/components/CountryComparisonPanel';
 import ForecastOutlookCard from '@/components/ForecastOutlookCard';
 import CostIndexCard from '@/components/CostIndexCard';
+import SystemHistoryCard from '@/components/SystemHistoryCard';
 
 export const revalidate = 60;
 
@@ -98,6 +99,12 @@ export default async function SolarPage({
 
       {/* Forecast Outlook */}
       {data.forecast && <ForecastOutlookCard forecast={data.forecast} />}
+
+      <SystemHistoryCard
+        title="Cost History & Outlook"
+        subtitle="Modeled benchmark history for the selected country and technology. Future roadmap points are shown as a dashed line."
+        data={data.history}
+      />
 
       <CostIndexCard data={data.idiotIndex} />
 

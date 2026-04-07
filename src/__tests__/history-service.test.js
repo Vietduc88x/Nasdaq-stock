@@ -25,10 +25,10 @@ describe('history-service', () => {
     const data = getHistoryPageData();
 
     expect(data.roadmapBenchmarks).toHaveLength(4);
-    expect(data.roadmapBenchmarks.map(series => series.label)).toContain('Solar PV Module — Vietnam TOPCon');
-    expect(data.roadmapBenchmarks.map(series => series.label)).toContain('BESS Pack — LFP');
+    expect(data.roadmapBenchmarks.map(series => series.label)).toContain('Solar PV Module - Vietnam TOPCon');
+    expect(data.roadmapBenchmarks.map(series => series.label)).toContain('BESS Pack - LFP');
     expect(data.roadmapBenchmarks.map(series => series.label)).toContain('Onshore Wind Turbine');
-    expect(data.roadmapBenchmarks.map(series => series.label)).toContain('CN→US Module DDP — Current Policy');
+    expect(data.roadmapBenchmarks.map(series => series.label)).toContain('CN->US Module DDP - Current Policy');
   });
 
   it('roadmap series are positive and have change summaries', () => {

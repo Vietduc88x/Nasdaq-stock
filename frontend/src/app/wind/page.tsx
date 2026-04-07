@@ -5,6 +5,7 @@ import MaterialBreakdownTable from '@/components/MaterialBreakdownTable';
 import StageDetailCards from '@/components/StageDetailCards';
 import WindControls from '@/components/WindControls';
 import CostIndexCard from '@/components/CostIndexCard';
+import SystemHistoryCard from '@/components/SystemHistoryCard';
 
 export const revalidate = 60;
 
@@ -77,6 +78,12 @@ export default async function WindPage({
 
       {/* Controls */}
       <WindControls currentYear={data.params.year} />
+
+      <SystemHistoryCard
+        title="Cost History & Outlook"
+        subtitle="Modeled benchmark history for onshore wind. Future roadmap points are shown as a dashed line."
+        data={data.history}
+      />
 
       <CostIndexCard data={data.idiotIndex} />
 
