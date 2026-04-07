@@ -80,7 +80,10 @@ export interface CostIndexData {
   conversionCost: number;
   multiplier: number | null;
   rawSharePct: number | null;
+  baseLabel?: string;
+  upliftLabel?: string;
   topDriver: { label: string; component?: string; value: number } | null;
+  contributors?: Array<{ label: string; component?: string; value: number }>;
   explanation: string;
 }
 

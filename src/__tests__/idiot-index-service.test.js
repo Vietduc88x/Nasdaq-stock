@@ -19,6 +19,7 @@ describe('idiot-index-service', () => {
     expect(index.finishedCost).toBe(0.179);
     expect(index.conversionCost).toBe(0.149);
     expect(index.topDriver?.label).toBe('Glass');
+    expect(index.contributors?.[0]?.label).toBe('Glass');
   });
 
   it('builds a trade uplift index from EXW to DDP', () => {
@@ -42,6 +43,7 @@ describe('idiot-index-service', () => {
     expect(index.multiplier).toBeGreaterThan(1.5);
     expect(index.topDriver?.label).toBe('Customs Duty');
     expect(index.conversionCost).toBe(0.101);
+    expect(index.contributors?.[0]?.label).toBe('Customs Duty');
   });
 
   it('returns null for trade uplift without a selected route', () => {

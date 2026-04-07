@@ -29,9 +29,23 @@ function buildBaseCostIndex({ title, kind, unit, baseCost, finishedCost, topDriv
     conversionCost: upliftCost,
     multiplier: multiplier ? round2(multiplier) : null,
     rawSharePct: baseShare ? round2(baseShare * 100) : null,
+    baseLabel: kind === 'system' ? 'Raw material basket' : 'Factory-side value',
+    upliftLabel: kind === 'system' ? 'Conversion layer' : 'Trade / delivery layer',
     topDriver,
+    contributors: [],
     explanation,
   };
+}
+
+function buildContributors(materials, getBaseline) {
+  return materials
+    .map(material => ({
+      label: material.name,
+      component: material.component,
+      value: round4(getBaseline(material)),
+    }))
+    .filter(item => Number.isFinite(item.value) && item.value > 0)
+    .sort((a, b) => b.value - a.value);
 }
 
 function buildTopMaterial(materials, getBaseline) {
@@ -74,7 +88,7 @@ function buildTopTradeAdder(selectedRoute) {
 export function buildSystemIdiotIndex({ title = 'Idiot Index', totalCost, unit, materials, baselineKey = 'baselineCost' }) {
   const rawMaterialCost =
     materials.reduce((sum, material) => sum + (Number(material[baselineKey]) || 0), 0)
-  return buildBaseCostIndex({
+  const index = buildBaseCostIndex({
     title,
     kind: 'system',
     unit,
@@ -83,11 +97,13 @@ export function buildSystemIdiotIndex({ title = 'Idiot Index', totalCost, unit, 
     topDriver: buildTopMaterial(materials, material => Number(material[baselineKey]) || 0),
     explanation: 'Finished cost divided by the raw-material basket. Higher values imply more conversion cost, overhead, logistics, or margin layered on top of materials.',
   });
+  index.contributors = buildContributors(materials, material => Number(material[baselineKey]) || 0);
+  return index;
 }
 
 export function buildTradeUpliftIndex(selectedRoute) {
   if (!selectedRoute) return null;
-  return buildBaseCostIndex({
+  const index = buildBaseCostIndex({
     title: 'Trade Uplift Index',
     kind: 'trade',
     unit: '$/Wp',
@@ -96,10 +112,22 @@ export function buildTradeUpliftIndex(selectedRoute) {
     topDriver: buildTopTradeAdder(selectedRoute),
     explanation: 'Delivered landed cost divided by factory EXW cost. Higher values mean tariffs, freight, insurance, and clearance are adding more friction to the route.',
   });
+  index.contributors = [
+    { label: 'Inland Freight', value: round4(selectedRoute.breakdown.inlandFreight) },
+    { label: 'Port Handling', value: round4(selectedRoute.breakdown.portHandling) },
+    { label: 'Ocean Freight', value: round4(selectedRoute.breakdown.oceanFreight) },
+    { label: 'Insurance', value: round4(selectedRoute.breakdown.insurance) },
+    { label: 'Customs Duty', value: round4(selectedRoute.breakdown.customsDuty) },
+    { label: 'Anti-Dumping', value: round4(selectedRoute.breakdown.antiDumping) },
+    { label: 'Countervailing', value: round4(selectedRoute.breakdown.countervailing) },
+    { label: 'Customs Clearance', value: round4(selectedRoute.breakdown.customsClearance) },
+    { label: 'Inland Delivery', value: round4(selectedRoute.breakdown.inlandDelivery) },
+  ].filter(item => item.value > 0).sort((a, b) => b.value - a.value);
+  return index;
 }
 
 export function buildScenarioUpliftIndex({ title = 'Scenario Index', unit, baseCost, finishedCost, topDriver }) {
-  return buildBaseCostIndex({
+  const index = buildBaseCostIndex({
     title,
     kind: 'trade',
     unit,
@@ -108,4 +136,5 @@ export function buildScenarioUpliftIndex({ title = 'Scenario Index', unit, baseC
     topDriver,
     explanation: 'Delivered scenario cost divided by the underlying factory-side scenario value. Higher values mean more trade friction or downstream cost layered on top of the source manufacturing value.',
   });
+  return index;
 }

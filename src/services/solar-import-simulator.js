@@ -210,6 +210,10 @@ export function calculateSolarImportComparison({ dest, source, tech, year, regim
           value: round5(s.totalCostPerWp - (destStages.polysilicon + destStages.wafer + destStages.cell + destStages.module)),
         },
       });
+      s.scenarioIndex.contributors = s.stageBreakdown.map(stage => ({
+        label: stage.stage,
+        value: round5(stage.costPerWp),
+      }));
       continue;
     }
 
@@ -251,6 +255,10 @@ export function calculateSolarImportComparison({ dest, source, tech, year, regim
         value: Math.abs(s.mainDriver === 'Tariff and freight burden' ? tradeBurden : manufacturingDelta),
       },
     });
+    s.scenarioIndex.contributors = s.stageBreakdown.map(stage => ({
+      label: stage.stage,
+      value: round5(stage.costPerWp),
+    }));
   }
 
   // Ranking: find cheapest scenario under this regime
