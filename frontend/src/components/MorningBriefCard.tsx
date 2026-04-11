@@ -19,8 +19,16 @@ export default function MorningBriefCard({ brief }: Props) {
       <div className="card-surface p-4">
         <div className="section-label mb-2">Morning Brief</div>
         <p className="text-[13px]" style={{ color: 'var(--text-muted)' }}>
-          No prior snapshot available yet. Check back tomorrow for material movers and cost impact analysis.
+          No prior snapshot available yet. We publish a daily movers brief once enough live prices are captured.
         </p>
+        <div className="mt-2 text-[11px]" style={{ color: 'var(--text-faint)' }}>
+          Next update: tomorrow morning (local time).
+        </div>
+        <div className="mt-3">
+          <Link href="/history" className="text-[12px] font-medium hover:underline" style={{ color: 'var(--accent-gold)' }}>
+            See recent material history instead
+          </Link>
+        </div>
       </div>
     );
   }

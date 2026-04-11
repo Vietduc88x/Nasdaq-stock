@@ -9,6 +9,7 @@ interface Props {
   totalCost: number;
   costUnit?: string;   // '$/Wp' or '$/kWh'
   totalLabel?: string; // 'module cost' or 'pack cost'
+  summaryNote?: string;
 }
 
 // Helper to get cost from either solar or BESS material impact shape
@@ -20,7 +21,7 @@ function getMaterialShare(m: MaterialImpact, totalCost: number): number {
   return m.shareOfSystemPct ?? ((getMaterialCost(m) / totalCost) * 100);
 }
 
-export default function MaterialBreakdownTable({ materials, totalCost, costUnit = '$/Wp', totalLabel = 'system cost' }: Props) {
+export default function MaterialBreakdownTable({ materials, totalCost, costUnit = '$/Wp', totalLabel = 'system cost', summaryNote }: Props) {
   const isKwh = costUnit === '$/kWh';
   const decimals = isKwh ? 2 : 4;
   const totalMaterialCost = materials.reduce((s, m) => s + getMaterialCost(m), 0);
@@ -37,6 +38,11 @@ export default function MaterialBreakdownTable({ materials, totalCost, costUnit 
           {materialPct}% of {totalLabel}
         </span>
       </div>
+      {summaryNote && (
+        <div className="text-[11px] mb-3" style={{ color: 'var(--text-faint)' }}>
+          {summaryNote}
+        </div>
+      )}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

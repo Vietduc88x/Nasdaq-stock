@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useSession } from '@/hooks/useSession';
 
 const links = [
-  { href: '/', label: 'Materials' },
+  { href: '/', label: 'Dashboard' },
   { href: '/solar', label: 'Solar PV' },
   { href: '/bess', label: 'BESS' },
   { href: '/wind', label: 'Wind' },

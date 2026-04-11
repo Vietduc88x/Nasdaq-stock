@@ -70,6 +70,29 @@ export default async function BessPage({
         data={data.history}
       />
 
+      {/* Mobile key stats */}
+      <div className="card-surface p-3 sm:hidden">
+        <div className="section-label mb-2">Key Stats</div>
+        <div className="grid grid-cols-2 gap-2 text-[11px]" style={{ color: 'var(--text-muted)' }}>
+          <div>
+            <div className="text-[10px]" style={{ color: 'var(--text-faint)' }}>Model</div>
+            <div className="font-mono">{data.model.version}</div>
+          </div>
+          <div>
+            <div className="text-[10px]" style={{ color: 'var(--text-faint)' }}>Live coverage</div>
+            <div>{data.meta.liveCoveragePct}% live</div>
+          </div>
+          <div>
+            <div className="text-[10px]" style={{ color: 'var(--text-faint)' }}>Pack cost</div>
+            <div className="font-price">${data.model.totalCostPerKwh.toFixed(0)}/kWh</div>
+          </div>
+          <div>
+            <div className="text-[10px]" style={{ color: 'var(--text-faint)' }}>Reference</div>
+            <div>{data.meta.referenceCoveragePct}% reference</div>
+          </div>
+        </div>
+      </div>
+
       <CostIndexCard data={data.idiotIndex} />
 
       {/* Freshness + provenance */}
@@ -99,7 +122,8 @@ export default async function BessPage({
         materials={data.materialImpacts}
         totalCost={data.model.totalCostPerKwh}
         costUnit="$/kWh"
-        totalLabel="pack cost"
+        totalLabel="pack cost (tracked materials subset)"
+        summaryNote="Tracked materials shown here are a subset of the full bottom-up basket, so totals may not sum to the base basket."
       />
     </div>
   );

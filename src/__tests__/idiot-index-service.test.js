@@ -23,6 +23,7 @@ describe('idiot-index-service', () => {
     expect(index.topDriver?.label).toBe('Glass');
     expect(index.contributors?.[0]?.label).toBe('Glass');
     expect(index.contributors?.[0]?.formula).toContain('g/Wp');
+    expect(index.title).toBe('Conversion Index');
   });
 
   it('builds a trade uplift index from EXW to DDP', () => {
@@ -68,6 +69,7 @@ describe('idiot-index-service', () => {
     expect(index.contributors?.some(item => item.label === 'Cathode Active Material (LFP)')).toBe(true);
     expect(index.contributors?.some(item => item.label === 'Formation Cycling')).toBe(false);
     expect(index.contributors?.find(item => item.label === 'Cathode Active Material (LFP)')?.formula).toContain('kg/kWh');
+    expect(index.title).toBe('Conversion Index');
   });
 
   it('builds a wind idiot index from bottom-up stage components', () => {
@@ -84,5 +86,6 @@ describe('idiot-index-service', () => {
     expect(index.topDriver?.label).toBe('Tower Steel');
     expect(index.contributors?.some(item => item.label === 'Crane Erection')).toBe(false);
     expect(index.contributors?.find(item => item.label === 'Tower Steel')?.formula).toContain('kg/kW');
+    expect(index.title).toBe('Conversion Index');
   });
 });

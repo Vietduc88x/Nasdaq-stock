@@ -104,7 +104,7 @@ function buildTopTradeAdder(selectedRoute) {
   return entries ? { label: entries.label, value: round4(entries.value) } : null;
 }
 
-export function buildSystemIdiotIndex({ title = 'Idiot Index', totalCost, unit, materials, baselineKey = 'baselineCost' }) {
+export function buildSystemIdiotIndex({ title = 'Conversion Index', totalCost, unit, materials, baselineKey = 'baselineCost' }) {
   const rawMaterialCost =
     materials.reduce((sum, material) => sum + (Number(material[baselineKey]) || 0), 0)
   const index = buildBaseCostIndex({
@@ -121,7 +121,7 @@ export function buildSystemIdiotIndex({ title = 'Idiot Index', totalCost, unit, 
 }
 
 export function buildDetailedSystemIdiotIndex({
-  title = 'Idiot Index',
+  title = 'Conversion Index',
   unit,
   totalCost,
   contributors,
