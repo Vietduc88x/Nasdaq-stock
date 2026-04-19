@@ -20,6 +20,12 @@ export default function MaterialRow({ material: m, index }: Props) {
   const hasChange = m.currentPrice?.change24hPct != null;
   const hasSparkline = m.currentPrice?.sparkline5d && m.currentPrice.sparkline5d.length > 1;
 
+  const sourceLine = m.currentPrice?.fallbackPriceSource;
+  const asOfLine = m.currentPrice?.asOf;
+  const badgeTooltip = [sourceLine, asOfLine ? `As of ${asOfLine}` : null]
+    .filter(Boolean)
+    .join(' — ') || `Coverage: ${tierLabel}`;
+
   return (
     <Link href={`/material/${m.slug}`}>
       <div
@@ -58,7 +64,7 @@ export default function MaterialRow({ material: m, index }: Props) {
 
         {/* Source badge */}
         <div className="text-right">
-          <span className={`tier-badge ${tierClass}`}>{tierLabel}</span>
+          <span className={`tier-badge ${tierClass}`} title={badgeTooltip}>{tierLabel}</span>
         </div>
 
         {/* 5D Sparkline */}

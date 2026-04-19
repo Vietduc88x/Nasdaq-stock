@@ -6,6 +6,7 @@ export interface MaterialPrice {
   coverageTier: string;
   source: string;
   asOf: string | null;
+  fallbackPriceSource?: string | null;
   staleAfterSeconds: number | null;
   fallbackUsed: boolean;
   change24hPct: number | null;
