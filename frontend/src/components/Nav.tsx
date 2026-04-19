@@ -44,6 +44,15 @@ export default function Nav() {
               </Link>
             );
           })}
+          <a
+            href="https://techmadeeasy.info/blog"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            Blog ↗
+          </a>
         </nav>
 
         {/* Right side */}
